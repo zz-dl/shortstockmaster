@@ -230,9 +230,9 @@ let rankJobId = null, rankTimer = null;
 
 async function startRank() {
   const markets = [];
-  if (document.getElementById('mkt-a').checked)  markets.push('A股');
-  if (document.getElementById('mkt-hk').checked) markets.push('港股');
-  if (document.getElementById('mkt-us').checked) markets.push('美股');
+  if (document.getElementById('mkt-a').checked)  markets.push('A');
+  if (document.getElementById('mkt-hk').checked) markets.push('HK');
+  if (document.getElementById('mkt-us').checked) markets.push('US');
   if (!markets.length) { alert('请至少选择一个市场'); return; }
 
   document.getElementById('rankContent').innerHTML = '';

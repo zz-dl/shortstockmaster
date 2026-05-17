@@ -577,8 +577,14 @@ def api_status():
 @app.route("/api/rank", methods=["POST"])
 def api_rank():
     """同步扫描并直接返回结果（无轮询，无跨 worker 状态问题）。"""
-    body = request.get_json(silent=True) or {}
-    markets = body.get("markets", ["A股"])
+    body = request.get_json(silent=True, force=True) or {}
+    raw_markets = body.get("markets", ["A"])
+    # 支持英文代码和中文名
+    mkt_alias = {"A": "A股", "HK": "港股", "US": "美股",
+                 "A股": "A股", "港股": "港股", "美股": "美股"}
+    markets = [mkt_alias.get(m, m) for m in raw_markets if mkt_alias.get(m, m) in _RANK_UNIVERSE]
+    if not markets:
+        markets = ["A股"]
 
     candidates = []
     tencent_codes = []
