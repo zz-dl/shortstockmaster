@@ -572,23 +572,18 @@ def index():
 def api_status():
     return jsonify({"ok": True, "time": datetime.now().isoformat()})
 
-@app.route("/api/debug/tencent")
-def api_debug_tencent():
-    # 完整批次2：港股+美股
-    batch2 = ["hk00700","hk09988","hk03690","hk09618","hk01211","hk00941","hk01810","hk09999","hk00388",
-               "usNVDA","usAAPL","usMSFT","usTSLA","usMETA","usGOOGL","usAMZN","usAMD","usCOIN"]
-    qt = _tencent_quote(batch2)
-    return jsonify({"count": len(qt), "keys": list(qt.keys()),
-                    "sample": {k: {"name": v.get("name"), "price": v.get("price")} for k, v in list(qt.items())[:5]}})
 
-@app.route("/api/debug/rank")
-def api_debug_rank():
-    """直接在当前进程内跑排行逻辑，返回中间数据。"""
-    markets = ["A股", "港股", "美股"]
+
+@app.route("/api/rank/start", methods=["POST"])
+def api_rank_start():
+    """同步运行排行扫描，直接返回结果（不用后台线程）。"""
+    body = request.get_json(silent=True) or {}
+    markets = body.get("markets", ["A股"])
+
     candidates = []
     tencent_codes = []
     for mkt in markets:
-        for code, name in _RANK_UNIVERSE.get(mkt, [])[:3]:
+        for code, name in _RANK_UNIVERSE.get(mkt, []):
             if mkt == "A股":
                 m2 = "A股SH" if code.startswith("6") or code.startswith("9") else "A股SZ"
             else:
@@ -596,33 +591,31 @@ def api_debug_rank():
             candidates.append((code, name, m2))
             clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
             if m2.startswith("A股"):
-                tk = f"{'sh' if m2=='A股SH' else 'sz'}{clean}"
+                tencent_codes.append(f"{'sh' if m2=='A股SH' else 'sz'}{clean}")
             elif m2 == "港股":
-                tk = f"hk{clean.lstrip('0').zfill(5)}"
+                tencent_codes.append(f"hk{clean.lstrip('0').zfill(5)}")
             else:
-                tk = f"us{clean}"
-            tencent_codes.append(tk)
+                tencent_codes.append(f"us{clean}")
 
-    qt = _tencent_quote(tencent_codes)
+    # 分批抓行情（主线程，稳定可靠）
+    all_tencent = {}
+    batch_size = 20
+    for i in range(0, len(tencent_codes), batch_size):
+        batch = tencent_codes[i:i+batch_size]
+        qt = _tencent_quote(batch)
+        all_tencent.update(qt)
+
     results = []
     for code, name, market in candidates:
-        r = _rank_score_quick(code, market, qt)
-        results.append({"code": code, "market": market,
-                         "tk_lookup": tencent_codes[candidates.index((code, name, market))],
-                         "got_data": bool(r), "price": r.get("price", 0) if r else 0,
-                         "score": r.get("score", "N/A") if r else "N/A"})
-    return jsonify({"tencent_keys": list(qt.keys()), "results": results})
+        r = _rank_score_quick(code, market, all_tencent)
+        if r and r.get("price", 0) > 0:
+            results.append(r)
 
+    results.sort(key=lambda x: x["score"], reverse=True)
 
-@app.route("/api/rank/start", methods=["POST"])
-def api_rank_start():
-    body = request.get_json(silent=True) or {}
-    markets = body.get("markets", ["A股"])
     job_id = str(uuid.uuid4())[:8]
-    _rank_jobs[job_id] = {"status": "queued", "progress": 0, "results": [], "total": 0}
-    # 用 daemon=False 确保线程在主进程内正常完成
-    t = threading.Thread(target=_run_rank_job, args=(job_id, markets), daemon=False)
-    t.start()
+    _rank_jobs[job_id] = {"status": "done", "progress": 100,
+                          "results": results[:15], "total": len(candidates)}
     return jsonify({"job_id": job_id})
 
 
