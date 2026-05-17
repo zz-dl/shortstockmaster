@@ -574,9 +574,9 @@ def api_status():
 
 
 
-@app.route("/api/rank/start", methods=["POST"])
-def api_rank_start():
-    """同步运行排行扫描，直接返回结果（不用后台线程）。"""
+@app.route("/api/rank", methods=["POST"])
+def api_rank():
+    """同步扫描并直接返回结果（无轮询，无跨 worker 状态问题）。"""
     body = request.get_json(silent=True) or {}
     markets = body.get("markets", ["A股"])
 
@@ -597,13 +597,9 @@ def api_rank_start():
             else:
                 tencent_codes.append(f"us{clean}")
 
-    # 分批抓行情（主线程，稳定可靠）
     all_tencent = {}
-    batch_size = 20
-    for i in range(0, len(tencent_codes), batch_size):
-        batch = tencent_codes[i:i+batch_size]
-        qt = _tencent_quote(batch)
-        all_tencent.update(qt)
+    for i in range(0, len(tencent_codes), 20):
+        all_tencent.update(_tencent_quote(tencent_codes[i:i+20]))
 
     results = []
     for code, name, market in candidates:
@@ -612,25 +608,18 @@ def api_rank_start():
             results.append(r)
 
     results.sort(key=lambda x: x["score"], reverse=True)
+    return Response(jdump({"status": "done", "total": len(candidates),
+                            "results": results[:15]}), mimetype="application/json")
 
-    job_id = str(uuid.uuid4())[:8]
-    _rank_jobs[job_id] = {"status": "done", "progress": 100,
-                          "results": results[:15], "total": len(candidates)}
-    return jsonify({"job_id": job_id})
 
+# 兼容旧接口
+@app.route("/api/rank/start", methods=["POST"])
+def api_rank_start():
+    return api_rank()
 
 @app.route("/api/rank/status/<job_id>")
 def api_rank_status(job_id):
-    job = _rank_jobs.get(job_id)
-    if not job:
-        return jsonify({"error": "job not found"}), 404
-    return Response(jdump({
-        "status":   job["status"],
-        "progress": job["progress"],
-        "total":    job.get("total", 0),
-        "results":  job.get("results", []),
-        "error":    job.get("error", ""),
-    }), mimetype="application/json")
+    return jsonify({"error": "use /api/rank directly"}), 410
 
 
 

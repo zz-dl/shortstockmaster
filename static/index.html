@@ -237,31 +237,25 @@ async function startRank() {
 
   document.getElementById('rankContent').innerHTML = '';
   document.getElementById('rankProgress').style.display = 'block';
-  document.getElementById('rankProgressText').textContent = '启动扫描…';
-  document.getElementById('rankProgressBar').style.width = '0%';
+  document.getElementById('rankProgressText').textContent = '扫描中，请稍候（约15-30秒）…';
+  document.getElementById('rankProgressBar').style.width = '30%';
 
-  const res = await fetch('/api/rank/start', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({markets})
-  }).then(r=>r.json());
-  rankJobId = res.job_id;
-  if (rankTimer) clearInterval(rankTimer);
-  rankTimer = setInterval(pollRank, 1500);
-}
+  try {
+    const d = await fetch('/api/rank', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({markets})
+    }).then(r=>r.json());
 
-async function pollRank() {
-  if (!rankJobId) return;
-  const d = await fetch(`/api/rank/status/${rankJobId}`).then(r=>r.json());
-  document.getElementById('rankProgressBar').style.width = d.progress + '%';
-  document.getElementById('rankProgressText').textContent =
-    d.status==='done' ? `扫描完成，共${d.results.length}支` :
-    d.status==='error' ? `错误: ${d.error}` :
-    `扫描中 ${d.progress}%…`;
+    document.getElementById('rankProgressBar').style.width = '100%';
+    document.getElementById('rankProgressText').textContent = `扫描完成，共${d.results ? d.results.length : 0}支`;
 
-  if (d.status === 'done' || d.status === 'error') {
-    clearInterval(rankTimer);
-    rankTimer = null;
-    if (d.results && d.results.length > 0) renderRank(d.results);
+    if (d.results && d.results.length > 0) {
+      renderRank(d.results);
+    } else {
+      document.getElementById('rankContent').innerHTML = '<div class="empty">未扫描到数据，请重试</div>';
+    }
+  } catch(e) {
+    document.getElementById('rankProgressText').textContent = `错误: ${e.message}`;
   }
 }
 
