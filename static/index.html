@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>ShortStockMaster</title>
+<link rel="manifest" href="/static/manifest.json">
+<style>
+:root{--bg:#0a0c12;--card:#131720;--border:#1e2535;--text:#e8eaf0;--dim:#5a6070;
+  --buy:#00dd66;--sell:#ff4455;--hold:#ffcc00;--accent:#5b9cff;--purple:#bb86fc}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;
+  font-size:14px;min-height:100vh;padding-bottom:60px}
+.header{background:linear-gradient(135deg,#0d1520,#111827);padding:14px 16px 10px;
+  border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.header h1{font-size:17px;font-weight:700;color:var(--accent);letter-spacing:.5px}
+.header p{font-size:11px;color:var(--dim);margin-top:2px}
+.tabs{display:flex;background:var(--card);border-bottom:1px solid var(--border);
+  position:sticky;top:48px;z-index:99}
+.tab{flex:1;padding:11px 4px;text-align:center;font-size:12px;color:var(--dim);cursor:pointer;
+  border-bottom:2px solid transparent;transition:.2s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-content{display:none;padding:12px}
+.tab-content.active{display:block}
+.card{background:var(--card);border-radius:12px;padding:14px;margin-bottom:10px;
+  border:1px solid var(--border)}
+.card-title{font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text)}
+.row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;
+  border-bottom:1px solid var(--border)}
+.row:last-child{border-bottom:none}
+.label{color:var(--dim);font-size:12px}
+.value{font-size:12px;font-weight:600}
+.up{color:var(--buy)}.dn{color:var(--sell)}.neutral{color:var(--hold)}
+.gauge-wrap{text-align:center;padding:10px 0}
+.gauge-score{font-size:52px;font-weight:800;line-height:1}
+.gauge-label{font-size:16px;font-weight:600;margin-top:6px}
+.gauge-bar{height:8px;border-radius:4px;background:var(--border);margin:12px 0 4px;overflow:hidden}
+.gauge-fill{height:100%;border-radius:4px;transition:width .5s}
+.index-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.index-item{background:#0f1520;border-radius:8px;padding:10px;text-align:center}
+.index-name{font-size:11px;color:var(--dim);margin-bottom:4px}
+.index-price{font-size:15px;font-weight:700}
+.index-chg{font-size:12px;margin-top:2px}
+.search-row{display:flex;gap:8px;margin-bottom:10px}
+.search-input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:10px 14px;color:var(--text);font-size:14px;outline:none}
+.search-input:focus{border-color:var(--accent)}
+.btn{padding:10px 18px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;
+  background:var(--accent);color:#000}
+.btn:active{opacity:.7}
+.btn-outline{background:transparent;border:1px solid var(--accent);color:var(--accent)}
+.score-big{font-size:42px;font-weight:800;text-align:center;padding:8px 0}
+.rec-pill{display:inline-block;padding:4px 14px;border-radius:20px;font-size:13px;font-weight:700;
+  background:rgba(0,0,0,.4);border:1px solid currentColor;margin-left:8px}
+.signal-item{padding:8px 0;border-bottom:1px solid var(--border)}
+.signal-item:last-child{border-bottom:none}
+.signal-name{font-size:12px;font-weight:700;margin-bottom:3px}
+.signal-detail{font-size:11px;color:var(--dim);line-height:1.4}
+.news-item{padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.news-item:last-child{border-bottom:none}
+.news-title{font-size:12px;line-height:1.5;margin-bottom:3px}
+.news-date{font-size:10px;color:var(--dim)}
+.cf-bar{display:flex;align-items:center;gap:8px;padding:4px 0}
+.cf-label{font-size:11px;color:var(--dim);width:50px}
+.cf-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.cf-fill{height:100%;border-radius:3px;transition:width .4s}
+.cf-val{font-size:11px;width:55px;text-align:right}
+.sector-card{background:var(--card);border-radius:10px;padding:12px;margin-bottom:8px;
+  border:1px solid var(--border)}
+.sector-name{font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)}
+.ai-box{background:#0d1220;border:1px solid var(--purple);border-radius:10px;padding:12px;margin-top:8px}
+.ai-box-title{font-size:11px;color:var(--purple);font-weight:700;margin-bottom:6px}
+.ai-text{font-size:12px;line-height:1.7;white-space:pre-wrap}
+.loading{text-align:center;padding:30px;color:var(--dim);font-size:13px}
+.empty{text-align:center;padding:20px;color:var(--dim);font-size:12px}
+.chip{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;margin-left:6px}
+.chip-buy{background:rgba(0,221,102,.15);color:var(--buy);border:1px solid rgba(0,221,102,.3)}
+.chip-sell{background:rgba(255,68,85,.15);color:var(--sell);border:1px solid rgba(255,68,85,.3)}
+.chip-hold{background:rgba(255,204,0,.12);color:var(--hold);border:1px solid rgba(255,204,0,.3)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>⚡ ShortStockMaster</h1>
+  <p>短线交易信号 · 资金流向 · 市场情绪</p>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('sentiment')">📊 情绪</div>
+  <div class="tab" onclick="switchTab('stock')">🔍 个股</div>
+  <div class="tab" onclick="switchTab('sectors')">🔄 板块</div>
+  <div class="tab" onclick="switchTab('news')">📰 消息</div>
+</div>
+
+<!-- Tab 1: 市场情绪 -->
+<div class="tab-content active" id="tab-sentiment">
+  <div id="sentimentContent"><div class="loading">⏳ 加载市场情绪中…</div></div>
+</div>
+
+<!-- Tab 2: 个股短线 -->
+<div class="tab-content" id="tab-stock">
+  <div class="search-row">
+    <input id="stockCode" class="search-input" type="text" placeholder="输入代码：600031 / 002415"
+      autocapitalize="characters" autocomplete="off"
+      onkeydown="if(event.key==='Enter')analyzeStock()">
+    <button class="btn" onclick="analyzeStock()">分析</button>
+  </div>
+  <div id="stockContent"><div class="empty">输入股票代码，获取短线信号</div></div>
+</div>
+
+<!-- Tab 3: 板块轮动 -->
+<div class="tab-content" id="tab-sectors">
+  <div id="sectorsContent"><div class="loading">⏳ 加载板块数据…</div></div>
+</div>
+
+<!-- Tab 4: 消息雷达 -->
+<div class="tab-content" id="tab-news">
+  <div id="newsContent"><div class="loading">⏳ 加载消息…</div></div>
+</div>
+
+<!-- AI 分析底部弹窗 -->
+<div id="aiModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200"
+  onclick="if(event.target===this)closeAI()">
+  <div style="position:absolute;bottom:0;left:0;right:0;background:#0f1520;border-radius:18px 18px 0 0;
+    padding:16px;max-height:80vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-size:14px;font-weight:700;color:var(--purple)" id="aiModalTitle">🤖 AI 短线分析</span>
+      <button onclick="closeAI()" style="background:none;border:none;color:var(--dim);font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div id="aiModalStatus" style="font-size:11px;color:var(--dim);margin-bottom:8px"></div>
+    <div id="aiModalBody" style="font-size:13px;line-height:1.7;white-space:pre-wrap"></div>
+  </div>
+</div>
+
+<script>
+// ── 工具函数 ──────────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['sentiment','stock','sectors','news'][i]===name));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if (name==='sentiment' && !sentimentLoaded) loadSentiment();
+  if (name==='sectors'   && !sectorsLoaded)  loadSectors();
+  if (name==='news'      && !newsLoaded)     loadNews();
+}
+
+let sentimentLoaded=false, sectorsLoaded=false, newsLoaded=false;
+
+function chgColor(v){return v>0?'var(--buy)':v<0?'var(--sell)':'var(--dim)'}
+function chgClass(v){return v>0?'up':v<0?'dn':'neutral'}
+function fmtChg(v){return (v>0?'+':'')+v.toFixed(2)+'%'}
+function fmtNet(v){return (v>0?'+':'')+v.toFixed(2)+'亿'}
+
+// ── 市场情绪 ─────────────────────────────────────────────────────────────────
+async function loadSentiment() {
+  sentimentLoaded = true;
+  try {
+    const d = await fetch('/api/market').then(r=>r.json());
+    const s = d.sentiment;
+    const pct = s.score;
+
+    let html = `
+    <div class="card">
+      <div class="card-title">市场情绪指数</div>
+      <div class="gauge-wrap">
+        <div class="gauge-score" style="color:${s.color}">${pct}</div>
+        <div class="gauge-label" style="color:${s.color}">${s.label}</div>
+        <div class="gauge-bar"><div class="gauge-fill" style="width:${pct}%;background:${s.color}"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--dim)">
+          <span>极度恐慌 0</span><span>中性 50</span><span>100 极度贪婪</span>
+        </div>
+      </div>
+      <div style="margin-top:10px">`;
+    for (const d_ of s.details) {
+      html += `<div class="row"><span class="label">${d_.label}</span>
+               <span class="value">${d_.value}</span></div>`;
+    }
+    html += `</div></div>`;
+
+    // 指数行情
+    html += `<div class="card"><div class="card-title">主要指数</div><div class="index-grid">`;
+    for (const idx of d.indices) {
+      const c = chgColor(idx.chg_pct);
+      html += `<div class="index-item">
+        <div class="index-name">${idx.name}</div>
+        <div class="index-price" style="color:${c}">${idx.price.toFixed(2)}</div>
+        <div class="index-chg" style="color:${c}">${fmtChg(idx.chg_pct)}</div>
+      </div>`;
+    }
+    html += `</div></div>`;
+
+    document.getElementById('sentimentContent').innerHTML = html;
+  } catch(e) {
+    document.getElementById('sentimentContent').innerHTML = `<div class="empty">❌ 加载失败: ${e.message}</div>`;
+  }
+}
+
+// ── 个股短线信号 ──────────────────────────────────────────────────────────────
+async function analyzeStock() {
+  const code = document.getElementById('stockCode').value.trim().toUpperCase();
+  if (!code) { alert('请输入股票代码'); return; }
+  document.getElementById('stockContent').innerHTML = '<div class="loading">⏳ 分析中（约10-20秒）…</div>';
+  try {
+    const d = await fetch(`/api/stock?code=${encodeURIComponent(code)}`).then(r=>r.json());
+    if (d.error) throw new Error(d.error);
+
+    const scoreColor = d.rec_color || 'var(--hold)';
+    const chipClass = d.score>=15?'chip-buy':d.score<=-15?'chip-sell':'chip-hold';
+
+    let html = `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-size:16px;font-weight:700">${d.name}</div>
+          <div style="font-size:11px;color:var(--dim);margin-top:2px">${d.code}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:18px;font-weight:700;color:${chgColor(d.chg_pct)}">${d.price.toFixed(2)}</div>
+          <div style="font-size:12px;color:${chgColor(d.chg_pct)}">${fmtChg(d.chg_pct)}</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--dim)">量比 <b style="color:var(--text)">${d.vol_ratio.toFixed(1)}</b></span>
+        <span style="font-size:11px;color:var(--dim)">换手 <b style="color:var(--text)">${d.turnover.toFixed(2)}%</b></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">短线综合评分</div>
+      <div style="text-align:center">
+        <div class="score-big" style="color:${scoreColor}">${d.score>0?'+':''}${d.score}</div>
+        <div style="font-size:14px;color:${scoreColor};font-weight:700">${d.rec}</div>
+      </div>
+    </div>`;
+
+    // 主力资金流向图
+    if (d.capital_flow && d.capital_flow.length > 0) {
+      html += `<div class="card"><div class="card-title">主力资金净流入（亿元）</div>`;
+      const maxAbs = Math.max(...d.capital_flow.map(x=>Math.abs(x.main_net)), 0.1);
+      for (const cf of d.capital_flow) {
+        const pct = Math.min(Math.abs(cf.main_net) / maxAbs * 100, 100);
+        const c = cf.main_net >= 0 ? 'var(--buy)' : 'var(--sell)';
+        html += `<div class="cf-bar">
+          <span class="cf-label">${cf.date.slice(5)}</span>
+          <div class="cf-track"><div class="cf-fill" style="width:${pct}%;background:${c}"></div></div>
+          <span class="cf-val" style="color:${c}">${fmtNet(cf.main_net)}</span>
+        </div>`;
+      }
+      html += `</div>`;
+    }
+
+    // 信号详情
+    html += `<div class="card"><div class="card-title">信号详情</div>`;
+    for (const sig of d.signals) {
+      const rc = {积极:'var(--buy)',消极:'var(--sell)',极强:'#ff8800',中性:'var(--dim)'}[sig.rating]||'var(--dim)';
+      html += `<div class="signal-item">
+        <div class="signal-name">▸ ${sig.name} <span style="font-size:10px;color:${rc}">${sig.rating}</span></div>
+        <div class="signal-detail">${sig.detail}</div>
+      </div>`;
+    }
+    html += `</div>`;
+
+    // AI 分析
+    if (d.ai_analysis) {
+      html += `<div class="ai-box">
+        <div class="ai-box-title">🤖 AI 短线研判</div>
+        <div class="ai-text">${d.ai_analysis}</div>
+      </div>`;
+    }
+
+    // 近期新闻
+    if (d.news && d.news.length > 0) {
+      html += `<div class="card"><div class="card-title">近期板块新闻</div>`;
+      for (const n of d.news) {
+        html += `<div class="news-item">
+          <div class="news-title">${n.title}</div>
+          <div class="news-date">${n.date}</div>
+        </div>`;
+      }
+      html += `</div>`;
+    }
+
+    document.getElementById('stockContent').innerHTML = html;
+  } catch(e) {
+    document.getElementById('stockContent').innerHTML = `<div class="empty">❌ ${e.message}</div>`;
+  }
+}
+
+// ── 板块轮动 ─────────────────────────────────────────────────────────────────
+async function loadSectors() {
+  sectorsLoaded = true;
+  document.getElementById('sectorsContent').innerHTML = '<div class="loading">⏳ 加载板块数据…</div>';
+  try {
+    const d = await fetch('/api/sectors').then(r=>r.json());
+    if (!d.sectors || d.sectors.length === 0) {
+      document.getElementById('sectorsContent').innerHTML = '<div class="empty">暂无板块数据</div>';
+      return;
+    }
+    let html = '';
+    for (const s of d.sectors) {
+      html += `<div class="sector-card">
+        <div class="sector-name">📌 ${s.sector}</div>`;
+      for (const n of s.news.slice(0, 3)) {
+        html += `<div class="news-item">
+          <div class="news-title">${n.title}</div>
+          <div class="news-date">${n.date}</div>
+        </div>`;
+      }
+      html += `</div>`;
+    }
+    document.getElementById('sectorsContent').innerHTML = html;
+  } catch(e) {
+    document.getElementById('sectorsContent').innerHTML = `<div class="empty">❌ ${e.message}</div>`;
+  }
+}
+
+// ── 消息雷达 ─────────────────────────────────────────────────────────────────
+async function loadNews() {
+  newsLoaded = true;
+  document.getElementById('newsContent').innerHTML = '<div class="loading">⏳ 加载消息…</div>';
+  try {
+    const d = await fetch('/api/news').then(r=>r.json());
+    if (!d.news || d.news.length === 0) {
+      document.getElementById('newsContent').innerHTML = '<div class="empty">暂无近期消息</div>';
+      return;
+    }
+    let html = '<div class="card"><div class="card-title">📡 近3日市场消息</div>';
+    for (const n of d.news) {
+      html += `<div class="news-item" ${n.url?`onclick="window.open('${n.url}','_blank')"`:''}>
+        <div class="news-title">${n.title}</div>
+        <div class="news-date">${n.date}</div>
+      </div>`;
+    }
+    html += `</div>`;
+    document.getElementById('newsContent').innerHTML = html;
+  } catch(e) {
+    document.getElementById('newsContent').innerHTML = `<div class="empty">❌ ${e.message}</div>`;
+  }
+}
+
+function closeAI() { document.getElementById('aiModal').style.display = 'none'; }
+
+// 启动时加载情绪面板
+loadSentiment();
+</script>
+</body>
+</html>

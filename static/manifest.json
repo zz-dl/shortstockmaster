@@ -1,0 +1,9 @@
+{
+  "name": "ShortStockMaster",
+  "short_name": "短线",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0c12",
+  "theme_color": "#0a0c12",
+  "icons": []
+}
