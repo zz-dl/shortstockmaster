@@ -571,6 +571,13 @@ def index():
 def api_status():
     return jsonify({"ok": True, "time": datetime.now().isoformat()})
 
+@app.route("/api/debug/tencent")
+def api_debug_tencent():
+    codes = ["sz002415", "hk00700", "usNVDA"]
+    qt = _tencent_quote(codes)
+    return jsonify({"count": len(qt), "keys": list(qt.keys()),
+                    "sample": {k: {"name": v.get("name"), "price": v.get("price")} for k, v in qt.items()}})
+
 
 @app.route("/api/rank/start", methods=["POST"])
 def api_rank_start():
