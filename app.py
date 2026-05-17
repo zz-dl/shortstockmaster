@@ -574,10 +574,12 @@ def api_status():
 
 @app.route("/api/debug/tencent")
 def api_debug_tencent():
-    codes = ["sz002415", "hk00700", "usNVDA"]
-    qt = _tencent_quote(codes)
+    # 完整批次2：港股+美股
+    batch2 = ["hk00700","hk09988","hk03690","hk09618","hk01211","hk00941","hk01810","hk09999","hk00388",
+               "usNVDA","usAAPL","usMSFT","usTSLA","usMETA","usGOOGL","usAMZN","usAMD","usCOIN"]
+    qt = _tencent_quote(batch2)
     return jsonify({"count": len(qt), "keys": list(qt.keys()),
-                    "sample": {k: {"name": v.get("name"), "price": v.get("price")} for k, v in qt.items()}})
+                    "sample": {k: {"name": v.get("name"), "price": v.get("price")} for k, v in list(qt.items())[:5]}})
 
 @app.route("/api/debug/rank")
 def api_debug_rank():
