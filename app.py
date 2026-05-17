@@ -543,6 +543,7 @@ def _run_rank_job(job_id: str, markets: list):
             job["progress"] = int((i + batch_size) / total * 60)
 
         # 评分
+        job["tencent_count"] = len(all_tencent)  # 调试用
         results = []
         for idx, (code, name, market) in enumerate(candidates):
             r = _rank_score_quick(code, market, all_tencent)
@@ -617,7 +618,9 @@ def api_rank_start():
     markets = body.get("markets", ["A股"])
     job_id = str(uuid.uuid4())[:8]
     _rank_jobs[job_id] = {"status": "queued", "progress": 0, "results": [], "total": 0}
-    threading.Thread(target=_run_rank_job, args=(job_id, markets), daemon=True).start()
+    # 用 daemon=False 确保线程在主进程内正常完成
+    t = threading.Thread(target=_run_rank_job, args=(job_id, markets), daemon=False)
+    t.start()
     return jsonify({"job_id": job_id})
 
 
