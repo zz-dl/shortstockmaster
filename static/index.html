@@ -47,6 +47,16 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .search-input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;
   padding:10px 14px;color:var(--text);font-size:14px;outline:none}
 .search-input:focus{border-color:var(--accent)}
+.hist-wrap{position:relative;flex:1}
+.hist-drop{position:absolute;top:100%;left:0;right:0;background:#131d2e;border:1px solid var(--border);
+  border-radius:10px;z-index:50;margin-top:4px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.hist-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;
+  cursor:pointer;border-bottom:1px solid var(--border);gap:8px}
+.hist-item:last-child{border-bottom:none}
+.hist-item:active{background:var(--border)}
+.hist-code{font-size:13px;font-weight:700;color:var(--accent)}
+.hist-name{font-size:12px;color:var(--dim);flex:1;text-align:right}
+.hist-del{font-size:14px;color:var(--dim);padding:0 4px}
 .btn{padding:10px 18px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;
   background:var(--accent);color:#000}
 .btn:active{opacity:.7}
@@ -103,9 +113,13 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 <!-- Tab 2: 个股短线 -->
 <div class="tab-content" id="tab-stock">
   <div class="search-row">
-    <input id="stockCode" class="search-input" type="text" placeholder="输入代码：600031 / 002415"
-      autocapitalize="characters" autocomplete="off"
-      onkeydown="if(event.key==='Enter')analyzeStock()">
+    <div class="hist-wrap">
+      <input id="stockCode" class="search-input" type="text" placeholder="输入代码：600031 / 002415"
+        autocapitalize="characters" autocomplete="off"
+        onkeydown="if(event.key==='Enter'){hideHist();analyzeStock()}"
+        onfocus="showHist()" onblur="setTimeout(hideHist,200)">
+      <div id="histDrop" class="hist-drop" style="display:none"></div>
+    </div>
     <button class="btn" onclick="analyzeStock()">分析</button>
   </div>
   <div id="stockContent"><div class="empty">输入股票代码，获取短线信号</div></div>
@@ -197,6 +211,46 @@ async function loadSentiment() {
   }
 }
 
+// ── 搜索历史 ─────────────────────────────────────────────────────────────────
+const HIST_KEY = 'ssm_hist';
+const HIST_MAX = 10;
+
+function histLoad() {
+  try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); } catch { return []; }
+}
+function histSave(code, name) {
+  let h = histLoad().filter(x => x.code !== code);
+  h.unshift({ code, name: name || code });
+  if (h.length > HIST_MAX) h = h.slice(0, HIST_MAX);
+  localStorage.setItem(HIST_KEY, JSON.stringify(h));
+}
+function histDel(code, e) {
+  e.stopPropagation();
+  let h = histLoad().filter(x => x.code !== code);
+  localStorage.setItem(HIST_KEY, JSON.stringify(h));
+  showHist();
+}
+function showHist() {
+  const h = histLoad();
+  const drop = document.getElementById('histDrop');
+  if (!h.length) { drop.style.display = 'none'; return; }
+  drop.innerHTML = h.map(x => `
+    <div class="hist-item" onclick="pickHist('${x.code}')">
+      <span class="hist-code">${x.code}</span>
+      <span class="hist-name">${x.name}</span>
+      <span class="hist-del" onclick="histDel('${x.code}',event)">✕</span>
+    </div>`).join('');
+  drop.style.display = 'block';
+}
+function hideHist() {
+  document.getElementById('histDrop').style.display = 'none';
+}
+function pickHist(code) {
+  document.getElementById('stockCode').value = code;
+  hideHist();
+  analyzeStock();
+}
+
 // ── 个股短线信号 ──────────────────────────────────────────────────────────────
 async function analyzeStock() {
   const code = document.getElementById('stockCode').value.trim().toUpperCase();
@@ -205,6 +259,7 @@ async function analyzeStock() {
   try {
     const d = await fetch(`/api/stock?code=${encodeURIComponent(code)}`).then(r=>r.json());
     if (d.error) throw new Error(d.error);
+    histSave(d.code || code, d.name || code);
 
     const scoreColor = d.rec_color || 'var(--hold)';
     const chipClass = d.score>=15?'chip-buy':d.score<=-15?'chip-sell':'chip-hold';
