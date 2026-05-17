@@ -715,17 +715,27 @@ def api_news():
 # ── 模拟交易 ─────────────────────────────────────────────────────────────────
 
 _TRADE_FILE = os.path.join(os.path.dirname(__file__), "trade.json")
+_TRADE_MEM: list = []   # 内存主存储，重启后从文件恢复
 
 def _load_trades() -> list:
+    global _TRADE_MEM
+    if _TRADE_MEM:
+        return _TRADE_MEM
     try:
         with open(_TRADE_FILE, encoding="utf-8") as f:
-            return json.load(f)
+            _TRADE_MEM = json.load(f)
     except Exception:
-        return []
+        _TRADE_MEM = []
+    return _TRADE_MEM
 
 def _save_trades(data: list):
-    with open(_TRADE_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    global _TRADE_MEM
+    _TRADE_MEM = data
+    try:
+        with open(_TRADE_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass  # 文件写入失败时内存仍有效
 
 
 @app.route("/api/trade/portfolio", methods=["GET"])
