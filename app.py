@@ -420,23 +420,6 @@ def index():
 def api_status():
     return jsonify({"ok": True, "time": datetime.now().isoformat()})
 
-@app.route("/api/debug/cf")
-def api_debug_cf():
-    """调试：直接测试资金流计算。"""
-    code = request.args.get("code", "002415")
-    mkt  = request.args.get("mkt", "SZ")
-    try:
-        yf_code = code if "." in code else (
-            code + ".SS" if mkt == "SH" else code + ".SZ"
-        )
-        df = yf.Ticker(yf_code).history(period="10d", auto_adjust=True)
-        rows = len(df) if df is not None else -1
-        cols = list(df.columns) if df is not None and not df.empty else []
-        sample = str(df.tail(3)) if df is not None and not df.empty else "empty"
-        return jsonify({"yf_code": yf_code, "rows": rows, "cols": cols, "sample": sample,
-                        "cf": _capital_flow(code, mkt)})
-    except Exception as e:
-        return jsonify({"error": str(e), "type": type(e).__name__})
 
 
 @app.route("/api/market")

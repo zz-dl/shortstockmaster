@@ -1,0 +1,15 @@
+name: Deploy to Render
+on:
+  push:
+    branches: [master]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render Deploy
+        run: |
+          curl -s -X POST \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            "https://api.render.com/v1/services/srv-d84rbcmk1jcs73akj0qg/deploys" \
+            -d '{"clearCache":"do_not_clear"}'
