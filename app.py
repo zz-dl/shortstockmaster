@@ -77,32 +77,7 @@ def _capital_flow(code: str, market: str, days: int = 5) -> list:
     mkt = mkt_map.get(market.upper(), "0")
     clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
 
-    # 方法1: push2his（本地可用，Render 可能被拦）
-    try:
-        r = _req.get(
-            "http://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get",
-            params={"secid": f"{mkt}.{clean}", "lmt": days, "klt": 101,
-                    "fields1": "f1,f2,f3,f7", "fields2": "f51,f52,f53,f54,f55,f56,f57,f58"},
-            headers=_HEADERS, timeout=5,
-        )
-        klines = r.json().get("data", {}).get("klines", []) or []
-        if klines:
-            result = []
-            for kl in klines:
-                p = kl.split(",")
-                if len(p) < 7:
-                    continue
-                result.append({
-                    "date": p[0], "super_net": float(p[1]) / 1e8,
-                    "large_net": float(p[2]) / 1e8, "mid_net": float(p[3]) / 1e8,
-                    "small_net": float(p[4]) / 1e8, "main_net": float(p[5]) / 1e8,
-                    "main_pct": float(p[6]),
-                })
-            return result
-    except Exception:
-        pass
-
-    # 方法2: yfinance 量价估算（备用，云端使用）
+    # yfinance 量价估算（兼容本地和云端）
     try:
         yf_code = code if "." in code else (
             code + ".SS" if market == "SH" else
