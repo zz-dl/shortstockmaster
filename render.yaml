@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: shortstockmaster
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --workers 2 --timeout 120
+    envVars:
+      - key: DEEPSEEK_API_KEY
+        value: sk-20cfd605d2a64ff5ab379a97c9c77365
+      - key: PYTHON_VERSION
+        value: 3.11.0
