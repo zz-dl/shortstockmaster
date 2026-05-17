@@ -578,6 +578,38 @@ def api_debug_tencent():
     return jsonify({"count": len(qt), "keys": list(qt.keys()),
                     "sample": {k: {"name": v.get("name"), "price": v.get("price")} for k, v in qt.items()}})
 
+@app.route("/api/debug/rank")
+def api_debug_rank():
+    """直接在当前进程内跑排行逻辑，返回中间数据。"""
+    markets = ["A股", "港股", "美股"]
+    candidates = []
+    tencent_codes = []
+    for mkt in markets:
+        for code, name in _RANK_UNIVERSE.get(mkt, [])[:3]:
+            if mkt == "A股":
+                m2 = "A股SH" if code.startswith("6") or code.startswith("9") else "A股SZ"
+            else:
+                m2 = mkt
+            candidates.append((code, name, m2))
+            clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
+            if m2.startswith("A股"):
+                tk = f"{'sh' if m2=='A股SH' else 'sz'}{clean}"
+            elif m2 == "港股":
+                tk = f"hk{clean.lstrip('0').zfill(5)}"
+            else:
+                tk = f"us{clean}"
+            tencent_codes.append(tk)
+
+    qt = _tencent_quote(tencent_codes)
+    results = []
+    for code, name, market in candidates:
+        r = _rank_score_quick(code, market, qt)
+        results.append({"code": code, "market": market,
+                         "tk_lookup": tencent_codes[candidates.index((code, name, market))],
+                         "got_data": bool(r), "price": r.get("price", 0) if r else 0,
+                         "score": r.get("score", "N/A") if r else "N/A"})
+    return jsonify({"tencent_keys": list(qt.keys()), "results": results})
+
 
 @app.route("/api/rank/start", methods=["POST"])
 def api_rank_start():
