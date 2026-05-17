@@ -32,6 +32,12 @@ def jdump(obj):
 
 def _tencent_quote(codes: list) -> dict:
     """从腾讯行情获取实时数据，返回 {code: {...}} 字典。"""
+    def safe_float(s):
+        try:
+            return float(s) if s and s.strip() else 0
+        except (ValueError, TypeError):
+            return 0
+
     query = ",".join(codes)
     try:
         r = _req.get(f"http://qt.gtimg.cn/q={query}", headers=_HEADERS, timeout=6)
@@ -44,21 +50,21 @@ def _tencent_quote(codes: list) -> dict:
                 continue
             code_key = m.group(1)
             parts = m.group(2).split("~")
-            if len(parts) < 50:
+            if len(parts) < 40:
                 continue
             result[code_key] = {
-                "name":     parts[1],
-                "code":     parts[2],
-                "price":    float(parts[3]) if parts[3] else 0,
-                "prev_close": float(parts[4]) if parts[4] else 0,
-                "open":     float(parts[5]) if parts[5] else 0,
-                "volume":   float(parts[36]) if parts[36] else 0,  # 手
-                "amount":   float(parts[37]) if parts[37] else 0,  # 万元
-                "chg_pct":  float(parts[32]) if parts[32] else 0,
-                "turnover": float(parts[38]) if parts[38] else 0,  # 换手率%
-                "vol_ratio": float(parts[49]) if parts[49] else 0, # 量比
-                "pe":       float(parts[52]) if parts[52] else 0,
-                "pb":       float(parts[46]) if parts[46] else 0,
+                "name":      parts[1],
+                "code":      parts[2],
+                "price":     safe_float(parts[3]),
+                "prev_close": safe_float(parts[4]),
+                "open":      safe_float(parts[5]),
+                "volume":    safe_float(parts[36]),
+                "amount":    safe_float(parts[37]),
+                "chg_pct":   safe_float(parts[32]),
+                "turnover":  safe_float(parts[38]),
+                "vol_ratio": safe_float(parts[49]) if len(parts) > 49 and safe_float(parts[49]) < 30 else 1.0,
+                "pe":        safe_float(parts[52]) if len(parts) > 52 else 0,
+                "pb":        safe_float(parts[46]) if len(parts) > 46 else 0,
             }
         return result
     except Exception:
