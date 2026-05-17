@@ -1,6 +1,6 @@
 # app.py — ShortStockMaster Flask backend
 # Short-term trading signals: sentiment, capital flow, momentum, news, AI
-import json, os, re
+import json, os, re, threading, uuid
 from datetime import date, datetime, timedelta
 import numpy as np
 import pandas as pd
@@ -410,6 +410,151 @@ def _ai_short_analyze(code: str, name: str, data: dict, news: list) -> str:
     return ""
 
 
+# ── 推荐排行榜 ───────────────────────────────────────────────────────────────
+
+# 股票候选池：A股/港股/美股热门标的
+_RANK_UNIVERSE = {
+    "A股": [
+        ("600519", "贵州茅台"), ("300750", "宁德时代"), ("000858", "五粮液"),
+        ("601318", "中国平安"), ("600036", "招商银行"), ("000333", "美的集团"),
+        ("002594", "比亚迪"), ("601166", "兴业银行"), ("600276", "恒瑞医药"),
+        ("000725", "京东方A"), ("002415", "海康威视"), ("600031", "三一重工"),
+        ("603259", "药明康德"), ("601899", "紫金矿业"), ("600900", "长江电力"),
+        ("000001", "平安银行"), ("601668", "中国建筑"), ("600887", "伊利股份"),
+        ("002714", "牧原股份"), ("300760", "迈瑞医疗"),
+    ],
+    "港股": [
+        ("0700.HK", "腾讯控股"), ("9988.HK", "阿里巴巴"), ("3690.HK", "美团"),
+        ("9618.HK", "京东集团"), ("1211.HK", "比亚迪H"), ("0941.HK", "中国移动"),
+        ("1810.HK", "小米集团"), ("9999.HK", "网易"), ("0388.HK", "港交所"),
+    ],
+    "美股": [
+        ("NVDA", "英伟达"), ("AAPL", "苹果"), ("MSFT", "微软"),
+        ("TSLA", "特斯拉"), ("META", "Meta"), ("GOOGL", "谷歌"),
+        ("AMZN", "亚马逊"), ("AMD", "AMD"), ("COIN", "Coinbase"),
+    ],
+}
+
+# 后台任务存储
+_rank_jobs: dict = {}
+
+
+def _rank_score_quick(code: str, market: str, tencent_data: dict) -> dict:
+    """用已抓取的腾讯数据快速计算短线评分（无额外网络请求）。"""
+    mkt_code = {"A股SH": "sh", "A股SZ": "sz", "港股": "hk", "美股": "us"}.get(market, "sz")
+    clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
+
+    # 腾讯行情 key 格式
+    if market.startswith("A股"):
+        tk = f"{'sh' if market=='A股SH' else 'sz'}{clean}"
+    elif market == "港股":
+        tk = f"hk{clean.replace('.HK','').lstrip('0').zfill(5)}"
+    else:
+        tk = f"us{clean}"
+
+    q = tencent_data.get(tk, {})
+    if not q:
+        return {}
+
+    name     = q.get("name", code)
+    price    = q.get("price", 0)
+    chg_pct  = q.get("chg_pct", 0)
+    vol_ratio = q.get("vol_ratio", 1.0)
+    turnover = q.get("turnover", 0)
+
+    score = 0
+
+    # 量比信号
+    if vol_ratio >= 3.0:   score += 25
+    elif vol_ratio >= 1.5: score += 12
+    elif vol_ratio < 0.5:  score -= 10
+
+    # 当日涨幅
+    if chg_pct >= 5:    score += 20
+    elif chg_pct >= 2:  score += 10
+    elif chg_pct <= -5: score -= 20
+    elif chg_pct <= -2: score -= 10
+
+    # 换手率异动（换手率>3%是活跃信号）
+    if turnover >= 5:   score += 10
+    elif turnover >= 3: score += 5
+
+    score = max(-100, min(100, score))
+
+    if score >= 30:    rec, rc = "短线做多", "#00cc55"
+    elif score >= 10:  rec, rc = "偏多观望", "#55ee99"
+    elif score >= -10: rec, rc = "中性",     "#ffcc00"
+    elif score >= -30: rec, rc = "偏空观望", "#ff9944"
+    else:              rec, rc = "短线做空", "#ff4444"
+
+    return {
+        "code": code, "name": name, "market": market.replace("A股SH","A股").replace("A股SZ","A股"),
+        "price": price, "chg_pct": chg_pct, "vol_ratio": vol_ratio,
+        "turnover": turnover, "score": score, "rec": rec, "rec_color": rc,
+    }
+
+
+def _run_rank_job(job_id: str, markets: list):
+    """后台线程：批量抓取行情并评分排名。"""
+    job = _rank_jobs[job_id]
+    job["status"] = "running"
+    job["progress"] = 0
+
+    try:
+        # 收集候选股
+        candidates = []
+        for mkt in markets:
+            stocks = _RANK_UNIVERSE.get(mkt, [])
+            for code, name in stocks:
+                if mkt == "A股":
+                    m2 = "A股SH" if code.startswith("6") or code.startswith("9") else "A股SZ"
+                else:
+                    m2 = mkt
+                candidates.append((code, name, m2))
+
+        total = len(candidates)
+        job["total"] = total
+
+        # 分批用腾讯 API 抓行情（每批 20 只）
+        all_tencent = {}
+        batch_size = 20
+        tencent_codes = []
+        for code, _, market in candidates:
+            clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
+            if market == "A股SH":
+                tencent_codes.append(f"sh{clean}")
+            elif market == "A股SZ":
+                tencent_codes.append(f"sz{clean}")
+            elif market == "港股":
+                tencent_codes.append(f"hk{clean.replace('.HK','').lstrip('0').zfill(5)}")
+            else:
+                tencent_codes.append(f"us{clean}")
+
+        for i in range(0, len(tencent_codes), batch_size):
+            batch = tencent_codes[i:i+batch_size]
+            qt = _tencent_quote(batch)
+            all_tencent.update(qt)
+            job["progress"] = int((i + batch_size) / total * 60)
+
+        # 评分
+        results = []
+        for idx, (code, name, market) in enumerate(candidates):
+            r = _rank_score_quick(code, market, all_tencent)
+            if r and r.get("price", 0) > 0:
+                results.append(r)
+            job["progress"] = 60 + int(idx / total * 30)
+
+        # 按评分排序，取前15
+        results.sort(key=lambda x: x["score"], reverse=True)
+        job["results"] = results[:15]
+        job["status"] = "done"
+        job["progress"] = 100
+
+    except Exception as e:
+        job["status"] = "error"
+        job["error"] = str(e)
+
+
 # ── Flask 路由 ────────────────────────────────────────────────────────────────
 
 @app.route("/")
@@ -419,6 +564,30 @@ def index():
 @app.route("/api/status")
 def api_status():
     return jsonify({"ok": True, "time": datetime.now().isoformat()})
+
+
+@app.route("/api/rank/start", methods=["POST"])
+def api_rank_start():
+    body = request.get_json(silent=True) or {}
+    markets = body.get("markets", ["A股"])
+    job_id = str(uuid.uuid4())[:8]
+    _rank_jobs[job_id] = {"status": "queued", "progress": 0, "results": [], "total": 0}
+    threading.Thread(target=_run_rank_job, args=(job_id, markets), daemon=True).start()
+    return jsonify({"job_id": job_id})
+
+
+@app.route("/api/rank/status/<job_id>")
+def api_rank_status(job_id):
+    job = _rank_jobs.get(job_id)
+    if not job:
+        return jsonify({"error": "job not found"}), 404
+    return Response(jdump({
+        "status":   job["status"],
+        "progress": job["progress"],
+        "total":    job.get("total", 0),
+        "results":  job.get("results", []),
+        "error":    job.get("error", ""),
+    }), mimetype="application/json")
 
 
 
@@ -541,6 +710,95 @@ def api_news():
     unique.sort(key=lambda x: x["date"], reverse=True)
 
     return Response(jdump({"news": unique[:20]}), mimetype="application/json")
+
+
+# ── 模拟交易 ─────────────────────────────────────────────────────────────────
+
+_TRADE_FILE = os.path.join(os.path.dirname(__file__), "trade.json")
+
+def _load_trades() -> list:
+    try:
+        with open(_TRADE_FILE, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+def _save_trades(data: list):
+    with open(_TRADE_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+@app.route("/api/trade/portfolio", methods=["GET"])
+def api_trade_portfolio():
+    positions = _load_trades()
+    # 刷新当前价格
+    if positions:
+        codes = []
+        for p in positions:
+            mkt = p.get("market", "A股")
+            code = p["code"]
+            clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
+            if mkt == "A股":
+                codes.append(f"{'sh' if code.startswith('6') or code.startswith('9') else 'sz'}{clean}")
+            elif mkt == "港股":
+                codes.append(f"hk{clean.replace('.HK','').lstrip('0').zfill(5)}")
+            else:
+                codes.append(f"us{clean}")
+        qt = _tencent_quote(codes)
+        for p, tk in zip(positions, codes):
+            q = qt.get(tk, {})
+            if q.get("price"):
+                p["cur_price"] = q["price"]
+                p["chg_pct"]   = q.get("chg_pct", 0)
+    return Response(jdump(positions), mimetype="application/json")
+
+
+@app.route("/api/trade/buy", methods=["POST"])
+def api_trade_buy():
+    body = request.get_json(silent=True) or {}
+    code    = body.get("code", "").strip().upper()
+    name    = body.get("name", code)
+    market  = body.get("market", "A股")
+    price   = float(body.get("price", 0))
+    shares  = float(body.get("shares", 0))
+    score   = int(body.get("score", 0))
+    rec     = body.get("rec", "")
+    if not code or price <= 0 or shares <= 0:
+        return jsonify({"error": "参数错误"}), 400
+
+    positions = _load_trades()
+    new_pos = {
+        "id":          len(positions) + 1,
+        "code":        code,
+        "name":        name,
+        "market":      market,
+        "entry_price": price,
+        "cur_price":   price,
+        "shares":      shares,
+        "cost":        round(price * shares, 2),
+        "score_at_buy": score,
+        "rec_at_buy":  rec,
+        "buy_date":    date.today().isoformat(),
+        "chg_pct":     0,
+    }
+    positions.append(new_pos)
+    _save_trades(positions)
+    return jsonify({"ok": True, "position": new_pos})
+
+
+@app.route("/api/trade/sell", methods=["POST"])
+def api_trade_sell():
+    body = request.get_json(silent=True) or {}
+    pos_id = int(body.get("id", 0))
+    price  = float(body.get("price", 0))
+    positions = _load_trades()
+    updated = [p for p in positions if p.get("id") != pos_id]
+    if len(updated) == len(positions):
+        return jsonify({"error": "持仓不存在"}), 404
+    sold = next(p for p in positions if p.get("id") == pos_id)
+    pnl  = round((price - sold["entry_price"]) * sold["shares"], 2)
+    _save_trades(updated)
+    return jsonify({"ok": True, "pnl": pnl, "sell_price": price})
 
 
 if __name__ == "__main__":
