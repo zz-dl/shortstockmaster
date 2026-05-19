@@ -1,0 +1,39 @@
+name: StockMaster 每日跟踪日报
+
+on:
+  schedule:
+    - cron: '0 1 * * 1-5'   # 北京时间 09:00，周一到周五
+  workflow_dispatch:          # 允许手动触发
+
+jobs:
+  daily-report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run daily report
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: zz-dl/shortstockmaster
+        run: python scripts/daily_report.py
+
+      - name: Commit and push log
+        run: |
+          git config user.name "StockMaster Bot"
+          git config user.email "bot@stockmaster.local"
+          git add daily_logs/
+          git diff --cached --quiet || git commit -m "📊 每日日报 $(date +%Y-%m-%d)"
+          git push
