@@ -29,11 +29,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: zz-dl/shortstockmaster
         run: python scripts/daily_report.py
-
-      - name: Commit and push log
-        run: |
-          git config user.name "StockMaster Bot"
-          git config user.email "bot@stockmaster.local"
-          git add daily_logs/
-          git diff --cached --quiet || git commit -m "📊 每日日报 $(date +%Y-%m-%d)"
-          git push
+        # 脚本通过 GitHub API 直接提交文件，无需额外 git push
