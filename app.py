@@ -798,6 +798,22 @@ def api_trade_portfolio():
             if q.get("price"):
                 p["cur_price"] = q["price"]
                 p["chg_pct"]   = q.get("chg_pct", 0)
+
+    # 按卖出紧迫度排序（亏损深 + 今日大跌 → 排前面）
+    def _urgency(p):
+        cur = p.get("cur_price", p["entry_price"])
+        cost = p.get("cost", p["entry_price"] * p["shares"])
+        pnl_pct = (cur * p["shares"] - cost) / cost * 100 if cost else 0
+        chg = p.get("chg_pct", 0) or 0
+        score = 0
+        if pnl_pct <= -15: score += 30
+        elif pnl_pct <= -8: score += 20
+        elif pnl_pct <= -3: score += 5
+        if chg <= -5: score += 25
+        elif chg <= -2: score += 10
+        return score
+
+    positions.sort(key=_urgency, reverse=True)
     return Response(jdump(positions), mimetype="application/json")
 
 

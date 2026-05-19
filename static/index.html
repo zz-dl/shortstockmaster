@@ -378,19 +378,40 @@ function calcShares() {
 }
 async function confirmBuy() {
   if (!buyTarget) return;
-  const price  = parseFloat(document.getElementById('buyPrice').value) || buyTarget.price;
+  const price  = parseFloat(document.getElementById('buyPrice').value);
   const amount = parseFloat(document.getElementById('buyAmount').value) || 0;
+  if (!price || price <= 0) { alert('请输入有效价格'); return; }
   const shares = Math.floor(amount / price);
-  if (shares <= 0) { alert('请输入有效金额'); return; }
-  const r = await fetch('/api/trade/buy', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({...buyTarget, price, shares})
-  }).then(r=>r.json());
-  if (r.ok) {
-    closeBuy();
-    alert(`✅ 买入成功！${buyTarget.name} ${shares}股 @ ${price}`);
-  } else {
-    alert('买入失败: ' + (r.error || '未知错误'));
+  if (shares <= 0) { alert('请输入买入金额（元）'); return; }
+
+  // 显示加载状态
+  const confirmBtn = document.querySelector('#buyModal .btn:last-child');
+  const origText = confirmBtn ? confirmBtn.textContent : '';
+  if (confirmBtn) { confirmBtn.textContent = '提交中…'; confirmBtn.disabled = true; }
+
+  try {
+    const resp = await fetch('/api/trade/buy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code: buyTarget.code, name: buyTarget.name,
+        market: buyTarget.market || 'A股',
+        price, shares,
+        score: buyTarget.score || 0,
+        rec: buyTarget.rec || ''
+      })
+    });
+    const r = await resp.json();
+    if (r.ok) {
+      closeBuy();
+      alert(`✅ 买入成功！${buyTarget.name || buyTarget.code} ${shares}股 @ ${price}`);
+    } else {
+      alert('买入失败：' + (r.error || `HTTP ${resp.status}`));
+    }
+  } catch (e) {
+    alert('网络错误，请重试：' + e.message);
+  } finally {
+    if (confirmBtn) { confirmBtn.textContent = origText; confirmBtn.disabled = false; }
   }
 }
 async function sellPos(id, curPrice) {
