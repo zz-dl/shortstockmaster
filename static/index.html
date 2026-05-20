@@ -293,12 +293,51 @@ function pickRankStock(code, name) {
   analyzeStock();
 }
 
-// ── 模拟交易 ─────────────────────────────────────────────────────────────────
+// ── 模拟交易（数据存 localStorage，不依赖服务器，部署不丢失）────────────────
 let buyTarget = null;
+const TRADE_KEY = 'ssm_trade_v1';
+
+function _tradeLoad() {
+  try { return JSON.parse(localStorage.getItem(TRADE_KEY) || '[]'); } catch { return []; }
+}
+function _tradeSave(data) {
+  localStorage.setItem(TRADE_KEY, JSON.stringify(data));
+}
 
 async function loadPortfolio() {
   document.getElementById('tradeContent').innerHTML = '<div class="loading">⏳ 刷新持仓…</div>';
-  const positions = await fetch('/api/trade/portfolio').then(r=>r.json());
+  let positions = _tradeLoad();
+
+  // 实时刷新价格（服务端只负责价格查询）
+  if (positions.length) {
+    const codes   = positions.map(p => p.code).join(',');
+    const markets = positions.map(p => p.market || 'US').join(',');
+    try {
+      const qt = await fetch(`/api/quotes?codes=${encodeURIComponent(codes)}&markets=${encodeURIComponent(markets)}`).then(r=>r.json());
+      positions = positions.map(p => {
+        const q = qt[p.code] || {};
+        if (q.price) { p.cur_price = q.price; p.chg_today = q.chg_pct || 0; }
+        return p;
+      });
+    } catch(_) {}
+
+    // 按卖出紧迫度排序
+    positions.sort((a, b) => {
+      const urgency = p => {
+        const cur = p.cur_price || p.entry_price || 0;
+        const cost = p.cost || 0;
+        const pnlPct = cost ? (cur * p.shares - cost) / cost * 100 : 0;
+        const chg = p.chg_today || 0;
+        let s = 0;
+        if (pnlPct <= -15) s += 30; else if (pnlPct <= -8) s += 20; else if (pnlPct <= -3) s += 5;
+        if (chg <= -5) s += 25; else if (chg <= -2) s += 10;
+        return s;
+      };
+      return urgency(b) - urgency(a);
+    });
+    _tradeSave(positions); // 保存刷新后的价格
+  }
+
   renderPortfolio(positions);
 }
 
@@ -384,50 +423,38 @@ async function confirmBuy() {
   const shares = Math.floor(amount / price);
   if (shares <= 0) { alert('请输入买入金额（元）'); return; }
 
-  // 显示加载状态
-  const confirmBtn = document.querySelector('#buyModal .btn:last-child');
-  const origText = confirmBtn ? confirmBtn.textContent : '';
-  if (confirmBtn) { confirmBtn.textContent = '提交中…'; confirmBtn.disabled = true; }
-
-  try {
-    const resp = await fetch('/api/trade/buy', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        code: buyTarget.code, name: buyTarget.name,
-        market: buyTarget.market || 'A股',
-        price, shares,
-        score: buyTarget.score || 0,
-        rec: buyTarget.rec || ''
-      })
-    });
-    const r = await resp.json();
-    if (r.ok) {
-      closeBuy();
-      alert(`✅ 买入成功！${buyTarget.name || buyTarget.code} ${shares}股 @ ${price}`);
-    } else {
-      alert('买入失败：' + (r.error || `HTTP ${resp.status}`));
-    }
-  } catch (e) {
-    alert('网络错误，请重试：' + e.message);
-  } finally {
-    if (confirmBtn) { confirmBtn.textContent = origText; confirmBtn.disabled = false; }
-  }
+  // 直接存 localStorage，无需服务器
+  const positions = _tradeLoad();
+  const newPos = {
+    id: Date.now(),
+    code: buyTarget.code,
+    name: buyTarget.name || buyTarget.code,
+    market: buyTarget.market || 'A股',
+    entry_price: price,
+    cur_price: price,
+    shares: shares,
+    cost: Math.round(price * shares * 100) / 100,
+    score_at_buy: buyTarget.score || 0,
+    rec_at_buy: buyTarget.rec || '',
+    buy_date: new Date().toISOString().slice(0, 10),
+    chg_today: 0,
+  };
+  positions.push(newPos);
+  _tradeSave(positions);
+  closeBuy();
+  alert(`✅ 买入成功！${newPos.name} ${shares}股 @ ${price}`);
 }
 async function sellPos(id, curPrice) {
   const price = parseFloat(prompt(`卖出价格（当前 ${curPrice}）`, curPrice)) || 0;
   if (!price) return;
-  const r = await fetch('/api/trade/sell', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({id, price})
-  }).then(r=>r.json());
-  if (r.ok) {
-    const pnl = r.pnl;
-    alert(`✅ 卖出成功！盈亏: ${pnl>=0?'+':''}${pnl.toFixed(2)} 元`);
-    loadPortfolio();
-  } else {
-    alert('卖出失败: ' + (r.error || '未知错误'));
-  }
+  const positions = _tradeLoad();
+  const pos = positions.find(p => p.id === id);
+  if (!pos) { alert('持仓不存在'); return; }
+  const pnl = (price - pos.entry_price) * pos.shares;
+  const updated = positions.filter(p => p.id !== id);
+  _tradeSave(updated);
+  alert(`✅ 卖出成功！盈亏: ${pnl>=0?'+':''}${pnl.toFixed(2)} 元`);
+  loadPortfolio();
 }
 function goAnalyze(code) {
   switchTab('stock');
