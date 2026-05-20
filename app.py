@@ -573,6 +573,29 @@ def api_status():
     return jsonify({"ok": True, "time": datetime.now().isoformat()})
 
 
+@app.route("/api/quotes", methods=["GET"])
+def api_quotes():
+    """批量实时行情：?codes=AAPL,NVDA&markets=US,US"""
+    codes_str   = request.args.get("codes", "")
+    markets_str = request.args.get("markets", "")
+    if not codes_str:
+        return jsonify({}), 400
+    codes_list   = [c.strip().upper() for c in codes_str.split(",") if c.strip()]
+    markets_list = [m.strip() for m in markets_str.split(",")]
+    while len(markets_list) < len(codes_list):
+        markets_list.append("美股")
+    mkt_alias = {"A": "A股", "HK": "港股", "US": "美股",
+                 "A股": "A股", "港股": "港股", "美股": "美股"}
+    tk_keys = [_portfolio_tencent_key(c, mkt_alias.get(m, "美股"))
+               for c, m in zip(codes_list, markets_list)]
+    qt = _tencent_quote(tk_keys)
+    result = {}
+    for code, tk in zip(codes_list, tk_keys):
+        q = qt.get(tk, {})
+        result[code] = {"price": q.get("price", 0), "chg_pct": q.get("chg_pct", 0)}
+    return Response(jdump(result), mimetype="application/json")
+
+
 
 @app.route("/api/rank", methods=["POST"])
 def api_rank():
