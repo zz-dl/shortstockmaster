@@ -586,7 +586,17 @@ def api_quotes():
         markets_list.append("美股")
     mkt_alias = {"A": "A股", "HK": "港股", "US": "美股",
                  "A股": "A股", "港股": "港股", "美股": "美股"}
-    tk_keys = [_portfolio_tencent_key(c, mkt_alias.get(m, "美股"))
+
+    def _to_tk(code, market):
+        clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
+        if market == "A股":
+            return f"{'sh' if code.startswith('6') or code.startswith('9') else 'sz'}{clean}"
+        elif market == "港股":
+            return f"hk{clean.lstrip('0').zfill(5)}"
+        else:
+            return f"us{clean}"
+
+    tk_keys = [_to_tk(c, mkt_alias.get(m, "美股"))
                for c, m in zip(codes_list, markets_list)]
     qt = _tencent_quote(tk_keys)
     result = {}
