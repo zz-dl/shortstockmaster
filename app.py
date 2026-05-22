@@ -572,6 +572,21 @@ def index():
 def api_status():
     return jsonify({"ok": True, "time": datetime.now().isoformat()})
 
+@app.route("/api/debug/cftest")
+def api_debug_cftest():
+    """测试 push2his 在 Render 上是否可用。"""
+    import requests as _r
+    h = {"User-Agent": "Mozilla/5.0"}
+    try:
+        r = _r.get("http://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get",
+            params={"secid":"0.000725","lmt":3,"klt":101,
+                    "fields1":"f1,f2,f3,f7","fields2":"f51,f52,f53,f54,f55,f56,f57,f58"},
+            headers=h, timeout=8)
+        klines = r.json().get("data",{}).get("klines",[]) or []
+        return jsonify({"ok": bool(klines), "http": r.status_code, "klines": klines})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
+
 
 @app.route("/api/quotes", methods=["GET"])
 def api_quotes():
