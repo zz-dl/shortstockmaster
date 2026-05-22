@@ -141,17 +141,21 @@ def _capital_flow(code: str, market: str, days: int = 5) -> list:
 
 
 def _detect_market(code: str) -> str:
-    """根据代码推断市场标识。"""
-    if code.endswith(".SS") or code.startswith("6") or code.startswith("0"):
-        return "SH" if (code.startswith("6") or code.endswith(".SS")) else "SZ"
-    if code.endswith(".SZ") or code.startswith("0") or code.startswith("3"):
-        return "SZ"
+    """根据代码推断市场标识。HK/US扩展名优先，防止被A股前缀误判。"""
+    # 扩展名优先（避免 0700.HK 被误判为 SZ）
     if code.endswith(".HK") or re.match(r"^\d{4,5}\.?HK$", code):
         return "HK"
-    # 纯数字
-    if code.isdigit():
-        if code.startswith("6"): return "SH"
+    if code.endswith(".SS"):
+        return "SH"
+    if code.endswith(".SZ"):
+        return "SZ"
+    # 纯数字 A 股
+    if code.isdigit() or re.match(r"^\d{6}$", code):
+        if code.startswith("6") or code.startswith("9"): return "SH"
         if code.startswith("0") or code.startswith("3"): return "SZ"
+    # A 股带前缀数字（无扩展名）
+    if code.startswith("6"): return "SH"
+    if code.startswith("0") or code.startswith("3"): return "SZ"
     return "SH"
 
 
@@ -337,6 +341,23 @@ def _short_signal_score(code: str) -> dict:
     else:
         signals.append({"name": "涨跌平稳", "rating": "中性", "detail": f"今日涨跌{chg_pct:+.2f}%"})
 
+    # ── 1.5. 港股恒生指数联动（仅HK市场）
+    if mkt == "HK":
+        hsi = _tencent_quote(["hkHSI"]).get("hkHSI", {})
+        hsi_chg = hsi.get("chg_pct", 0)
+        if hsi_chg <= -1.5:
+            score -= 15; signals.append({"name": "港股大盘弱势", "rating": "消极",
+                "detail": f"恒生指数今日{hsi_chg:+.2f}%，港股整体承压，个股难逃拖累"})
+        elif hsi_chg <= -0.5:
+            score -= 8;  signals.append({"name": "港股偏弱", "rating": "消极",
+                "detail": f"恒生指数今日{hsi_chg:+.2f}%，港股情绪偏弱"})
+        elif hsi_chg >= 1.0:
+            score += 8;  signals.append({"name": "港股大盘强势", "rating": "积极",
+                "detail": f"恒生指数今日{hsi_chg:+.2f}%，港股整体向好，个股受益"})
+        else:
+            signals.append({"name": "恒生指数", "rating": "中性",
+                "detail": f"恒生指数今日{hsi_chg:+.2f}%，港股大盘中性"})
+
     # ── 2. 主力资金净流入（近3日）
     cf = _capital_flow(code, mkt, days=5)
     if cf:
@@ -363,19 +384,26 @@ def _short_signal_score(code: str) -> dict:
     try:
         yf_code = code if "." in code else (code + ".SS" if mkt == "SH" else code + ".SZ")
         df = yf.Ticker(yf_code).history(period="10d", auto_adjust=True)
-        if not df.empty and len(df) >= 5:
-            r5 = (float(df["Close"].iloc[-1]) / float(df["Close"].iloc[-6]) - 1) * 100
-            r3 = (float(df["Close"].iloc[-1]) / float(df["Close"].iloc[-4]) - 1) * 100
-            if r5 > 8:
-                score += 12; signals.append({"name": "5日强势", "rating": "积极", "detail": f"近5日涨幅{r5:+.1f}%，短线动能强劲"})
-            elif r5 > 3:
-                score += 5;  signals.append({"name": "5日上涨", "rating": "积极", "detail": f"近5日涨幅{r5:+.1f}%"})
-            elif r5 < -8:
-                score -= 12; signals.append({"name": "5日弱势", "rating": "消极", "detail": f"近5日跌幅{abs(r5):.1f}%，短线动能疲软"})
-            elif r5 < -3:
-                score -= 5;  signals.append({"name": "5日下跌", "rating": "消极", "detail": f"近5日跌幅{abs(r5):.1f}%"})
-            else:
-                signals.append({"name": "5日横盘", "rating": "中性", "detail": f"近5日涨跌{r5:+.1f}%"})
+        if not df.empty:
+            # 涨停次日追买风险（A股专属，HK/US无涨停制度）
+            if mkt in ("SH", "SZ") and len(df) >= 3:
+                prev_chg = float(df["Close"].iloc[-2]) / float(df["Close"].iloc[-3]) - 1
+                if prev_chg >= 0.095:
+                    score -= 20; signals.append({"name": "涨停次日风险", "rating": "消极",
+                        "detail": f"昨日涨幅{prev_chg*100:.1f}%（接近涨停），次日追买历史规律容易回调"})
+            # 5日动量
+            if len(df) >= 6:
+                r5 = (float(df["Close"].iloc[-1]) / float(df["Close"].iloc[-6]) - 1) * 100
+                if r5 > 8:
+                    score += 12; signals.append({"name": "5日强势", "rating": "积极", "detail": f"近5日涨幅{r5:+.1f}%，短线动能强劲"})
+                elif r5 > 3:
+                    score += 5;  signals.append({"name": "5日上涨", "rating": "积极", "detail": f"近5日涨幅{r5:+.1f}%"})
+                elif r5 < -8:
+                    score -= 12; signals.append({"name": "5日弱势", "rating": "消极", "detail": f"近5日跌幅{abs(r5):.1f}%，短线动能疲软"})
+                elif r5 < -3:
+                    score -= 5;  signals.append({"name": "5日下跌", "rating": "消极", "detail": f"近5日跌幅{abs(r5):.1f}%"})
+                else:
+                    signals.append({"name": "5日横盘", "rating": "中性", "detail": f"近5日涨跌{r5:+.1f}%"})
             info = yf.Ticker(yf_code).info or {}
     except Exception:
         pass
