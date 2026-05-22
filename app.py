@@ -75,39 +75,65 @@ def _tencent_quote(codes: list) -> dict:
 
 def _capital_flow(code: str, market: str, days: int = 5) -> list:
     """
-    返回最近 N 天主力净流入数据。
+    返回最近 N 天真实主力净流入数据（东方财富 push2his API）。
     market: A股SH→1, A股SZ→0, 港股→116, 美股→105
-    格式: [{date, super_net, large_net, main_net, main_pct}, ...]
     """
     mkt_map = {"SH": "1", "SZ": "0", "HK": "116", "US": "105"}
     mkt = mkt_map.get(market.upper(), "0")
     clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
 
-    # yfinance 量价估算（兼容本地和云端）
+    try:
+        r = _req.get(
+            "http://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get",
+            params={"secid": f"{mkt}.{clean}", "lmt": days, "klt": 101,
+                    "fields1": "f1,f2,f3,f7",
+                    "fields2": "f51,f52,f53,f54,f55,f56,f57,f58"},
+            headers=_HEADERS, timeout=8,
+        )
+        klines = r.json().get("data", {}).get("klines", []) or []
+        result = []
+        for kl in klines:
+            p = kl.split(",")
+            if len(p) < 7:
+                continue
+            result.append({
+                "date":      p[0],
+                "super_net": round(float(p[1]) / 1e8, 3),   # 超大单净（亿）
+                "large_net": round(float(p[2]) / 1e8, 3),   # 大单净（亿）
+                "mid_net":   round(float(p[3]) / 1e8, 3),
+                "small_net": round(float(p[4]) / 1e8, 3),
+                "main_net":  round(float(p[5]) / 1e8, 3),   # 主力净=超大+大单（亿）
+                "main_pct":  round(float(p[6]), 2),          # 主力净占比%
+            })
+        if result:
+            return result
+    except Exception:
+        pass
+
+    # push2his 不可用时的备用：使用真实日涨跌幅（昨收→今收）而非开收差
     try:
         yf_code = code if "." in code else (
             code + ".SS" if market == "SH" else
             code + ".SZ" if market == "SZ" else code
         )
-        df = yf.Ticker(yf_code).history(period=f"{days + 3}d", auto_adjust=True)
+        df = yf.Ticker(yf_code).history(period=f"{days + 5}d", auto_adjust=True)
         if df is None or df.empty:
             return []
-        avg_vol = float(df["Volume"].mean()) or 1
         result = []
-        for i in range(max(0, len(df) - days), len(df)):
-            row = df.iloc[i]
-            chg = (float(row["Close"]) - float(row["Open"])) / float(row["Open"]) if float(row["Open"]) else 0
-            vol_ratio = float(row["Volume"]) / avg_vol
-            amount_bn = float(row["Volume"]) * float(row["Close"]) / 1e8
-            main_net = round(amount_bn * chg * vol_ratio, 3)
+        for i in range(max(1, len(df) - days), len(df)):
+            prev_close = float(df["Close"].iloc[i - 1])
+            curr_close = float(df["Close"].iloc[i])
+            chg = (curr_close - prev_close) / prev_close if prev_close else 0
+            amount_bn = float(df["Volume"].iloc[i]) * curr_close / 1e8
+            main_net = round(amount_bn * chg, 3)
             result.append({
-                "date": str(df.index[i])[:10],
+                "date":      str(df.index[i])[:10],
                 "super_net": round(main_net * 0.4, 3),
                 "large_net": round(main_net * 0.3, 3),
-                "mid_net": round(main_net * 0.2, 3),
+                "mid_net":   round(main_net * 0.2, 3),
                 "small_net": round(main_net * 0.1, 3),
-                "main_net": main_net,
-                "main_pct": round(chg * vol_ratio * 100, 1),
+                "main_net":  main_net,
+                "main_pct":  round(chg * 100, 2),
             })
         return result
     except Exception:
@@ -572,20 +598,6 @@ def index():
 def api_status():
     return jsonify({"ok": True, "time": datetime.now().isoformat()})
 
-@app.route("/api/debug/cftest")
-def api_debug_cftest():
-    """测试 push2his 在 Render 上是否可用。"""
-    import requests as _r
-    h = {"User-Agent": "Mozilla/5.0"}
-    try:
-        r = _r.get("http://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get",
-            params={"secid":"0.000725","lmt":3,"klt":101,
-                    "fields1":"f1,f2,f3,f7","fields2":"f51,f52,f53,f54,f55,f56,f57,f58"},
-            headers=h, timeout=8)
-        klines = r.json().get("data",{}).get("klines",[]) or []
-        return jsonify({"ok": bool(klines), "http": r.status_code, "klines": klines})
-    except Exception as e:
-        return jsonify({"ok": False, "error": str(e)})
 
 
 @app.route("/api/quotes", methods=["GET"])
