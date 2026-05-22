@@ -135,8 +135,13 @@ def _capital_flow(code: str, market: str, days: int = 5) -> list:
         for i in range(max(1, len(df) - days), len(df)):
             prev_close = float(df["Close"].iloc[i - 1])
             curr_close = float(df["Close"].iloc[i])
-            chg = (curr_close - prev_close) / prev_close if prev_close else 0
-            amount_bn = float(df["Volume"].iloc[i]) * curr_close / 1e8
+            if math.isnan(prev_close) or math.isnan(curr_close) or prev_close == 0:
+                continue
+            chg = (curr_close - prev_close) / prev_close
+            vol = float(df["Volume"].iloc[i])
+            if math.isnan(vol):
+                continue
+            amount_bn = vol * curr_close / 1e8
             main_net = round(amount_bn * chg, 3)
             result.append({
                 "date":      str(df.index[i])[:10],
@@ -379,10 +384,11 @@ def _short_signal_score(code: str) -> dict:
     cf = _capital_flow(code, mkt, days=5)
     if cf:
         recent3 = cf[-3:] if len(cf) >= 3 else cf
-        net3 = sum(x["main_net"] for x in recent3)
+        def _safe_num(v): return 0 if (v is None or (isinstance(v, float) and math.isnan(v))) else v
+        net3 = sum(_safe_num(x.get("main_net", 0)) for x in recent3)
         today = cf[-1] if cf else {}
-        today_net = today.get("main_net", 0)
-        today_pct = today.get("main_pct", 0)
+        today_net = _safe_num(today.get("main_net", 0))
+        today_pct = _safe_num(today.get("main_pct", 0))
 
         if today_net > 0.5:
             score += 20; signals.append({"name": "主力净流入", "rating": "积极",
@@ -410,17 +416,23 @@ def _short_signal_score(code: str) -> dict:
                         "detail": f"昨日涨幅{prev_chg*100:.1f}%（接近涨停），次日追买历史规律容易回调"})
             # 5日动量
             if len(df) >= 6:
-                r5 = (float(df["Close"].iloc[-1]) / float(df["Close"].iloc[-6]) - 1) * 100
-                if r5 > 8:
-                    score += 12; signals.append({"name": "5日强势", "rating": "积极", "detail": f"近5日涨幅{r5:+.1f}%，短线动能强劲"})
-                elif r5 > 3:
-                    score += 5;  signals.append({"name": "5日上涨", "rating": "积极", "detail": f"近5日涨幅{r5:+.1f}%"})
-                elif r5 < -8:
-                    score -= 12; signals.append({"name": "5日弱势", "rating": "消极", "detail": f"近5日跌幅{abs(r5):.1f}%，短线动能疲软"})
-                elif r5 < -3:
-                    score -= 5;  signals.append({"name": "5日下跌", "rating": "消极", "detail": f"近5日跌幅{abs(r5):.1f}%"})
-                else:
-                    signals.append({"name": "5日横盘", "rating": "中性", "detail": f"近5日涨跌{r5:+.1f}%"})
+                try:
+                    c1 = float(df["Close"].iloc[-1])
+                    c6 = float(df["Close"].iloc[-6])
+                    r5 = None if (math.isnan(c1) or math.isnan(c6) or c6 == 0) else (c1 / c6 - 1) * 100
+                except Exception:
+                    r5 = None
+                if r5 is not None:
+                    if r5 > 8:
+                        score += 12; signals.append({"name": "5日强势", "rating": "积极", "detail": f"近5日涨幅{r5:+.1f}%，短线动能强劲"})
+                    elif r5 > 3:
+                        score += 5;  signals.append({"name": "5日上涨", "rating": "积极", "detail": f"近5日涨幅{r5:+.1f}%"})
+                    elif r5 < -8:
+                        score -= 12; signals.append({"name": "5日弱势", "rating": "消极", "detail": f"近5日跌幅{abs(r5):.1f}%，短线动能疲软"})
+                    elif r5 < -3:
+                        score -= 5;  signals.append({"name": "5日下跌", "rating": "消极", "detail": f"近5日跌幅{abs(r5):.1f}%"})
+                    else:
+                        signals.append({"name": "5日横盘", "rating": "中性", "detail": f"近5日涨跌{r5:+.1f}%"})
             info = yf.Ticker(yf_code).info or {}
     except Exception:
         pass
