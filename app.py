@@ -1,6 +1,6 @@
 # app.py — ShortStockMaster Flask backend
 # Short-term trading signals: sentiment, capital flow, momentum, news, AI
-import json, os, re, threading, uuid
+import json, math, os, re, threading, uuid
 from datetime import date, datetime, timedelta
 import numpy as np
 import pandas as pd
@@ -15,17 +15,29 @@ _DEEPSEEK_KEY = os.environ.get("DEEPSEEK_API_KEY", "sk-20cfd605d2a64ff5ab379a97c
 _DEEPSEEK_BASE = "https://api.deepseek.com"
 
 
+def _sanitize(obj):
+    """递归将 NaN/Inf 替换为 None，确保 JSON 合法（Safari 不接受裸 NaN）。"""
+    if isinstance(obj, float) and (math.isnan(obj) or math.isinf(obj)):
+        return None
+    if isinstance(obj, dict):
+        return {k: _sanitize(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_sanitize(v) for v in obj]
+    return obj
+
 class SafeEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, (np.integer,)): return int(obj)
-        if isinstance(obj, (np.floating,)): return float(obj)
+        if isinstance(obj, (np.floating,)):
+            f = float(obj)
+            return None if (math.isnan(f) or math.isinf(f)) else f
         if isinstance(obj, np.ndarray): return obj.tolist()
         if isinstance(obj, pd.Series): return obj.tolist()
         if isinstance(obj, (date, datetime)): return str(obj)
         return super().default(obj)
 
 def jdump(obj):
-    return json.dumps(obj, cls=SafeEncoder, ensure_ascii=False)
+    return json.dumps(_sanitize(obj), cls=SafeEncoder, ensure_ascii=False)
 
 
 # ── 腾讯行情解析 ─────────────────────────────────────────────────────────────
@@ -303,8 +315,13 @@ def _short_signal_score(code: str) -> dict:
     返回 score(-100~+100), signals, recommendation
     """
     mkt = _detect_market(code)
-    mkt_code = {"SH": "sh", "SZ": "sz", "HK": "hk"}.get(mkt, "sz")
-    tencent_code = f"{mkt_code}{re.sub(r'.(SS|SZ|HK)$', '', code)}"
+    clean_code = re.sub(r"\.(SS|SZ|HK)$", "", code, flags=re.IGNORECASE)
+    if mkt == "HK":
+        # 腾讯港股代码格式：hk + 5位零补齐（如 hk00700）
+        tencent_code = f"hk{clean_code.lstrip('0').zfill(5)}"
+    else:
+        mkt_code = {"SH": "sh", "SZ": "sz"}.get(mkt, "sz")
+        tencent_code = f"{mkt_code}{clean_code}"
 
     signals = []
     score = 0
