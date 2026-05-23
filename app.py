@@ -224,6 +224,7 @@ def _sector_news(code: str, info: dict, n: int = 8) -> list:
                         "token": "D43BF722C8E33BDC906FB84D85E326DE", "count": "5"},
                 headers=_HEADERS, timeout=5,
             )
+            bk_count = 0
             for d in r2.json().get("QuotationCodeTable", {}).get("Data", []):
                 if d.get("SecurityTypeName") == "板块" and d.get("Code", "").startswith("BK"):
                     bk = d["Code"]
@@ -235,7 +236,9 @@ def _sector_news(code: str, info: dict, n: int = 8) -> list:
                     )
                     for it in r3.json().get("data", {}).get("list", []) or []:
                         sector_news.append({"title": it.get("Art_Title", ""), "date": it.get("Art_ShowTime", "")[:10]})
-                    break
+                    bk_count += 1
+                    if bk_count >= 2:  # 最多取2个关联板块，扩大中小盘覆盖
+                        break
         except Exception:
             pass
 
@@ -248,7 +251,7 @@ def _sector_news(code: str, info: dict, n: int = 8) -> list:
             seen.add(t)
             merged.append(n_)
 
-    # 补充巨潮资讯公告（官方披露源，中小盘覆盖好）
+    # 补充同花顺新闻（中国 IP 可访问时生效；海外降级至仅使用上方东财数据）
     if mkt in ("SH", "SZ"):
         for n_ in _cninfo_news(code, mkt, n=5):
             t = n_.get("title", "")
