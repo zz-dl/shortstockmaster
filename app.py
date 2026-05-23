@@ -247,7 +247,45 @@ def _sector_news(code: str, info: dict, n: int = 8) -> list:
         if t and t not in seen:
             seen.add(t)
             merged.append(n_)
+
+    # 补充巨潮资讯公告（官方披露源，中小盘覆盖好）
+    if mkt in ("SH", "SZ"):
+        for n_ in _cninfo_news(code, mkt, n=5):
+            t = n_.get("title", "")
+            if t and t not in seen:
+                seen.add(t)
+                merged.append(n_)
+
     return merged[:12]
+
+
+def _cninfo_news(code: str, market: str, n: int = 5) -> list:
+    """从巨潮资讯获取个股公告（官方披露源，对中小盘覆盖好）。"""
+    clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
+    if market not in ("SH", "SZ"):
+        return []
+    exchange = "sse" if market == "SH" else "szse"
+    stock_key = f"{clean},{'sh' if market == 'SH' else 'sz'}"
+    try:
+        r = _req.post(
+            "https://www.cninfo.com.cn/new/hisAnnouncement/query",
+            headers={**_HEADERS, "Content-Type": "application/x-www-form-urlencoded",
+                     "Referer": "https://www.cninfo.com.cn/"},
+            data={"tabName": "fulltext", "pageNum": 1, "pageSize": n,
+                  "column": exchange, "stock": stock_key, "searchkey": "",
+                  "sortName": "", "sortType": "", "isHLtitle": "true"},
+            timeout=6,
+        )
+        results = []
+        for ann in r.json().get("announcements") or []:
+            title = ann.get("announcementTitle", "")
+            ts = ann.get("announcementTime", 0)
+            dt = datetime.fromtimestamp(ts / 1000).strftime("%Y-%m-%d") if ts else ""
+            if title:
+                results.append({"title": title, "date": dt, "source": "cninfo"})
+        return results
+    except Exception:
+        return []
 
 
 # ── 市场情绪综合评分 ─────────────────────────────────────────────────────────
@@ -437,18 +475,31 @@ def _short_signal_score(code: str) -> dict:
     except Exception:
         pass
 
-    # ── 4. 近期新闻情绪扫描
+    # ── 4. 近期新闻情绪扫描（含巨潮公告，分级加权）
     news = _sector_news(code, info, n=8)
-    neg_kw = ["立案", "调查", "违规", "处罚", "下调", "警示", "问询", "亏损", "暴跌", "崩盘"]
-    pos_kw = ["涨停", "大涨", "突破", "创新高", "买入", "上调", "超预期", "爆发", "龙头"]
+    neg_kw = ["立案", "调查", "违规", "处罚", "下调", "警示", "问询", "亏损", "暴跌", "崩盘",
+              "退市", "造假", "虚假陈述", "被罚", "减持", "质押", "违约"]
+    pos_kw = ["涨停", "大涨", "突破", "创新高", "买入", "上调", "超预期", "爆发", "龙头",
+              "获批", "利好", "战略合作", "业绩预增", "扭亏", "回购", "增持", "重大合同"]
     neg_hits = sum(1 for n in news if any(kw in n.get("title", "") for kw in neg_kw))
     pos_hits = sum(1 for n in news if any(kw in n.get("title", "") for kw in pos_kw))
-    if pos_hits > neg_hits and pos_hits >= 2:
-        score += 10; signals.append({"name": "消息面偏多", "rating": "积极",
-            "detail": f"近期{pos_hits}条利好新闻 vs {neg_hits}条利空"})
-    elif neg_hits > pos_hits and neg_hits >= 2:
-        score -= 10; signals.append({"name": "消息面偏空", "rating": "消极",
-            "detail": f"近期{neg_hits}条利空新闻 vs {pos_hits}条利好"})
+    if pos_hits >= 3 and pos_hits > neg_hits:
+        news_delta = 18
+    elif pos_hits >= 1 and pos_hits > neg_hits:
+        news_delta = 10
+    elif neg_hits >= 3 and neg_hits > pos_hits:
+        news_delta = -18
+    elif neg_hits >= 1 and neg_hits > pos_hits:
+        news_delta = -10
+    else:
+        news_delta = 0
+    score += news_delta
+    if news_delta > 0:
+        signals.append({"name": "消息面偏多", "rating": "积极",
+            "detail": f"近期{pos_hits}条利好新闻 vs {neg_hits}条利空（情绪权重+{news_delta}）"})
+    elif news_delta < 0:
+        signals.append({"name": "消息面偏空", "rating": "消极",
+            "detail": f"近期{neg_hits}条利空新闻 vs {pos_hits}条利好（情绪权重{news_delta}）"})
     else:
         signals.append({"name": "消息面中性", "rating": "中性",
             "detail": f"近期利好{pos_hits}条，利空{neg_hits}条"})
@@ -567,6 +618,10 @@ def _rank_score_quick(code: str, market: str, tencent_data: dict) -> dict:
     # 换手率异动（换手率>3%是活跃信号）
     if turnover >= 5:   score += 10
     elif turnover >= 3: score += 5
+
+    # 涨停或接近涨停（A股专属）：当日无法买入且次日追买历史回调率高
+    if market.startswith("A股") and chg_pct >= 9.5:
+        score -= 30
 
     score = max(-100, min(100, score))
 

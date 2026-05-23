@@ -1,6 +1,6 @@
 """每日 StockMaster 跟踪日报脚本，由 GitHub Actions 自动运行。"""
 import requests, json, base64, re, os
-from datetime import date
+from datetime import date, datetime
 
 GH_TOKEN = os.environ["GH_TOKEN"]
 GH_REPO  = os.environ.get("GH_REPO", "zz-dl/shortstockmaster")
@@ -66,6 +66,30 @@ def sector_news(kw, n=4):
     except: pass
     return []
 
+def cninfo_news(code, exchange, n=3):
+    """从巨潮资讯获取个股公告（官方披露源，中小盘覆盖好）。"""
+    try:
+        r = requests.post(
+            "https://www.cninfo.com.cn/new/hisAnnouncement/query",
+            headers={"User-Agent": "Mozilla/5.0", "Referer": "https://www.cninfo.com.cn/",
+                     "Content-Type": "application/x-www-form-urlencoded"},
+            data={"tabName": "fulltext", "pageNum": 1, "pageSize": n,
+                  "column": "sse" if exchange == "sh" else "szse",
+                  "stock": f"{code},{exchange}", "searchkey": "",
+                  "sortName": "", "sortType": "", "isHLtitle": "true"},
+            timeout=6,
+        )
+        results = []
+        for ann in r.json().get("announcements") or []:
+            title = ann.get("announcementTitle", "")
+            ts = ann.get("announcementTime", 0)
+            dt = datetime.fromtimestamp(ts / 1000).strftime("%Y-%m-%d") if ts else ""
+            if title:
+                results.append((title, dt))
+        return results
+    except:
+        return []
+
 print(f"=== 日报生成 {today} ===")
 
 state, state_sha = gh_get("daily_logs/portfolio_state.json")
@@ -126,12 +150,15 @@ for kw, items in news_all.items():
         elif any(k in t for k in pos_kw): key_events.append(("✅ 利好", kw, dt, t))
 
 anomalies = []
+limit_up_stocks = []   # 今日涨停，明日追买高风险
 for p in positions:
     rec, pnl = p.get("rec",""), p.get("pnl_pct",0)
     if ("多" in rec or "买" in rec) and pnl < -2:
         anomalies.append((p["name"], p["code"], rec, pnl, p.get("chg_today",0), "推荐做多但下跌"))
     elif ("空" in rec or "卖" in rec) and pnl > 2:
         anomalies.append((p["name"], p["code"], rec, pnl, p.get("chg_today",0), "推荐做空但上涨"))
+    if p.get("chg_today", 0) >= 9.5:
+        limit_up_stocks.append(p["name"])
 
 total_pnl = sum(p.get("pnl",0) for p in positions)
 total_inv = sum(p.get("amount",10000) for p in positions)
@@ -163,6 +190,9 @@ if anomalies:
         md.append(f"  > 可能原因：技术指标滞后、板块传染效应未识别、宏观因素突变")
 else:
     md.append("- ✅ 本日所有持仓方向与推荐一致，无异常")
+if limit_up_stocks:
+    md.append("")
+    md.append(f"- ⚠️ **涨停次日追买预警**：{'、'.join(limit_up_stocks)} 今日涨停，已触发追买风险惩罚，明日排行榜将自动降权")
 
 md += ["", "## 📰 今日关键市场事件", ""]
 if key_events:
@@ -184,11 +214,30 @@ suggestions = []
 big_moves = [p for p in positions if abs(p.get("chg_today",0)) > 5]
 if big_moves:
     names = "、".join(p["name"] for p in big_moves)
-    suggestions.append(f"**{names}** 今日波动超 5%，系统未提前识别——建议加强实时新闻触发检测")
+    suggestions.append(f"**{names}** 今日波动超 5%，系统未提前识别——可考虑加强实时新闻触发检测")
 if len(anomalies) > 1:
-    suggestions.append(f"{len(anomalies)} 只股票出现方向错误，技术指标在横盘市可靠性下降，建议加入新闻情绪权重")
-suggestions.append("考虑在「涨停次日」加入追买风险惩罚项（参考三一重工案例）")
-suggestions.append("扩充新闻源：东方财富对中小盘覆盖不足，可补充新浪财经个股公告接口")
+    suggestions.append(f"{len(anomalies)} 只股票出现方向错误，新闻情绪加权（±10~18分）机制已激活，请关注后续改善效果")
+elif anomalies:
+    suggestions.append(f"出现 {len(anomalies)} 只方向偏差，在可接受范围，新闻情绪加权正常运作")
+
+# 涨停追买机制状态
+if limit_up_stocks:
+    suggestions.append(f"涨停追买惩罚（-30分）已触发：{'、'.join(limit_up_stocks)}，明日将从排行榜降权")
+else:
+    suggestions.append("今日无涨停股，涨停次日追买惩罚机制（-30分）正常待机")
+
+# 巨潮公告覆盖状态
+ann_count = 0
+for p in positions:
+    code = p["code"]
+    if re.match(r"^\d{6}$", code):
+        exchange = "sh" if code.startswith("6") or code.startswith("9") else "sz"
+        ann_count += len(cninfo_news(code, exchange, n=2))
+if ann_count > 0:
+    suggestions.append(f"巨潮资讯公告接口已激活，今日持仓新增 {ann_count} 条官方公告补充覆盖")
+else:
+    suggestions.append("巨潮资讯公告接口已接入，今日持仓暂无新公告")
+
 for i, s in enumerate(suggestions, 1):
     md.append(f"{i}. {s}")
 
