@@ -67,23 +67,18 @@ def sector_news(kw, n=4):
     return []
 
 def cninfo_news(code, exchange, n=3):
-    """从巨潮资讯获取个股公告（官方披露源，中小盘覆盖好）。"""
+    """从同花顺获取个股新闻（覆盖广，中小盘数据好）。"""
     try:
-        r = requests.post(
-            "https://www.cninfo.com.cn/new/hisAnnouncement/query",
-            headers={"User-Agent": "Mozilla/5.0", "Referer": "https://www.cninfo.com.cn/",
-                     "Content-Type": "application/x-www-form-urlencoded"},
-            data={"tabName": "fulltext", "pageNum": 1, "pageSize": n,
-                  "column": "sse" if exchange == "sh" else "szse",
-                  "stock": f"{code},{exchange}", "searchkey": "",
-                  "sortName": "", "sortType": "", "isHLtitle": "true"},
-            timeout=6,
+        r = requests.get(
+            "https://news.10jqka.com.cn/tapp/news/push/stock/",
+            params={"code": code, "page": 1, "pageSize": n, "tag": "", "enterby": ""},
+            headers={"User-Agent": "Mozilla/5.0"}, timeout=6,
         )
         results = []
-        for ann in r.json().get("announcements") or []:
-            title = ann.get("announcementTitle", "")
-            ts = ann.get("announcementTime", 0)
-            dt = datetime.fromtimestamp(ts / 1000).strftime("%Y-%m-%d") if ts else ""
+        for item in r.json().get("data", {}).get("list", []) or []:
+            title = item.get("title", "")
+            ts = item.get("ctime", 0)
+            dt = datetime.fromtimestamp(ts).strftime("%Y-%m-%d") if ts else ""
             if title:
                 results.append((title, dt))
         return results

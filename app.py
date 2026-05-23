@@ -260,29 +260,23 @@ def _sector_news(code: str, info: dict, n: int = 8) -> list:
 
 
 def _cninfo_news(code: str, market: str, n: int = 5) -> list:
-    """从巨潮资讯获取个股公告（官方披露源，对中小盘覆盖好）。"""
+    """从同花顺获取个股新闻（覆盖广，中小盘数据好）。"""
     clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
     if market not in ("SH", "SZ"):
         return []
-    exchange = "sse" if market == "SH" else "szse"
-    stock_key = f"{clean},{'sh' if market == 'SH' else 'sz'}"
     try:
-        r = _req.post(
-            "https://www.cninfo.com.cn/new/hisAnnouncement/query",
-            headers={**_HEADERS, "Content-Type": "application/x-www-form-urlencoded",
-                     "Referer": "https://www.cninfo.com.cn/"},
-            data={"tabName": "fulltext", "pageNum": 1, "pageSize": n,
-                  "column": exchange, "stock": stock_key, "searchkey": "",
-                  "sortName": "", "sortType": "", "isHLtitle": "true"},
-            timeout=6,
+        r = _req.get(
+            "https://news.10jqka.com.cn/tapp/news/push/stock/",
+            params={"code": clean, "page": 1, "pageSize": n, "tag": "", "enterby": ""},
+            headers=_HEADERS, timeout=6,
         )
         results = []
-        for ann in r.json().get("announcements") or []:
-            title = ann.get("announcementTitle", "")
-            ts = ann.get("announcementTime", 0)
-            dt = datetime.fromtimestamp(ts / 1000).strftime("%Y-%m-%d") if ts else ""
+        for item in r.json().get("data", {}).get("list", []) or []:
+            title = item.get("title", "")
+            ts = item.get("ctime", 0)
+            dt = datetime.fromtimestamp(ts).strftime("%Y-%m-%d") if ts else ""
             if title:
-                results.append({"title": title, "date": dt, "source": "cninfo"})
+                results.append({"title": title, "date": dt, "source": "ths"})
         return results
     except Exception:
         return []
