@@ -672,7 +672,7 @@ def _run_rank_job(job_id: str, markets: list):
         # 收集候选股
         candidates = []
         for mkt in markets:
-            stocks = _RANK_UNIVERSE.get(mkt, [])
+            stocks = _fetch_eastmoney_top(mkt, n=50)
             for code, name in stocks:
                 if mkt == "A股":
                     m2 = "A股SH" if code.startswith("6") or code.startswith("9") else "A股SZ"
