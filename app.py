@@ -110,12 +110,12 @@ def _capital_flow(code: str, market: str, days: int = 5) -> list:
                 continue
             result.append({
                 "date":      p[0],
-                "super_net": round(float(p[1]) / 1e8, 3),   # 超大单净（亿）
-                "large_net": round(float(p[2]) / 1e8, 3),   # 大单净（亿）
-                "mid_net":   round(float(p[3]) / 1e8, 3),
-                "small_net": round(float(p[4]) / 1e8, 3),
-                "main_net":  round(float(p[5]) / 1e8, 3),   # 主力净=超大+大单（亿）
-                "main_pct":  round(float(p[6]), 2),          # 主力净占比%
+                "main_net":  round(float(p[1]) / 1e8, 3),   # 主力净=超大+大单（亿）f52
+                "small_net": round(float(p[2]) / 1e8, 3),   # 小单净（亿）f53
+                "mid_net":   round(float(p[3]) / 1e8, 3),   # 中单净（亿）f54
+                "large_net": round(float(p[4]) / 1e8, 3),   # 大单净（亿）f55
+                "super_net": round(float(p[5]) / 1e8, 3),   # 超大单净（亿）f56
+                "main_pct":  round(float(p[6]), 2),          # 主力净占比% f57
             })
         if result:
             return result
