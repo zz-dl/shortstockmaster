@@ -120,6 +120,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
         <input type="checkbox" id="mkt-a" checked> A股
       </label>
       <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer">
+        <input type="checkbox" id="mkt-star"> 科创板
+      </label>
+      <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer">
         <input type="checkbox" id="mkt-hk"> 港股
       </label>
       <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer">
@@ -230,9 +233,10 @@ let rankJobId = null, rankTimer = null;
 
 async function startRank() {
   const markets = [];
-  if (document.getElementById('mkt-a').checked)  markets.push('A');
-  if (document.getElementById('mkt-hk').checked) markets.push('HK');
-  if (document.getElementById('mkt-us').checked) markets.push('US');
+  if (document.getElementById('mkt-a').checked)    markets.push('A');
+  if (document.getElementById('mkt-star').checked) markets.push('STAR');
+  if (document.getElementById('mkt-hk').checked)   markets.push('HK');
+  if (document.getElementById('mkt-us').checked)   markets.push('US');
   if (!markets.length) { alert('请至少选择一个市场'); return; }
 
   document.getElementById('rankContent').innerHTML = '';

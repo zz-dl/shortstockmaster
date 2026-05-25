@@ -549,22 +549,15 @@ def _ai_short_analyze(code: str, name: str, data: dict, news: list) -> str:
 
 # ── 推荐排行榜 ───────────────────────────────────────────────────────────────
 
-# 股票候选池：A股/港股/美股热门标的
-_RANK_UNIVERSE = {
-    "A股": [
-        ("600519", "贵州茅台"), ("300750", "宁德时代"), ("000858", "五粮液"),
-        ("601318", "中国平安"), ("600036", "招商银行"), ("000333", "美的集团"),
-        ("002594", "比亚迪"), ("601166", "兴业银行"), ("600276", "恒瑞医药"),
-        ("000725", "京东方A"), ("002415", "海康威视"), ("600031", "三一重工"),
-        ("603259", "药明康德"), ("601899", "紫金矿业"), ("600900", "长江电力"),
-        ("000001", "平安银行"), ("601668", "中国建筑"), ("600887", "伊利股份"),
-        ("002714", "牧原股份"), ("300760", "迈瑞医疗"),
-    ],
-    "港股": [
-        ("0700.HK", "腾讯控股"), ("9988.HK", "阿里巴巴"), ("3690.HK", "美团"),
-        ("9618.HK", "京东集团"), ("1211.HK", "比亚迪H"), ("0941.HK", "中国移动"),
-        ("1810.HK", "小米集团"), ("9999.HK", "网易"), ("0388.HK", "港交所"),
-    ],
+# 东方财富 clist API 市场过滤参数
+_MARKET_FS = {
+    "A股":   "m:1+t:2,m:0+t:6,m:0+t:80",  # 沪主板+深主板+创业板（不含科创板）
+    "科创板": "m:1+t:23",                    # 科创板
+    "港股":   "m:116+t:3,m:116+t:4",        # 港股主板+创业板
+}
+
+# 美股及兜底：EastMoney美股覆盖有限，保留固定列表
+_MARKET_FALLBACK = {
     "美股": [
         ("NVDA", "英伟达"), ("AAPL", "苹果"), ("MSFT", "微软"),
         ("TSLA", "特斯拉"), ("META", "Meta"), ("GOOGL", "谷歌"),
@@ -572,18 +565,48 @@ _RANK_UNIVERSE = {
     ],
 }
 
+
+def _fetch_eastmoney_top(market: str, n: int = 50) -> list:
+    """从东方财富拉当日涨幅 Top N，返回 [(code, name), ...]。失败时返回空列表。"""
+    fs = _MARKET_FS.get(market)
+    if not fs:
+        return _MARKET_FALLBACK.get(market, [])
+    try:
+        r = _req.get(
+            "https://push2.eastmoney.com/api/qt/clist/get",
+            params={"pn": 1, "pz": n, "po": 1, "np": 1,
+                    "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+                    "fltt": 2, "invt": 2, "fid": "f3",
+                    "fs": fs, "fields": "f12,f14"},
+            headers=_HEADERS, timeout=10,
+        )
+        items = r.json().get("data", {}).get("diff", []) or []
+        result = []
+        for item in items:
+            code = str(item.get("f12", ""))
+            name = item.get("f14", "")
+            if code and name and name != "-":
+                if market in ("A股", "科创板"):
+                    code = code.zfill(6)
+                result.append((code, name))
+        return result or _MARKET_FALLBACK.get(market, [])
+    except Exception as e:
+        print(f"EastMoney {market} fetch error: {e}")
+        return _MARKET_FALLBACK.get(market, [])
+
 # 后台任务存储
 _rank_jobs: dict = {}
 
 
 def _rank_score_quick(code: str, market: str, tencent_data: dict) -> dict:
     """用已抓取的腾讯数据快速计算短线评分（无额外网络请求）。"""
-    mkt_code = {"A股SH": "sh", "A股SZ": "sz", "港股": "hk", "美股": "us"}.get(market, "sz")
     clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
 
     # 腾讯行情 key 格式
     if market.startswith("A股"):
         tk = f"{'sh' if market=='A股SH' else 'sz'}{clean}"
+    elif market == "科创板":
+        tk = f"sh{clean}"
     elif market == "港股":
         tk = f"hk{clean.replace('.HK','').lstrip('0').zfill(5)}"
     else:
@@ -616,8 +639,11 @@ def _rank_score_quick(code: str, market: str, tencent_data: dict) -> dict:
     if turnover >= 5:   score += 10
     elif turnover >= 3: score += 5
 
-    # 涨停或接近涨停（A股专属）：当日无法买入且次日追买历史回调率高
+    # 涨停或接近涨停：当日无法买入且次日追买历史回调率高
+    # A股/创业板±10%，科创板±20%
     if market.startswith("A股") and chg_pct >= 9.5:
+        score -= 30
+    elif market == "科创板" and chg_pct >= 19.5:
         score -= 30
 
     score = max(-100, min(100, score))
@@ -628,8 +654,9 @@ def _rank_score_quick(code: str, market: str, tencent_data: dict) -> dict:
     elif score >= -30: rec, rc = "偏空观望", "#ff9944"
     else:              rec, rc = "短线做空", "#ff4444"
 
+    display_market = market.replace("A股SH", "A股").replace("A股SZ", "A股")
     return {
-        "code": code, "name": name, "market": market.replace("A股SH","A股").replace("A股SZ","A股"),
+        "code": code, "name": name, "market": display_market,
         "price": price, "chg_pct": chg_pct, "vol_ratio": vol_ratio,
         "turnover": turnover, "score": score, "rec": rec, "rec_color": rc,
     }
@@ -748,29 +775,33 @@ def api_rank():
     """同步扫描并直接返回结果（无轮询，无跨 worker 状态问题）。"""
     body = request.get_json(silent=True, force=True) or {}
     raw_markets = body.get("markets", ["A"])
-    # 支持英文代码和中文名
-    mkt_alias = {"A": "A股", "HK": "港股", "US": "美股",
-                 "A股": "A股", "港股": "港股", "美股": "美股"}
-    markets = [mkt_alias.get(m, m) for m in raw_markets if mkt_alias.get(m, m) in _RANK_UNIVERSE]
+    mkt_alias = {"A": "A股", "HK": "港股", "US": "美股", "STAR": "科创板",
+                 "A股": "A股", "港股": "港股", "美股": "美股", "科创板": "科创板"}
+    valid_markets = {"A股", "港股", "美股", "科创板"}
+    markets = [mkt_alias.get(m, m) for m in raw_markets if mkt_alias.get(m, m) in valid_markets]
     if not markets:
         markets = ["A股"]
 
     candidates = []
     tencent_codes = []
     for mkt in markets:
-        for code, name in _RANK_UNIVERSE.get(mkt, []):
+        stocks = _fetch_eastmoney_top(mkt, n=50)
+        for code, name in stocks:
+            clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
             if mkt == "A股":
                 m2 = "A股SH" if code.startswith("6") or code.startswith("9") else "A股SZ"
+                tk = f"{'sh' if m2 == 'A股SH' else 'sz'}{clean}"
+            elif mkt == "科创板":
+                m2 = "科创板"
+                tk = f"sh{clean}"
+            elif mkt == "港股":
+                m2 = "港股"
+                tk = f"hk{clean.lstrip('0').zfill(5)}"
             else:
-                m2 = mkt
+                m2 = "美股"
+                tk = f"us{clean}"
             candidates.append((code, name, m2))
-            clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
-            if m2.startswith("A股"):
-                tencent_codes.append(f"{'sh' if m2=='A股SH' else 'sz'}{clean}")
-            elif m2 == "港股":
-                tencent_codes.append(f"hk{clean.lstrip('0').zfill(5)}")
-            else:
-                tencent_codes.append(f"us{clean}")
+            tencent_codes.append(tk)
 
     all_tencent = {}
     for i in range(0, len(tencent_codes), 20):
