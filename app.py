@@ -778,23 +778,31 @@ def _rank_score_quick(code: str, market: str, tencent_data: dict) -> dict:
 
     score = 0
 
-    # 量比信号
-    if vol_ratio >= 3.0:   score += 25
+    # 量比信号（精细分档，区分冷热差异）
+    if vol_ratio >= 6.0:   score += 32
+    elif vol_ratio >= 4.0: score += 26
+    elif vol_ratio >= 2.5: score += 20
     elif vol_ratio >= 1.5: score += 12
+    elif vol_ratio >= 0.8: score += 4
     elif vol_ratio < 0.5:  score -= 10
 
-    # 当日涨幅
-    if chg_pct >= 5:    score += 20
-    elif chg_pct >= 2:  score += 10
-    elif chg_pct <= -5: score -= 20
-    elif chg_pct <= -2: score -= 10
+    # 当日涨幅（更细分档，8%以上和5%差别明显）
+    if chg_pct >= 8:     score += 22
+    elif chg_pct >= 6:   score += 17
+    elif chg_pct >= 4:   score += 12
+    elif chg_pct >= 2:   score += 7
+    elif chg_pct >= 0:   score += 2
+    elif chg_pct <= -5:  score -= 22
+    elif chg_pct <= -3:  score -= 14
+    elif chg_pct <= -1:  score -= 6
 
-    # 换手率异动（换手率>3%是活跃信号）
-    if turnover >= 5:   score += 10
-    elif turnover >= 3: score += 5
+    # 换手率（活跃度加成）
+    if turnover >= 8:    score += 13
+    elif turnover >= 5:  score += 9
+    elif turnover >= 3:  score += 5
+    elif turnover >= 1:  score += 2
 
     # 涨停或接近涨停：当日无法买入且次日追买历史回调率高
-    # A股/创业板±10%，科创板±20%
     if market.startswith("A股") and chg_pct >= 9.5:
         score -= 30
     elif market == "科创板" and chg_pct >= 19.5:
