@@ -551,7 +551,7 @@ def _ai_short_analyze(code: str, name: str, data: dict, news: list) -> str:
 
 # 动态股票池缓存：EastMoney成功后缓存10分钟，避免间歇性封禁导致结果交替
 _em_cache: dict = {}          # {"A股": {"stocks": [...], "ts": datetime}}
-_EM_CACHE_TTL = 600           # 秒
+_EM_CACHE_TTL = 60            # 秒（防抖：60秒内重复扫描用缓存，超过则重新拉取）
 
 # 东方财富 clist API 市场过滤参数
 _MARKET_FS = {
