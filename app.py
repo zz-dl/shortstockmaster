@@ -549,6 +549,10 @@ def _ai_short_analyze(code: str, name: str, data: dict, news: list) -> str:
 
 # ── 推荐排行榜 ───────────────────────────────────────────────────────────────
 
+# 动态股票池缓存：EastMoney成功后缓存10分钟，避免间歇性封禁导致结果交替
+_em_cache: dict = {}          # {"A股": {"stocks": [...], "ts": datetime}}
+_EM_CACHE_TTL = 600           # 秒
+
 # 东方财富 clist API 市场过滤参数
 _MARKET_FS = {
     "A股":   "m:1+t:2,m:0+t:6,m:0+t:80",  # 沪主板+深主板+创业板（不含科创板）
@@ -600,7 +604,13 @@ _MARKET_FALLBACK = {
 
 
 def _fetch_eastmoney_top(market: str, n: int = 50) -> list:
-    """从东方财富拉当日涨幅 Top N，返回 [(code, name), ...]。失败时返回空列表。"""
+    """从东方财富拉当日涨幅 Top N，返回 [(code, name), ...]。
+    成功结果缓存10分钟，避免Render间歇性封禁导致结果忽动忽静。"""
+    # 检查缓存
+    cached = _em_cache.get(market)
+    if cached and (datetime.now() - cached["ts"]).total_seconds() < _EM_CACHE_TTL:
+        return cached["stocks"]
+
     fs = _MARKET_FS.get(market)
     if not fs:
         return _MARKET_FALLBACK.get(market, [])
@@ -622,7 +632,10 @@ def _fetch_eastmoney_top(market: str, n: int = 50) -> list:
                 if market in ("A股", "科创板"):
                     code = code.zfill(6)
                 result.append((code, name))
-        return result or _MARKET_FALLBACK.get(market, [])
+        if result:
+            _em_cache[market] = {"stocks": result, "ts": datetime.now()}
+            return result
+        return _MARKET_FALLBACK.get(market, [])
     except Exception as e:
         print(f"EastMoney {market} fetch error: {e}")
         return _MARKET_FALLBACK.get(market, [])
