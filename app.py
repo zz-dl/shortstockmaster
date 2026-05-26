@@ -553,6 +553,110 @@ def _ai_short_analyze(code: str, name: str, data: dict, news: list) -> str:
 _em_cache: dict = {}          # {"A股": {"stocks": [...], "ts": datetime}}
 _EM_CACHE_TTL = 60            # 秒（防抖：60秒内重复扫描用缓存，超过则重新拉取）
 
+# Tencent 全量扫描缓存（EastMoney 被封时使用）
+_tencent_scan_cache: dict = {}   # {"A股": {"stocks": [...], "ts": datetime}}
+_TENCENT_SCAN_TTL = 120          # 2分钟
+
+
+def _gen_astock_qtcodes(market: str) -> list:
+    """生成指定市场的腾讯行情代码列表"""
+    codes = []
+    if market == "A股":
+        for n in range(600000, 608000):
+            codes.append(f"sh{n}")
+        for n in range(1, 4000):
+            codes.append(f"sz{str(n).zfill(6)}")
+        for n in range(300000, 302000):
+            codes.append(f"sz{n}")
+    elif market == "科创板":
+        for n in range(688000, 689000):
+            codes.append(f"sh{n}")
+    return codes
+
+
+def _tencent_scan_fallback(market: str, top_n: int = 60) -> list:
+    """
+    腾讯全量扫描兜底：EastMoney 被封时使用。
+    返回 [(code, name), ...] 格式，取活跃度最高的 top_n 只。
+    20 个并发线程，约 5-10 秒完成全市场扫描。
+    """
+    cached = _tencent_scan_cache.get(market)
+    if cached and (datetime.now() - cached["ts"]).total_seconds() < _TENCENT_SCAN_TTL:
+        return cached["stocks"]
+
+    qtcodes = _gen_astock_qtcodes(market)
+    if not qtcodes:
+        return []
+
+    BATCH = 60
+    WORKERS = 20
+    all_data: list = []
+    lock = threading.Lock()
+
+    def _sf(s):
+        try:
+            return float(s) if s and str(s).strip() else 0.0
+        except Exception:
+            return 0.0
+
+    def fetch(batch: list) -> None:
+        try:
+            r = _req.get(
+                f"http://qt.gtimg.cn/q={','.join(batch)}",
+                headers=_HEADERS, timeout=10,
+            )
+            for seg in r.text.strip().split(";"):
+                if "~" not in seg or "=" not in seg:
+                    continue
+                m = re.search(r'v_(\w+)="([^"]+)"', seg)
+                if not m:
+                    continue
+                qtcode = m.group(1)
+                parts = m.group(2).split("~")
+                if len(parts) < 40:
+                    continue
+                price = _sf(parts[3])
+                if price <= 0:
+                    continue
+                name = parts[1]
+                if not name or "ST" in name.upper():
+                    continue
+                chg_pct = _sf(parts[32])
+                vol_ratio = _sf(parts[49]) if len(parts) > 49 else 0
+                turnover = _sf(parts[38])
+                # 活跃度评分：量比 × 换手率，用于筛选最有意义的 top_n 只
+                activity = vol_ratio * turnover
+                with lock:
+                    all_data.append({
+                        "qtcode": qtcode,
+                        "code": qtcode[2:],
+                        "name": name,
+                        "chg_pct": chg_pct,
+                        "activity": activity,
+                    })
+        except Exception:
+            pass
+
+    batches = [qtcodes[i:i + BATCH] for i in range(0, len(qtcodes), BATCH)]
+    active = []
+    for b in batches:
+        t = threading.Thread(target=fetch, args=(b,), daemon=True)
+        active.append(t)
+        t.start()
+        if len(active) >= WORKERS:
+            for t2 in active:
+                t2.join(timeout=15)
+            active = []
+    for t2 in active:
+        t2.join(timeout=15)
+
+    # 按活跃度降序，取 top_n
+    all_data.sort(key=lambda x: -x["activity"])
+    result = [(d["code"], d["name"]) for d in all_data[:top_n]]
+    print(f"Tencent scan fallback {market}: {len(all_data)} valid → top {len(result)}")
+    _tencent_scan_cache[market] = {"stocks": result, "ts": datetime.now()}
+    return result
+
 # 东方财富 clist API 市场过滤参数
 _MARKET_FS = {
     "A股":   "m:1+t:2,m:0+t:6,m:0+t:80",  # 沪主板+深主板+创业板（不含科创板）
@@ -635,9 +739,13 @@ def _fetch_eastmoney_top(market: str, n: int = 50) -> list:
         if result:
             _em_cache[market] = {"stocks": result, "ts": datetime.now()}
             return result
+        if market in ("A股", "科创板"):
+            return _tencent_scan_fallback(market)
         return _MARKET_FALLBACK.get(market, [])
     except Exception as e:
         print(f"EastMoney {market} fetch error: {e}")
+        if market in ("A股", "科创板"):
+            return _tencent_scan_fallback(market)
         return _MARKET_FALLBACK.get(market, [])
 
 # 后台任务存储
