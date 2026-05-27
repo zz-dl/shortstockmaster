@@ -955,24 +955,51 @@ def api_rank():
 
     candidates = []
     tencent_codes = []
+    seen_codes: set = set()
+
+    def _add_candidate(code, name, mkt):
+        if not code or code in seen_codes:
+            return
+        clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
+        if mkt == "A股":
+            m2 = "A股SH" if code.startswith("6") or code.startswith("9") else "A股SZ"
+            tk = f"{'sh' if m2 == 'A股SH' else 'sz'}{clean}"
+        elif mkt == "科创板":
+            m2, tk = "科创板", f"sh{clean}"
+        elif mkt == "港股":
+            m2, tk = "港股", f"hk{clean.lstrip('0').zfill(5)}"
+        else:
+            m2, tk = "美股", f"us{clean}"
+        candidates.append((code, name, m2))
+        tencent_codes.append(tk)
+        seen_codes.add(code)
+
+    # 第一来源：涨幅 Top50（原有）
     for mkt in markets:
-        stocks = _fetch_eastmoney_top(mkt, n=50)
-        for code, name in stocks:
-            clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
-            if mkt == "A股":
-                m2 = "A股SH" if code.startswith("6") or code.startswith("9") else "A股SZ"
-                tk = f"{'sh' if m2 == 'A股SH' else 'sz'}{clean}"
-            elif mkt == "科创板":
-                m2 = "科创板"
-                tk = f"sh{clean}"
-            elif mkt == "港股":
-                m2 = "港股"
-                tk = f"hk{clean.lstrip('0').zfill(5)}"
-            else:
-                m2 = "美股"
-                tk = f"us{clean}"
-            candidates.append((code, name, m2))
-            tencent_codes.append(tk)
+        for code, name in _fetch_eastmoney_top(mkt, n=50):
+            _add_candidate(code, name, mkt)
+
+    # 第二来源：A股主力净流入 Top30（补充稳健积累型，不依赖涨幅排名）
+    if "A股" in markets:
+        try:
+            r_cf = _req.get(
+                "https://push2.eastmoney.com/api/qt/clist/get",
+                params={
+                    "fid": "f62", "po": 1, "pz": 30, "pn": 1,
+                    "np": 1, "fltt": 2, "invt": 2,
+                    "fs": "m:1+t:2,m:0+t:6,m:0+t:80,m:1+t:23",
+                    "fields": "f2,f3,f5,f6,f8,f10,f12,f13,f14,f20,f21",
+                    "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+                },
+                timeout=8,
+            )
+            for s in r_cf.json().get("data", {}).get("diff", []) or []:
+                code = str(s.get("f12") or "")
+                name = str(s.get("f14") or "")
+                if code and "ST" not in name.upper():
+                    _add_candidate(code, name, "A股")
+        except Exception as e:
+            print(f"Capital flow supplement failed: {e}")
 
     all_tencent = {}
     for i in range(0, len(tencent_codes), 20):
