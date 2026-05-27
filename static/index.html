@@ -367,6 +367,7 @@ function renderPortfolio(positions) {
         <div><span style="color:var(--dim)">成本额 </span>${p.cost.toFixed(0)}</div>
         <div><span style="color:var(--dim)">市值 </span>${val.toFixed(0)}</div>
         <div><span style="color:var(--dim)">今日 </span><span style="color:${chgColor(p.chg_pct||0)}">${fmtChg(p.chg_pct||0)}</span></div>
+        ${(p.score_at_buy!=null&&p.score_at_buy!==0)?`<div style="grid-column:span 3;margin-top:2px"><span style="color:var(--dim)">买入评分 </span><span style="color:${p.score_at_buy>=40?'#00cc55':p.score_at_buy>=20?'#55ee99':p.score_at_buy>=0?'#ffcc00':'#ff9944'};font-weight:700">${p.score_at_buy>0?'+':''}${p.score_at_buy}</span><span style="color:var(--dim);font-size:10px;margin-left:4px">${p.rec_at_buy||''}</span></div>`:''}
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn btn-outline" style="flex:1;font-size:12px" onclick="goAnalyze('${p.code}')">分析</button>

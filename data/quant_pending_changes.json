@@ -1,0 +1,10 @@
+[
+  {
+    "id": "rank_overnight_risk",
+    "title": "排行榜评分加入隔夜风险惩罚",
+    "description": "当前排行榜奖励高量比+高涨幅+高换手，但对隔夜持仓来说这三条恰是风险信号。需要在 _rank_score_quick() 里加：1) 换手率>15%扣分（主力出货风险）；2) 当日涨幅>7%扣分（已过热，次日回调概率高）",
+    "file": "F:/ShortStockMaster/app.py",
+    "function": "_rank_score_quick",
+    "created": "2026-05-27"
+  }
+]

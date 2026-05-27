@@ -752,11 +752,10 @@ def _fetch_eastmoney_top(market: str, n: int = 50) -> list:
 _rank_jobs: dict = {}
 
 
-def _rank_score_quick(code: str, market: str, tencent_data: dict) -> dict:
-    """用已抓取的腾讯数据快速计算短线评分（无额外网络请求）。"""
+def _rank_score_quick(code: str, market: str, tencent_data: dict, capital_net: float = 0) -> dict:
+    """用腾讯数据 + 主力资金净流入快速计算短线评分，针对隔夜持仓优化。"""
     clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
 
-    # 腾讯行情 key 格式
     if market.startswith("A股"):
         tk = f"{'sh' if market=='A股SH' else 'sz'}{clean}"
     elif market == "科创板":
@@ -770,15 +769,17 @@ def _rank_score_quick(code: str, market: str, tencent_data: dict) -> dict:
     if not q:
         return {}
 
-    name     = q.get("name", code)
-    price    = q.get("price", 0)
-    chg_pct  = q.get("chg_pct", 0)
+    name      = q.get("name", code)
+    price     = q.get("price", 0)
+    chg_pct   = q.get("chg_pct", 0)
     vol_ratio = q.get("vol_ratio", 1.0)
-    turnover = q.get("turnover", 0)
+    turnover  = q.get("turnover", 0)
 
     score = 0
+    is_astock = market.startswith("A股") or market == "科创板"
+    limit_thr = 19.5 if market == "科创板" else 9.5
 
-    # 量比信号（精细分档，区分冷热差异）
+    # ── 量比：动量强度
     if vol_ratio >= 6.0:   score += 32
     elif vol_ratio >= 4.0: score += 26
     elif vol_ratio >= 2.5: score += 20
@@ -786,27 +787,34 @@ def _rank_score_quick(code: str, market: str, tencent_data: dict) -> dict:
     elif vol_ratio >= 0.8: score += 4
     elif vol_ratio < 0.5:  score -= 10
 
-    # 当日涨幅（更细分档，8%以上和5%差别明显）
-    if chg_pct >= 8:     score += 22
-    elif chg_pct >= 6:   score += 17
-    elif chg_pct >= 4:   score += 12
-    elif chg_pct >= 2:   score += 7
+    # ── 当日涨幅：3-6% 是隔夜持仓甜蜜点，>7% 次日回调风险高
+    if chg_pct >= limit_thr:
+        score -= 30                       # 涨停，当日无法买入
+    elif chg_pct >= 7 and is_astock:
+        score += 8                        # 已过热，次日高开低走概率大
+    elif chg_pct >= 5:   score += 15
+    elif chg_pct >= 3:   score += 18     # 甜蜜点：有动能且未过热
+    elif chg_pct >= 1:   score += 8
     elif chg_pct >= 0:   score += 2
     elif chg_pct <= -5:  score -= 22
     elif chg_pct <= -3:  score -= 14
     elif chg_pct <= -1:  score -= 6
 
-    # 换手率（活跃度加成）
-    if turnover >= 8:    score += 13
+    # ── 换手率：>15% 疑似主力出货，红色预警
+    if turnover >= 20:   score -= 10     # 严重过度换手，主力出货红警
+    elif turnover >= 15: score += 3      # 偏高，观望
+    elif turnover >= 8:  score += 13
     elif turnover >= 5:  score += 9
     elif turnover >= 3:  score += 5
     elif turnover >= 1:  score += 2
 
-    # 涨停或接近涨停：当日无法买入且次日追买历史回调率高
-    if market.startswith("A股") and chg_pct >= 9.5:
-        score -= 30
-    elif market == "科创板" and chg_pct >= 19.5:
-        score -= 30
+    # ── 主力资金净流入（亿元，第二阶段传入）
+    if capital_net > 2.0:    score += 18
+    elif capital_net > 0.5:  score += 12
+    elif capital_net > 0.1:  score += 6
+    elif capital_net < -2.0: score -= 18
+    elif capital_net < -0.5: score -= 12
+    elif capital_net < -0.1: score -= 6
 
     score = max(-100, min(100, score))
 
@@ -820,7 +828,8 @@ def _rank_score_quick(code: str, market: str, tencent_data: dict) -> dict:
     return {
         "code": code, "name": name, "market": display_market,
         "price": price, "chg_pct": chg_pct, "vol_ratio": vol_ratio,
-        "turnover": turnover, "score": score, "rec": rec, "rec_color": rc,
+        "turnover": turnover, "capital_net": round(capital_net, 2),
+        "score": score, "rec": rec, "rec_color": rc,
     }
 
 
@@ -969,15 +978,55 @@ def api_rank():
     for i in range(0, len(tencent_codes), 20):
         all_tencent.update(_tencent_quote(tencent_codes[i:i+20]))
 
-    results = []
+    # 第一阶段：用腾讯数据打分，取 Top30 候选
+    phase1 = []
     for code, name, market in candidates:
         r = _rank_score_quick(code, market, all_tencent)
         if r and r.get("price", 0) > 0:
-            results.append(r)
+            phase1.append(r)
+    phase1.sort(key=lambda x: x["score"], reverse=True)
+    top30 = phase1[:30]
 
-    results.sort(key=lambda x: x["score"], reverse=True)
+    # 第二阶段：并行拉主力资金净流入，仅 A股/科创板
+    capital_nets: dict = {}
+    cf_lock = threading.Lock()
+
+    def _fetch_cf(stock: dict) -> None:
+        code = stock["code"]
+        if stock["market"] not in ("A股", "科创板"):
+            return
+        mkt_str = _detect_market(code)
+        cf = _capital_flow(code, mkt_str, days=1)
+        if cf:
+            with cf_lock:
+                capital_nets[code] = cf[-1].get("main_net", 0)
+
+    cf_threads = [threading.Thread(target=_fetch_cf, args=(s,), daemon=True) for s in top30]
+    for t in cf_threads: t.start()
+    for t in cf_threads: t.join(timeout=10)
+
+    # 第三阶段：把资金流加入评分，重新排序
+    for r in top30:
+        net = capital_nets.get(r["code"], 0)
+        r["capital_net"] = round(net, 2)
+        if net > 2.0:    delta = 18
+        elif net > 0.5:  delta = 12
+        elif net > 0.1:  delta = 6
+        elif net < -2.0: delta = -18
+        elif net < -0.5: delta = -12
+        elif net < -0.1: delta = -6
+        else:            delta = 0
+        r["score"] = max(-100, min(100, r["score"] + delta))
+        s = r["score"]
+        if s >= 30:    r["rec"], r["rec_color"] = "短线做多", "#00cc55"
+        elif s >= 10:  r["rec"], r["rec_color"] = "偏多观望", "#55ee99"
+        elif s >= -10: r["rec"], r["rec_color"] = "中性",     "#ffcc00"
+        elif s >= -30: r["rec"], r["rec_color"] = "偏空观望", "#ff9944"
+        else:          r["rec"], r["rec_color"] = "短线做空", "#ff4444"
+
+    top30.sort(key=lambda x: x["score"], reverse=True)
     return Response(jdump({"status": "done", "total": len(candidates),
-                            "results": results[:15]}), mimetype="application/json")
+                            "results": top30[:15]}), mimetype="application/json")
 
 
 # 兼容旧接口
