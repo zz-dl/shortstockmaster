@@ -985,7 +985,7 @@ def api_rank():
             r_cf = _req.get(
                 "https://push2.eastmoney.com/api/qt/clist/get",
                 params={
-                    "fid": "f62", "po": 1, "pz": 30, "pn": 1,
+                    "fid": "f62", "po": 1, "pz": 50, "pn": 1,
                     "np": 1, "fltt": 2, "invt": 2,
                     "fs": "m:1+t:2,m:0+t:6,m:0+t:80,m:1+t:23",
                     "fields": "f2,f3,f5,f6,f8,f10,f12,f13,f14,f20,f21",
