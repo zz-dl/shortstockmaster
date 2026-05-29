@@ -12,10 +12,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 328.52,
-      "cur_price": 27.58,
-      "chg_today": -2.89,
-      "pnl_pct": -9.4,
-      "pnl": -939.57
+      "cur_price": 28.04,
+      "chg_today": -1.82,
+      "pnl_pct": -7.88,
+      "pnl": -788.45
     },
     {
       "code": "600900",
@@ -28,10 +28,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 367.65,
-      "cur_price": 27.19,
-      "chg_today": -0.18,
-      "pnl_pct": -0.04,
-      "pnl": -3.68
+      "cur_price": 27.53,
+      "chg_today": 1.14,
+      "pnl_pct": 1.21,
+      "pnl": 121.32
     },
     {
       "code": "0700.HK",
@@ -44,10 +44,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 21.79,
-      "cur_price": 421.6,
-      "chg_today": -2.95,
-      "pnl_pct": -8.15,
-      "pnl": -814.95
+      "cur_price": 436.2,
+      "chg_today": 2.64,
+      "pnl_pct": -4.97,
+      "pnl": -496.81
     },
     {
       "code": "600519",
@@ -60,10 +60,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 7.58,
-      "cur_price": 1280.71,
-      "chg_today": -1.71,
-      "pnl_pct": -2.9,
-      "pnl": -290.31
+      "cur_price": 1319.99,
+      "chg_today": 3.45,
+      "pnl_pct": 0.07,
+      "pnl": 7.43
     },
     {
       "code": "300750",
@@ -76,10 +76,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 23.99,
-      "cur_price": 410.34,
-      "chg_today": -1.08,
-      "pnl_pct": -1.56,
-      "pnl": -156.41
+      "cur_price": 426.42,
+      "chg_today": 2.58,
+      "pnl_pct": 2.29,
+      "pnl": 229.34
     },
     {
       "code": "000858",
@@ -92,10 +92,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 116.81,
-      "cur_price": 81.4,
-      "chg_today": -2.97,
-      "pnl_pct": -4.92,
-      "pnl": -491.77
+      "cur_price": 84.46,
+      "chg_today": 3.64,
+      "pnl_pct": -1.34,
+      "pnl": -134.33
     },
     {
       "code": "601318",
@@ -108,10 +108,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 184.6,
-      "cur_price": 52.26,
-      "chg_today": -1.9,
-      "pnl_pct": -3.53,
-      "pnl": -352.59
+      "cur_price": 53.32,
+      "chg_today": 1.62,
+      "pnl_pct": -1.57,
+      "pnl": -156.91
     },
     {
       "code": "600036",
@@ -124,10 +124,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 267.59,
-      "cur_price": 37.11,
-      "chg_today": 0.3,
-      "pnl_pct": -0.7,
-      "pnl": -69.57
+      "cur_price": 37.86,
+      "chg_today": 1.99,
+      "pnl_pct": 1.31,
+      "pnl": 131.12
     },
     {
       "code": "002594",
@@ -140,10 +140,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 104.68,
-      "cur_price": 94.23,
-      "chg_today": -1.04,
-      "pnl_pct": -1.36,
-      "pnl": -136.08
+      "cur_price": 97.3,
+      "chg_today": 1.48,
+      "pnl_pct": 1.85,
+      "pnl": 185.28
     },
     {
       "code": "601166",
@@ -156,10 +156,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 570.78,
-      "cur_price": 18.03,
-      "chg_today": 0.17,
-      "pnl_pct": 2.91,
-      "pnl": 291.1
+      "cur_price": 18.32,
+      "chg_today": 1.95,
+      "pnl_pct": 4.57,
+      "pnl": 456.62
     }
   ],
   "history": [
@@ -209,6 +209,12 @@
       "date": "2026-05-28",
       "total_pnl": -2963.8300000000004,
       "pct": -2.96383,
+      "anomalies": 2
+    },
+    {
+      "date": "2026-05-29",
+      "total_pnl": -445.39,
+      "pct": -0.44539,
       "anomalies": 2
     }
   ]
