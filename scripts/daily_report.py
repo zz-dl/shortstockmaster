@@ -1,6 +1,7 @@
 """每日 StockMaster 跟踪日报脚本，由 GitHub Actions 自动运行。"""
 import requests, json, base64, re, os
 from datetime import date, datetime
+from trade_history import build_trade_history_records
 
 GH_TOKEN = os.environ["GH_TOKEN"]
 GH_REPO  = os.environ.get("GH_REPO", "zz-dl/shortstockmaster")
@@ -91,8 +92,10 @@ state, state_sha = gh_get("daily_logs/portfolio_state.json")
 is_day1 = state is None
 if is_day1:
     state = {"created": today, "positions": [], "history": []}
+    previous_positions = []
     print("第1天：初始化持仓")
 else:
+    previous_positions = [dict(p) for p in state.get("positions", [])]
     print(f"持续跟踪，第 {(date.today()-date.fromisoformat(state['created'])).days+1} 天")
 
 top10 = []
@@ -242,6 +245,18 @@ log_path = f"daily_logs/{today}.md"
 _, log_sha = gh_get(log_path)
 ok = gh_put(log_path, "\n".join(md), f"📊 每日日报 {today}", log_sha)
 print(f"日报提交：{'✅' if ok else '❌'} → {log_path}")
+
+trade_history = {
+    "date": today,
+    "source_app": "short_stockmaster",
+    "strategy": "daily_report_top10",
+    "records": build_trade_history_records(today, positions, previous_positions, top10, is_day1),
+}
+hist_path = f"daily_logs/trade_history/{today}.json"
+_, hist_sha = gh_get(hist_path)
+ok_hist = gh_put(hist_path, json.dumps(trade_history, ensure_ascii=False, indent=2),
+                 f"交易历史 {today}", hist_sha)
+print(f"交易历史：{'✅' if ok_hist else '❌'} → {hist_path}")
 
 state["positions"] = positions
 state["history"] = state.get("history", []) + [{
