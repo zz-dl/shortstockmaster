@@ -779,23 +779,23 @@ def _rank_score_quick(code: str, market: str, tencent_data: dict, capital_net: f
     is_astock = market.startswith("A股") or market == "科创板"
     limit_thr = 19.5 if market == "科创板" else 9.5
 
-    # ── 量比：动量强度
-    if vol_ratio >= 6.0:   score += 32
-    elif vol_ratio >= 4.0: score += 26
-    elif vol_ratio >= 2.5: score += 20
+    # ── 量比：全量回测显示 1.5-4 更稳，极端放量不再追高。
+    if vol_ratio >= 6.0:   score -= 8
+    elif vol_ratio >= 4.0: score -= 2
+    elif vol_ratio >= 2.5: score += 14
     elif vol_ratio >= 1.5: score += 12
-    elif vol_ratio >= 0.8: score += 4
+    elif vol_ratio >= 0.8: score += 2
     elif vol_ratio < 0.5:  score -= 10
 
-    # ── 当日涨幅：3-6% 是隔夜持仓甜蜜点，>7% 次日回调风险高
+    # ── 当日涨幅：3-7% 是回测支持的候选区，7%以上降权。
     if chg_pct >= limit_thr:
         score -= 30                       # 涨停，当日无法买入
     elif chg_pct >= 7 and is_astock:
-        score += 8                        # 已过热，次日高开低走概率大
-    elif chg_pct >= 5:   score += 15
-    elif chg_pct >= 3:   score += 18     # 甜蜜点：有动能且未过热
-    elif chg_pct >= 1:   score += 8
-    elif chg_pct >= 0:   score += 2
+        score -= 5                        # 已过热，次日高开低走概率大
+    elif chg_pct >= 5:   score += 20
+    elif chg_pct >= 3:   score += 16     # 甜蜜点：有动能且未过热
+    elif chg_pct >= 1:   score += 6
+    elif chg_pct >= 0:   score += 1
     elif chg_pct <= -5:  score -= 22
     elif chg_pct <= -3:  score -= 14
     elif chg_pct <= -1:  score -= 6
@@ -831,6 +831,16 @@ def _rank_score_quick(code: str, market: str, tencent_data: dict, capital_net: f
         "turnover": turnover, "capital_net": round(capital_net, 2),
         "score": score, "rec": rec, "rec_color": rc,
     }
+
+
+def _is_rank_candidate(stock: dict) -> bool:
+    """Apply the full-history backtest-supported A-share candidate filter."""
+    market = stock.get("market", "")
+    if market not in ("A股", "科创板", "A股SH", "A股SZ"):
+        return True
+    chg_pct = float(stock.get("chg_pct") or 0)
+    vol_ratio = float(stock.get("vol_ratio") or 0)
+    return 3.0 <= chg_pct < 7.0 and 1.5 <= vol_ratio < 4.0
 
 
 def _run_rank_job(job_id: str, markets: list):
@@ -1011,6 +1021,7 @@ def api_rank():
         r = _rank_score_quick(code, market, all_tencent)
         if r and r.get("price", 0) > 0:
             phase1.append(r)
+    phase1 = [r for r in phase1 if _is_rank_candidate(r)]
     phase1.sort(key=lambda x: x["score"], reverse=True)
     top30 = phase1[:30]
 
@@ -1051,6 +1062,7 @@ def api_rank():
         elif s >= -30: r["rec"], r["rec_color"] = "偏空观望", "#ff9944"
         else:          r["rec"], r["rec_color"] = "短线做空", "#ff4444"
 
+    top30 = [r for r in top30 if _is_rank_candidate(r)]
     top30.sort(key=lambda x: x["score"], reverse=True)
     return Response(jdump({"status": "done", "total": len(candidates),
                             "results": top30[:15]}), mimetype="application/json")
