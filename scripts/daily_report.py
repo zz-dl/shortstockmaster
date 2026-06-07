@@ -2,6 +2,7 @@
 import requests, json, base64, re, os
 from datetime import date, datetime
 from trade_history import build_trade_history_records
+from signal_snapshot import build_signal_snapshot_records
 
 GH_TOKEN = os.environ["GH_TOKEN"]
 GH_REPO  = os.environ.get("GH_REPO", "zz-dl/shortstockmaster")
@@ -257,6 +258,18 @@ _, hist_sha = gh_get(hist_path)
 ok_hist = gh_put(hist_path, json.dumps(trade_history, ensure_ascii=False, indent=2),
                  f"交易历史 {today}", hist_sha)
 print(f"交易历史：{'✅' if ok_hist else '❌'} → {hist_path}")
+
+signal_snapshot = {
+    "date": today,
+    "source_app": "short_stockmaster",
+    "strategy": "daily_report_top10",
+    "records": build_signal_snapshot_records(today, top10),
+}
+snapshot_path = f"daily_logs/signal_snapshots/{today}.json"
+_, snapshot_sha = gh_get(snapshot_path)
+ok_snapshot = gh_put(snapshot_path, json.dumps(signal_snapshot, ensure_ascii=False, indent=2),
+                     f"signal snapshot {today}", snapshot_sha)
+print(f"信号快照：{'✅' if ok_snapshot else '❌'} → {snapshot_path}")
 
 state["positions"] = positions
 state["history"] = state.get("history", []) + [{
