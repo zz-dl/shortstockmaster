@@ -2,22 +2,6 @@
   "created": "2026-05-19",
   "positions": [
     {
-      "code": "1810.HK",
-      "name": "小米集团-W",
-      "market": "港股",
-      "tk": "hk01810",
-      "score": 25,
-      "rec": "偏多观望",
-      "entry_price": 30.44,
-      "entry_date": "2026-05-19",
-      "amount": 10000,
-      "shares": 328.52,
-      "cur_price": 28.16,
-      "chg_today": -0.78,
-      "pnl_pct": -7.49,
-      "pnl": -749.03
-    },
-    {
       "code": "600900",
       "name": "长江电力",
       "market": "A股",
@@ -28,10 +12,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 367.65,
-      "cur_price": 27.68,
-      "chg_today": -0.14,
-      "pnl_pct": 1.76,
-      "pnl": 176.47
+      "cur_price": 27.36,
+      "chg_today": -0.91,
+      "pnl_pct": 0.59,
+      "pnl": 58.82
     },
     {
       "code": "0700.HK",
@@ -44,10 +28,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 21.79,
-      "cur_price": 458.8,
-      "chg_today": -0.04,
-      "pnl_pct": -0.04,
-      "pnl": -4.36
+      "cur_price": 447.6,
+      "chg_today": -1.24,
+      "pnl_pct": -2.48,
+      "pnl": -248.41
     },
     {
       "code": "600519",
@@ -60,10 +44,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 7.58,
-      "cur_price": 1270.41,
-      "chg_today": 0.19,
-      "pnl_pct": -3.68,
-      "pnl": -368.39
+      "cur_price": 1263.46,
+      "chg_today": -0.74,
+      "pnl_pct": -4.21,
+      "pnl": -421.07
     },
     {
       "code": "300750",
@@ -76,26 +60,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 23.99,
-      "cur_price": 407.83,
-      "chg_today": -0.09,
-      "pnl_pct": -2.17,
-      "pnl": -216.63
-    },
-    {
-      "code": "000858",
-      "name": "五 粮 液",
-      "market": "A股",
-      "tk": "sz000858",
-      "score": 0,
-      "rec": "中性",
-      "entry_price": 85.61,
-      "entry_date": "2026-05-19",
-      "amount": 10000,
-      "shares": 116.81,
-      "cur_price": 81.42,
-      "chg_today": 0.39,
-      "pnl_pct": -4.89,
-      "pnl": -489.43
+      "cur_price": 392.96,
+      "chg_today": -2.49,
+      "pnl_pct": -5.73,
+      "pnl": -573.36
     },
     {
       "code": "601318",
@@ -108,10 +76,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 184.6,
-      "cur_price": 53.56,
-      "chg_today": 0.62,
-      "pnl_pct": -1.13,
-      "pnl": -112.61
+      "cur_price": 53.45,
+      "chg_today": -0.06,
+      "pnl_pct": -1.33,
+      "pnl": -132.91
     },
     {
       "code": "600036",
@@ -124,10 +92,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 267.59,
-      "cur_price": 38.57,
-      "chg_today": 1.23,
-      "pnl_pct": 3.21,
-      "pnl": 321.11
+      "cur_price": 38.54,
+      "chg_today": -0.1,
+      "pnl_pct": 3.13,
+      "pnl": 313.08
     },
     {
       "code": "002594",
@@ -140,10 +108,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 104.68,
-      "cur_price": 92.54,
-      "chg_today": -0.96,
-      "pnl_pct": -3.13,
-      "pnl": -312.99
+      "cur_price": 90.71,
+      "chg_today": -2.47,
+      "pnl_pct": -5.05,
+      "pnl": -504.56
     },
     {
       "code": "601166",
@@ -156,10 +124,10 @@
       "entry_date": "2026-05-19",
       "amount": 10000,
       "shares": 570.78,
-      "cur_price": 18.61,
-      "chg_today": 1.75,
-      "pnl_pct": 6.22,
-      "pnl": 622.15
+      "cur_price": 18.57,
+      "chg_today": -0.16,
+      "pnl_pct": 5.99,
+      "pnl": 599.32
     }
   ],
   "history": [
@@ -245,6 +213,12 @@
       "date": "2026-06-05",
       "total_pnl": -1133.71,
       "pct": -1.13371,
+      "anomalies": 1
+    },
+    {
+      "date": "2026-06-08",
+      "total_pnl": -909.09,
+      "pct": -1.1363625,
       "anomalies": 1
     }
   ]
