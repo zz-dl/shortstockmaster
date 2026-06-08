@@ -41,4 +41,14 @@ check("tracking day creates snapshot", len(records) == 1, f"={len(records)}")
 check("snapshot fields normalized", records[0]["action"] == "snapshot" and
       records[0]["current_price"] == 27.8 and records[0]["return_pct"] == 2.21)
 
+sold = [dict(positions[0], sell_price=27.8, sell_reason="dropped_from_top10")]
+records = build_trade_history_records(
+    today, [], positions, [], False, sold_positions=sold,
+)
+check("sell records are normalized", len(records) == 1, f"={len(records)}")
+check("sell fields normalized", records[0]["action"] == "sell" and
+      records[0]["sell_time"] == "09:00:00" and
+      records[0]["sell_reason"] == "dropped_from_top10" and
+      records[0]["sell_price"] == 27.8)
+
 print("ALL TESTS PASSED")

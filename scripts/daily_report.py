@@ -10,6 +10,10 @@ GH_HDR   = {"Authorization": f"Bearer {GH_TOKEN}", "Accept": "application/vnd.gi
 TQ_HDR   = {"User-Agent": "Mozilla/5.0"}
 EM_HDR   = {"User-Agent": "Mozilla/5.0"}
 today    = date.today().isoformat()
+MAX_POSITIONS = 10
+BUY_AMOUNT = 10000
+BUY_TIME = "09:00:00"
+SELL_TIME = "09:00:00"
 
 def gh_get(path):
     r = requests.get(f"https://api.github.com/repos/{GH_REPO}/contents/{path}",
@@ -51,6 +55,84 @@ def get_quotes(codes):
         return out
     except Exception as e:
         print(f"Quote error: {e}"); return {}
+
+def _num(value, default=0):
+    try:
+        return float(value)
+    except Exception:
+        return default
+
+def _refresh_positions(positions):
+    if not positions:
+        return
+    for p in positions:
+        if not p.get("tk"):
+            p["tk"] = tk_code(p.get("code", ""), p.get("market", "A股"))
+    quotes = get_quotes([p["tk"] for p in positions])
+    for p in positions:
+        q = quotes.get(p["tk"], {})
+        p["cur_price"] = q.get("price", p.get("cur_price", p.get("entry_price", 0)))
+        p["chg_today"] = q.get("chg", p.get("chg_today", 0))
+        ep = _num(p.get("entry_price"), 1) or 1
+        p["pnl_pct"] = round((p["cur_price"] / ep - 1) * 100, 2)
+        p["pnl"] = round((p["cur_price"] - ep) * _num(p.get("shares")), 2)
+
+def _apply_rank_signal(position, signal, rank):
+    if not signal:
+        return
+    position["current_rank"] = rank
+    position["score"] = signal.get("score", position.get("score", 0))
+    position["rec"] = signal.get("rec", position.get("rec", ""))
+    position.setdefault("rank_at_buy", rank)
+    position.setdefault("score_at_buy", position.get("score"))
+    position.setdefault("rec_at_buy", position.get("rec", ""))
+
+def _is_bearish_signal(signal):
+    rec = str(signal.get("rec", ""))
+    score = _num(signal.get("score"))
+    return "短线做空" in rec or "偏空" in rec or score <= -10
+
+def _sell_reason(position, signal, rank_available=True):
+    rec = str((signal or {}).get("rec") or position.get("rec", ""))
+    score = _num((signal or {}).get("score", position.get("score", 0)))
+    pnl = _num(position.get("pnl_pct"))
+    chg = _num(position.get("chg_today"))
+    if signal is not None and ("短线做空" in rec or score <= -30):
+        return "bearish_signal"
+    if signal is not None and "偏空" in rec and pnl > 0:
+        return "weakening_take_profit"
+    if pnl <= -6:
+        return "stop_loss"
+    if pnl >= 8 and chg <= 0:
+        return "profit_protection"
+    if signal is None and rank_available:
+        return "dropped_from_top10"
+    return ""
+
+def _buy_position(signal, rank, quote):
+    price = _num(signal.get("price") or signal.get("current_price") or quote.get("price"), 0)
+    if price <= 0:
+        return None
+    shares = round(BUY_AMOUNT / price, 2)
+    return {
+        "code": signal["code"],
+        "name": signal.get("name", signal["code"]),
+        "market": signal.get("market", "A股"),
+        "tk": tk_code(signal["code"], signal.get("market", "A股")),
+        "score": signal.get("score", 0),
+        "rec": signal.get("rec", ""),
+        "entry_price": price,
+        "entry_date": today,
+        "buy_time": BUY_TIME,
+        "amount": BUY_AMOUNT,
+        "shares": shares,
+        "cur_price": price,
+        "chg_today": quote.get("chg", signal.get("chg_pct", signal.get("chg", 0))),
+        "rank_at_buy": rank,
+        "score_at_buy": signal.get("score", 0),
+        "rec_at_buy": signal.get("rec", ""),
+        "bought_today": True,
+    }
 
 def sector_news(kw, n=4):
     try:
@@ -108,33 +190,49 @@ try:
 except Exception as e:
     print(f"排行榜失败：{e}")
 
-if is_day1 and top10:
-    tks = [tk_code(s["code"], s.get("market","A股")) for s in top10]
-    quotes = get_quotes(tks)
-    positions = []
-    for s, tk in zip(top10, tks):
-        ep = quotes.get(tk, {}).get("price", 0) or 1
-        positions.append({
-            "code": s["code"], "name": s.get("name", s["code"]),
-            "market": s.get("market","A股"), "tk": tk,
-            "score": s.get("score",0), "rec": s.get("rec",""),
-            "entry_price": ep, "entry_date": today,
-            "amount": 10000, "shares": round(10000/ep, 2)
-        })
-    state["positions"] = positions
-    print(f"模拟买入 {len(positions)} 只，每只 1 万元")
+rank_available = bool(top10)
+ranked = [(i + 1, s) for i, s in enumerate(top10 or [])]
+top_by_code = {s.get("code"): (rank, s) for rank, s in ranked if s.get("code")}
 
 positions = state.get("positions", [])
-if positions:
-    tks = [p["tk"] for p in positions]
-    quotes = get_quotes(tks)
-    for p in positions:
-        q = quotes.get(p["tk"], {})
-        p["cur_price"] = q.get("price", p["entry_price"])
-        p["chg_today"] = q.get("chg", 0)
-        ep = p["entry_price"] or 1
-        p["pnl_pct"] = round((p["cur_price"]/ep - 1)*100, 2)
-        p["pnl"]     = round((p["cur_price"] - ep)*p["shares"], 2)
+_refresh_positions(positions)
+
+sold_positions = []
+remaining_positions = []
+for p in positions:
+    rank_signal = top_by_code.get(p.get("code"))
+    rank, signal = rank_signal if rank_signal else (None, None)
+    _apply_rank_signal(p, signal, rank)
+    reason = _sell_reason(p, signal, rank_available=rank_available)
+    if reason:
+        sold = dict(p)
+        sold["sell_date"] = today
+        sold["sell_time"] = SELL_TIME
+        sold["sell_price"] = sold.get("cur_price", sold.get("entry_price"))
+        sold["sell_reason"] = reason
+        sold_positions.append(sold)
+    else:
+        remaining_positions.append(p)
+
+positions = remaining_positions
+held_codes = {p.get("code") for p in positions}
+buy_candidates = [
+    (rank, s) for rank, s in ranked
+    if s.get("code") not in held_codes and not _is_bearish_signal(s)
+]
+slots = max(0, MAX_POSITIONS - len(positions))
+to_buy = buy_candidates[:slots]
+buy_quotes = get_quotes([tk_code(s["code"], s.get("market", "A股")) for _, s in to_buy])
+bought_positions = []
+for rank, s in to_buy:
+    tk = tk_code(s["code"], s.get("market", "A股"))
+    pos = _buy_position(s, rank, buy_quotes.get(tk, {}))
+    if pos:
+        bought_positions.append(pos)
+        positions.append(pos)
+
+state["positions"] = positions
+print(f"自动卖出 {len(sold_positions)} 只，自动买入 {len(bought_positions)} 只，当前持仓 {len(positions)} 只")
 
 news_all = {}
 for kw in ["半导体", "AI人工智能", "新能源", "工程机械", "CRO医药"]:
@@ -181,6 +279,28 @@ for i, p in enumerate(sorted(positions, key=lambda x: x.get("pnl_pct",0))):
     md.append(f"| {i+1} | {p['code']} | {p['name']} | {p['market']} | "
               f"{p['entry_price']:.2f} | {p['cur_price']:.2f} | "
               f"{p['chg_today']:+.2f}% | **{p['pnl_pct']:+.2f}%** | {p['rec']} |")
+
+md += ["", "## 🔁 今日自动模拟买卖", ""]
+if sold_positions:
+    md.append("**自动卖出**")
+    for p in sold_positions:
+        md.append(
+            f"- {p['name']}（{p['code']}）@ {p.get('sell_price', 0):.2f}，"
+            f"收益 {p.get('pnl_pct', 0):+.2f}%，原因：{p.get('sell_reason', '')}"
+        )
+else:
+    md.append("- 自动卖出：无")
+
+if bought_positions:
+    md.append("")
+    md.append("**自动买入**")
+    for p in bought_positions:
+        md.append(
+            f"- {p['name']}（{p['code']}）@ {p.get('entry_price', 0):.2f}，"
+            f"排名 {p.get('rank_at_buy')}，评分 {p.get('score_at_buy')}，方向：{p.get('rec_at_buy', '')}"
+        )
+else:
+    md.append("- 自动买入：无")
 
 md += ["", "## ⚠️ 预想外变化", ""]
 if anomalies:
@@ -251,7 +371,10 @@ trade_history = {
     "date": today,
     "source_app": "short_stockmaster",
     "strategy": "daily_report_top10",
-    "records": build_trade_history_records(today, positions, previous_positions, top10, is_day1),
+    "records": build_trade_history_records(
+        today, positions, previous_positions, top10, is_day1,
+        sold_positions=sold_positions,
+    ),
 }
 hist_path = f"daily_logs/trade_history/{today}.json"
 _, hist_sha = gh_get(hist_path)
