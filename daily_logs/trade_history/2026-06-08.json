@@ -27,7 +27,7 @@
       "score_at_buy": 25,
       "rec_at_buy": "偏多观望",
       "sell_reason": "stop_loss",
-      "holding_days": null,
+      "holding_days": 20,
       "pnl": -939.57,
       "chg_today": -0.79,
       "raw": {
@@ -75,7 +75,7 @@
       "score_at_buy": 0,
       "rec_at_buy": "中性",
       "sell_reason": "stop_loss",
-      "holding_days": null,
+      "holding_days": 20,
       "pnl": -677.5,
       "chg_today": -1.57,
       "raw": {
@@ -123,7 +123,7 @@
       "score_at_buy": 12,
       "rec_at_buy": "偏多观望",
       "sell_reason": "",
-      "holding_days": null,
+      "holding_days": 20,
       "pnl": 58.82,
       "chg_today": -0.91,
       "raw": {
@@ -167,7 +167,7 @@
       "score_at_buy": 10,
       "rec_at_buy": "偏多观望",
       "sell_reason": "",
-      "holding_days": null,
+      "holding_days": 20,
       "pnl": -248.41,
       "chg_today": -1.24,
       "raw": {
@@ -211,7 +211,7 @@
       "score_at_buy": 0,
       "rec_at_buy": "中性",
       "sell_reason": "",
-      "holding_days": null,
+      "holding_days": 20,
       "pnl": -421.07,
       "chg_today": -0.74,
       "raw": {
@@ -255,7 +255,7 @@
       "score_at_buy": 0,
       "rec_at_buy": "中性",
       "sell_reason": "",
-      "holding_days": null,
+      "holding_days": 20,
       "pnl": -573.36,
       "chg_today": -2.49,
       "raw": {
@@ -299,7 +299,7 @@
       "score_at_buy": 0,
       "rec_at_buy": "中性",
       "sell_reason": "",
-      "holding_days": null,
+      "holding_days": 20,
       "pnl": -132.91,
       "chg_today": -0.06,
       "raw": {
@@ -343,7 +343,7 @@
       "score_at_buy": 0,
       "rec_at_buy": "中性",
       "sell_reason": "",
-      "holding_days": null,
+      "holding_days": 20,
       "pnl": 313.08,
       "chg_today": -0.1,
       "raw": {
@@ -387,7 +387,7 @@
       "score_at_buy": 0,
       "rec_at_buy": "中性",
       "sell_reason": "",
-      "holding_days": null,
+      "holding_days": 20,
       "pnl": -504.56,
       "chg_today": -2.47,
       "raw": {
@@ -431,7 +431,7 @@
       "score_at_buy": 0,
       "rec_at_buy": "中性",
       "sell_reason": "",
-      "holding_days": null,
+      "holding_days": 20,
       "pnl": 599.32,
       "chg_today": -0.16,
       "raw": {
@@ -451,5 +451,9 @@
         "pnl": 599.32
       }
     }
-  ]
+  ],
+  "rank_available": false,
+  "rank_status": "",
+  "rank_total": null,
+  "rank_error": "2026-06-08 signal snapshot was empty during daily report run"
 }

@@ -2,5 +2,9 @@
   "date": "2026-06-08",
   "source_app": "short_stockmaster",
   "strategy": "daily_report_top10",
-  "records": []
+  "records": [],
+  "rank_available": false,
+  "rank_status": "",
+  "rank_total": null,
+  "rank_error": "rank returned no effective results during daily report run"
 }

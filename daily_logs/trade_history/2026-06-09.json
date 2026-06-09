@@ -27,7 +27,7 @@
       "score_at_buy": 12,
       "rec_at_buy": "偏多观望",
       "sell_reason": "",
-      "holding_days": null,
+      "holding_days": 21,
       "pnl": 161.77,
       "chg_today": 0.47,
       "raw": {
@@ -71,7 +71,7 @@
       "score_at_buy": 10,
       "rec_at_buy": "偏多观望",
       "sell_reason": "",
-      "holding_days": null,
+      "holding_days": 21,
       "pnl": 43.58,
       "chg_today": 3.27,
       "raw": {
@@ -115,7 +115,7 @@
       "score_at_buy": 0,
       "rec_at_buy": "中性",
       "sell_reason": "",
-      "holding_days": null,
+      "holding_days": 21,
       "pnl": -470.11,
       "chg_today": -0.47,
       "raw": {
@@ -159,7 +159,7 @@
       "score_at_buy": 0,
       "rec_at_buy": "中性",
       "sell_reason": "",
-      "holding_days": null,
+      "holding_days": 21,
       "pnl": -582.24,
       "chg_today": -0.11,
       "raw": {
@@ -203,7 +203,7 @@
       "score_at_buy": 0,
       "rec_at_buy": "中性",
       "sell_reason": "",
-      "holding_days": null,
+      "holding_days": 21,
       "pnl": -110.76,
       "chg_today": 0.36,
       "raw": {
@@ -247,7 +247,7 @@
       "score_at_buy": 0,
       "rec_at_buy": "中性",
       "sell_reason": "",
-      "holding_days": null,
+      "holding_days": 21,
       "pnl": 310.4,
       "chg_today": 0.08,
       "raw": {
@@ -291,7 +291,7 @@
       "score_at_buy": 0,
       "rec_at_buy": "中性",
       "sell_reason": "",
-      "holding_days": null,
+      "holding_days": 21,
       "pnl": -494.09,
       "chg_today": -0.42,
       "raw": {
@@ -335,7 +335,7 @@
       "score_at_buy": 0,
       "rec_at_buy": "中性",
       "sell_reason": "",
-      "holding_days": null,
+      "holding_days": 21,
       "pnl": 547.95,
       "chg_today": -0.32,
       "raw": {
@@ -355,5 +355,9 @@
         "pnl": 547.95
       }
     }
-  ]
+  ],
+  "rank_available": false,
+  "rank_status": "",
+  "rank_total": null,
+  "rank_error": "2026-06-09 signal snapshot was empty during daily report run"
 }

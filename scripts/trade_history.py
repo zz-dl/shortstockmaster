@@ -1,4 +1,16 @@
 import copy
+from datetime import date
+
+
+def _holding_days(today: str, entry_date) -> int | None:
+    if not entry_date:
+        return None
+    try:
+        start = date.fromisoformat(str(entry_date)[:10])
+        end = date.fromisoformat(str(today)[:10])
+    except ValueError:
+        return None
+    return max(0, (end - start).days)
 
 
 def build_trade_history_records(today: str, positions: list, previous_positions: list,
@@ -38,7 +50,7 @@ def build_trade_history_records(today: str, positions: list, previous_positions:
             "score_at_buy": p.get("score_at_buy", p.get("score")),
             "rec_at_buy": p.get("rec_at_buy", p.get("rec", "")),
             "sell_reason": p.get("sell_reason", ""),
-            "holding_days": None,
+            "holding_days": _holding_days(today, p.get("entry_date")),
             "pnl": p.get("pnl"),
             "chg_today": p.get("chg_today"),
             "raw": copy.deepcopy(p),
@@ -75,7 +87,7 @@ def build_trade_history_records(today: str, positions: list, previous_positions:
             "score_at_buy": p.get("score_at_buy", p.get("score")),
             "rec_at_buy": p.get("rec_at_buy", p.get("rec", "")),
             "sell_reason": "",
-            "holding_days": None,
+            "holding_days": _holding_days(today, p.get("entry_date")),
             "pnl": p.get("pnl"),
             "chg_today": p.get("chg_today"),
             "raw": copy.deepcopy(p),

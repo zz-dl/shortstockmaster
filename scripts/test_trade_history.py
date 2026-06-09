@@ -40,15 +40,24 @@ records = build_trade_history_records(today, positions, positions, [], False)
 check("tracking day creates snapshot", len(records) == 1, f"={len(records)}")
 check("snapshot fields normalized", records[0]["action"] == "snapshot" and
       records[0]["current_price"] == 27.8 and records[0]["return_pct"] == 2.21)
+check("same-day snapshot includes holding days", records[0]["holding_days"] == 0,
+      f"={records[0]['holding_days']}")
 
-sold = [dict(positions[0], sell_price=27.8, sell_reason="dropped_from_top10")]
+older_positions = [dict(positions[0], entry_date="2026-05-19")]
+records = build_trade_history_records("2026-06-08", older_positions, older_positions, [], False)
+check("multi-day snapshot includes holding days", records[0]["holding_days"] == 20,
+      f"={records[0]['holding_days']}")
+
+sold = [dict(older_positions[0], sell_price=27.8, sell_reason="dropped_from_top10")]
 records = build_trade_history_records(
-    today, [], positions, [], False, sold_positions=sold,
+    "2026-06-08", [], older_positions, [], False, sold_positions=sold,
 )
 check("sell records are normalized", len(records) == 1, f"={len(records)}")
 check("sell fields normalized", records[0]["action"] == "sell" and
       records[0]["sell_time"] == "09:00:00" and
       records[0]["sell_reason"] == "dropped_from_top10" and
       records[0]["sell_price"] == 27.8)
+check("sell records include holding days", records[0]["holding_days"] == 20,
+      f"={records[0]['holding_days']}")
 
 print("ALL TESTS PASSED")

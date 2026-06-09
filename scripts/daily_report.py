@@ -3,6 +3,7 @@ import requests, json, base64, re, os
 from datetime import date, datetime
 from trade_history import build_trade_history_records
 from signal_snapshot import build_signal_snapshot_records
+from report_health import summarize_rank_health
 
 GH_TOKEN = os.environ["GH_TOKEN"]
 GH_REPO  = os.environ.get("GH_REPO", "zz-dl/shortstockmaster")
@@ -182,15 +183,23 @@ else:
     print(f"持续跟踪，第 {(date.today()-date.fromisoformat(state['created'])).days+1} 天")
 
 top10 = []
+rank_status = ""
+rank_total = None
+rank_error = ""
 try:
     resp = requests.post("https://shortstockmaster.onrender.com/api/rank",
                          json={"markets":["A","HK","US"]}, timeout=90).json()
+    rank_status = resp.get("status", "")
+    rank_total = resp.get("total")
+    rank_error = str(resp.get("error", "") or "")
     top10 = resp.get("results", [])[:10]
     print(f"排行榜获取：{len(top10)} 只")
 except Exception as e:
+    rank_error = str(e)
     print(f"排行榜失败：{e}")
 
 rank_available = bool(top10)
+rank_health = summarize_rank_health(rank_available, rank_status, rank_total, rank_error)
 ranked = [(i + 1, s) for i, s in enumerate(top10 or [])]
 top_by_code = {s.get("code"): (rank, s) for rank, s in ranked if s.get("code")}
 
@@ -301,6 +310,10 @@ if bought_positions:
         )
 else:
     md.append("- 自动买入：无")
+if rank_health["warning"]:
+    md.append("")
+    md.append("**排行榜状态**")
+    md.append(rank_health["warning"])
 
 md += ["", "## ⚠️ 预想外变化", ""]
 if anomalies:
@@ -330,6 +343,8 @@ for kw, items in news_all.items():
 
 md += ["", "## 💡 软件分析盲点 & 改进建议", ""]
 suggestions = []
+if rank_health["suggestion"]:
+    suggestions.append(rank_health["suggestion"])
 big_moves = [p for p in positions if abs(p.get("chg_today",0)) > 5]
 if big_moves:
     names = "、".join(p["name"] for p in big_moves)
@@ -371,6 +386,10 @@ trade_history = {
     "date": today,
     "source_app": "short_stockmaster",
     "strategy": "daily_report_top10",
+    "rank_available": rank_available,
+    "rank_status": rank_status,
+    "rank_total": rank_total,
+    "rank_error": rank_error,
     "records": build_trade_history_records(
         today, positions, previous_positions, top10, is_day1,
         sold_positions=sold_positions,
@@ -386,6 +405,10 @@ signal_snapshot = {
     "date": today,
     "source_app": "short_stockmaster",
     "strategy": "daily_report_top10",
+    "rank_available": rank_available,
+    "rank_status": rank_status,
+    "rank_total": rank_total,
+    "rank_error": rank_error,
     "records": build_signal_snapshot_records(today, top10),
 }
 snapshot_path = f"daily_logs/signal_snapshots/{today}.json"
