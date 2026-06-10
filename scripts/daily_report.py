@@ -3,7 +3,7 @@ import requests, json, base64, re, os
 from datetime import date, datetime
 from trade_history import build_trade_history_records
 from signal_snapshot import build_signal_snapshot_records
-from report_health import summarize_rank_health
+from report_health import normalize_rank_error, summarize_rank_health
 
 GH_TOKEN = os.environ["GH_TOKEN"]
 GH_REPO  = os.environ.get("GH_REPO", "zz-dl/shortstockmaster")
@@ -13,8 +13,10 @@ EM_HDR   = {"User-Agent": "Mozilla/5.0"}
 today    = date.today().isoformat()
 MAX_POSITIONS = 10
 BUY_AMOUNT = 10000
-BUY_TIME = "09:00:00"
-SELL_TIME = "09:00:00"
+REPORT_TIME = os.environ.get("REPORT_TIME", "10:00:00")
+REPORT_TIME_LABEL = REPORT_TIME[:5]
+BUY_TIME = REPORT_TIME
+SELL_TIME = REPORT_TIME
 
 def gh_get(path):
     r = requests.get(f"https://api.github.com/repos/{GH_REPO}/contents/{path}",
@@ -199,6 +201,7 @@ except Exception as e:
     print(f"排行榜失败：{e}")
 
 rank_available = bool(top10)
+rank_error = normalize_rank_error(rank_available, rank_error)
 rank_health = summarize_rank_health(rank_available, rank_status, rank_total, rank_error)
 ranked = [(i + 1, s) for i, s in enumerate(top10 or [])]
 top_by_code = {s.get("code"): (rank, s) for rank, s in ranked if s.get("code")}
@@ -274,7 +277,7 @@ day_num   = (date.today()-date.fromisoformat(state["created"])).days + 1
 md = [
     f"# StockMaster 每日日报 {today}",
     "",
-    f"> 北京时间 09:00 自动生成 · 跟踪第 **{day_num}** 天",
+    f"> 北京时间 {REPORT_TIME_LABEL} 自动生成 · 跟踪第 **{day_num}** 天",
     "",
     "## 📊 持仓总览",
     "",
@@ -409,7 +412,7 @@ signal_snapshot = {
     "rank_status": rank_status,
     "rank_total": rank_total,
     "rank_error": rank_error,
-    "records": build_signal_snapshot_records(today, top10),
+    "records": build_signal_snapshot_records(today, top10, snapshot_time=REPORT_TIME),
 }
 snapshot_path = f"daily_logs/signal_snapshots/{today}.json"
 _, snapshot_sha = gh_get(snapshot_path)

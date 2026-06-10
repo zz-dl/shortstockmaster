@@ -2,7 +2,7 @@ name: StockMaster 每日跟踪日报
 
 on:
   schedule:
-    - cron: '0 1 * * 1-5'   # 北京时间 09:00，周一到周五
+    - cron: '0 2 * * 1-5'   # 北京时间 10:00，周一到周五，避开开盘前空行情
   workflow_dispatch:          # 允许手动触发
 
 permissions:
@@ -31,5 +31,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: zz-dl/shortstockmaster
+          REPORT_TIME: "10:00:00"
         run: python scripts/daily_report.py
         # 脚本通过 GitHub API 直接提交文件，无需额外 git push

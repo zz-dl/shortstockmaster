@@ -1,11 +1,16 @@
-def build_signal_snapshot_records(today: str, top_results: list, strategy: str = "daily_report_top10") -> list:
+def build_signal_snapshot_records(
+    today: str,
+    top_results: list,
+    strategy: str = "daily_report_top10",
+    snapshot_time: str = "09:00:00",
+) -> list:
     records = []
     for i, s in enumerate(top_results or [], 1):
         records.append({
             "source_app": "short_stockmaster",
             "strategy": strategy,
             "snapshot_date": today,
-            "snapshot_time": "09:00:00",
+            "snapshot_time": snapshot_time,
             "sequence": i,
             "code": s.get("code", ""),
             "name": s.get("name", s.get("code", "")),

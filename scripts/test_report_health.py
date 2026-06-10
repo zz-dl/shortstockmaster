@@ -3,7 +3,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from report_health import summarize_rank_health
+from report_health import normalize_rank_error, summarize_rank_health
 
 
 def check(label, cond, detail=""):
@@ -24,5 +24,12 @@ check("empty rank suggestion is actionable", "检查 API 可用性或候选过�
 
 failed = summarize_rank_health(False, "", None, "timeout")
 check("rank error includes cause", "timeout" in failed["warning"])
+
+check("available rank does not synthesize error",
+      normalize_rank_error(True, "") == "")
+check("empty rank records synthetic cause",
+      normalize_rank_error(False, "") == "rank returned no effective results during daily report run")
+check("existing rank error is preserved",
+      normalize_rank_error(False, "timeout") == "timeout")
 
 print("ALL TESTS PASSED")

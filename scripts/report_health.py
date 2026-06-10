@@ -1,3 +1,12 @@
+def normalize_rank_error(rank_available: bool, rank_error="") -> str:
+    """Return a durable reason when the rank endpoint yields no effective results."""
+    if rank_error:
+        return str(rank_error)
+    if not rank_available:
+        return "rank returned no effective results during daily report run"
+    return ""
+
+
 def summarize_rank_health(rank_available: bool, rank_status="", rank_total=None, rank_error="") -> dict:
     """Return daily-report text for rank data availability."""
     if rank_available:

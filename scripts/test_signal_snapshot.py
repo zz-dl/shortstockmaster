@@ -36,6 +36,17 @@ def test_short_signal_snapshot_keeps_rank_and_quote_context():
     assert rec["forward_returns"]["return_5d_pct"] is None
 
 
+def test_signal_snapshot_accepts_report_time():
+    records = build_signal_snapshot_records(
+        "2026-06-10",
+        [{"code": "0700.HK", "name": "腾讯控股"}],
+        snapshot_time="10:00:00",
+    )
+
+    assert records[0]["snapshot_time"] == "10:00:00"
+
+
 if __name__ == "__main__":
     test_short_signal_snapshot_keeps_rank_and_quote_context()
+    test_signal_snapshot_accepts_report_time()
     print("[PASS] test_short_signal_snapshot_keeps_rank_and_quote_context")
