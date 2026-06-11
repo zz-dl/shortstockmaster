@@ -131,6 +131,8 @@ def _buy_position(signal, rank, quote):
         "shares": shares,
         "cur_price": price,
         "chg_today": quote.get("chg", signal.get("chg_pct", signal.get("chg", 0))),
+        "pnl": 0.0,
+        "pnl_pct": 0.0,
         "rank_at_buy": rank,
         "score_at_buy": signal.get("score", 0),
         "rec_at_buy": signal.get("rec", ""),
@@ -287,10 +289,12 @@ md = [
     "| 序 | 代码 | 名称 | 市场 | 买入价 | 现价 | 今日涨跌 | 累计盈亏 | 推荐方向 |",
     "|:--:|:----:|:----:|:----:|:------:|:----:|:--------:|:--------:|:--------:|",
 ]
-for i, p in enumerate(sorted(positions, key=lambda x: x.get("pnl_pct",0))):
-    md.append(f"| {i+1} | {p['code']} | {p['name']} | {p['market']} | "
-              f"{p['entry_price']:.2f} | {p['cur_price']:.2f} | "
-              f"{p['chg_today']:+.2f}% | **{p['pnl_pct']:+.2f}%** | {p['rec']} |")
+for i, p in enumerate(sorted(positions, key=lambda x: x.get("pnl_pct", 0))):
+    # 当天新买入的持仓可能缺 pnl_pct/chg_today 等字段,统一 .get 防御
+    # (2026-06-10/11 两天日报正是因新买持仓无 pnl_pct 而 KeyError 中断)
+    md.append(f"| {i+1} | {p['code']} | {p['name']} | {p.get('market', '')} | "
+              f"{p.get('entry_price', 0):.2f} | {p.get('cur_price', p.get('entry_price', 0)):.2f} | "
+              f"{p.get('chg_today', 0):+.2f}% | **{p.get('pnl_pct', 0):+.2f}%** | {p.get('rec', '')} |")
 
 md += ["", "## 🔁 今日自动模拟买卖", ""]
 if sold_positions:
