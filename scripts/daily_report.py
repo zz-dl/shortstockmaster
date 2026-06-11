@@ -191,8 +191,9 @@ rank_status = ""
 rank_total = None
 rank_error = ""
 try:
+    # 模拟交易只做 A 股(2026-06-12 起,用户要求剔除美股/港股)
     resp = requests.post("https://shortstockmaster.onrender.com/api/rank",
-                         json={"markets":["A","HK","US"]}, timeout=90).json()
+                         json={"markets":["A"]}, timeout=90).json()
     rank_status = resp.get("status", "")
     rank_total = resp.get("total")
     rank_error = str(resp.get("error", "") or "")
@@ -230,9 +231,15 @@ for p in positions:
 
 positions = remaining_positions
 held_codes = {p.get("code") for p in positions}
+def _is_a_share(signal) -> bool:
+    """只买 A 股:市场标注为 A股,或代码是 6 位纯数字(防排行接口返回混合市场)。"""
+    mkt = str(signal.get("market", ""))
+    code = str(signal.get("code", ""))
+    return mkt == "A股" or (len(code) == 6 and code.isdigit())
+
 buy_candidates = [
     (rank, s) for rank, s in ranked
-    if s.get("code") not in held_codes and not _is_bearish_signal(s)
+    if s.get("code") not in held_codes and not _is_bearish_signal(s) and _is_a_share(s)
 ]
 slots = max(0, MAX_POSITIONS - len(positions))
 to_buy = buy_candidates[:slots]
