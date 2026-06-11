@@ -12,6 +12,7 @@ TQ_HDR   = {"User-Agent": "Mozilla/5.0"}
 EM_HDR   = {"User-Agent": "Mozilla/5.0"}
 today    = date.today().isoformat()
 MAX_POSITIONS = 10
+MIN_BUY_SCORE = 20   # 评分低于此不买,宁可空仓(避免为凑满仓位买低分中性股)
 BUY_AMOUNT = 10000
 REPORT_TIME = os.environ.get("REPORT_TIME", "10:00:00")
 REPORT_TIME_LABEL = REPORT_TIME[:5]
@@ -240,6 +241,7 @@ def _is_a_share(signal) -> bool:
 buy_candidates = [
     (rank, s) for rank, s in ranked
     if s.get("code") not in held_codes and not _is_bearish_signal(s) and _is_a_share(s)
+       and _num(s.get("score")) >= MIN_BUY_SCORE   # 低分中性股不买,宁可空仓
 ]
 slots = max(0, MAX_POSITIONS - len(positions))
 to_buy = buy_candidates[:slots]
