@@ -89,6 +89,14 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .chip-buy{background:rgba(0,221,102,.15);color:var(--buy);border:1px solid rgba(0,221,102,.3)}
 .chip-sell{background:rgba(255,68,85,.15);color:var(--sell);border:1px solid rgba(255,68,85,.3)}
 .chip-hold{background:rgba(255,204,0,.12);color:var(--hold);border:1px solid rgba(255,204,0,.3)}
+.rank-item{padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.rank-item:last-child{border-bottom:none}
+.plan-pill{display:inline-block;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;border:1px solid currentColor}
+.plan-box{background:#0f1520;border:1px solid var(--border);border-radius:8px;padding:10px;margin-top:8px}
+.plan-line{font-size:11px;color:var(--dim);line-height:1.55;margin-top:4px}
+.plan-strong{color:var(--text);font-weight:700}
+.risk-list{margin-top:6px;display:flex;gap:5px;flex-wrap:wrap}
+.risk-tag{font-size:10px;color:var(--sell);background:rgba(255,68,85,.12);border:1px solid rgba(255,68,85,.3);border-radius:5px;padding:2px 6px}
 </style>
 </head>
 <body>
@@ -227,6 +235,14 @@ function chgColor(v){return v>0?'var(--buy)':v<0?'var(--sell)':'var(--dim)'}
 function chgClass(v){return v>0?'up':v<0?'dn':'neutral'}
 function fmtChg(v){return (v>0?'+':'')+v.toFixed(2)+'%'}
 function fmtNet(v){return (v>0?'+':'')+v.toFixed(2)+'亿'}
+function planColor(decision){
+  return decision==='买入'?'var(--buy)':decision==='尾盘确认'?'#55ee99':decision==='观察'?'var(--hold)':'var(--sell)';
+}
+function shortPlanText(plan){
+  if (!plan) return '';
+  const risks = (plan.risk_flags || []).slice(0, 2).join('；');
+  return `${plan.buy_plan || ''}${risks ? ' 风险：' + risks : ''}`;
+}
 
 // ── 推荐排行榜 ────────────────────────────────────────────────────────────────
 let rankJobId = null, rankTimer = null;
@@ -264,26 +280,32 @@ async function startRank() {
 }
 
 function renderRank(results) {
-  const rcMap = {"短线做多":"var(--buy)","偏多观望":"#55ee99","中性":"var(--hold)","偏空观望":"#ff9944","短线做空":"var(--sell)"};
+  const rcMap = {"买入":"var(--buy)","尾盘确认":"#55ee99","观察":"var(--hold)","回避":"var(--sell)",
+    "短线做多":"var(--buy)","偏多观望":"#55ee99","中性":"var(--hold)","偏空观望":"#ff9944","短线做空":"var(--sell)"};
   let html = '<div class="card"><div class="card-title">🏆 短线推荐排行（按评分）</div>';
   results.forEach((r, i) => {
     const rc = r.rec_color || rcMap[r.rec] || 'var(--dim)';
+    const plan = r.trade_plan || {};
+    const decision = r.decision || plan.decision || r.rec || '';
+    const pc = planColor(decision);
+    const drivers = (plan.drivers || []).slice(0, 2).join(' · ');
     html += `
-    <div class="row" style="padding:8px 0;cursor:pointer" onclick="pickRankStock('${r.code}','${r.name}')">
-      <div style="display:flex;align-items:center;gap:8px;flex:1">
+    <div class="rank-item" onclick="pickRankStock('${r.code}','${r.name}')">
+      <div style="display:flex;align-items:flex-start;gap:8px">
         <span style="font-size:13px;font-weight:700;color:var(--dim);width:20px">${i+1}</span>
-        <div>
+        <div style="flex:1;min-width:0">
           <div style="font-size:13px;font-weight:700">${r.name}</div>
-          <div style="font-size:10px;color:var(--dim)">${r.code} · ${r.market}</div>
+          <div style="font-size:10px;color:var(--dim)">${r.code} · ${r.market} · 量比${r.vol_ratio.toFixed(1)} · 主力${fmtNet(r.capital_net||0)}</div>
+          <div class="plan-line"><span class="plan-strong" style="color:${pc}">${decision}</span>
+            ${plan.confidence?` · ${plan.confidence}信心`:''}${plan.position_pct?` · 仓位${plan.position_pct}%`:''}</div>
+          ${drivers?`<div class="plan-line">${drivers}</div>`:''}
+          ${plan.buy_plan?`<div class="plan-line">${shortPlanText(plan)}</div>`:''}
         </div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:13px;font-weight:700;color:${chgColor(r.chg_pct)}">${fmtChg(r.chg_pct)}</div>
-        <div style="font-size:11px;color:var(--dim)">量比${r.vol_ratio.toFixed(1)}</div>
-      </div>
-      <div style="text-align:right;min-width:60px;margin-left:8px">
-        <div style="font-size:15px;font-weight:800;color:${rc}">${r.score>0?'+':''}${r.score}</div>
-        <div style="font-size:10px;color:${rc}">${r.rec}</div>
+        <div style="text-align:right;min-width:58px">
+          <div style="font-size:13px;font-weight:700;color:${chgColor(r.chg_pct)}">${fmtChg(r.chg_pct)}</div>
+          <div style="font-size:15px;font-weight:800;color:${rc}">${r.score>0?'+':''}${r.score}</div>
+          <span class="plan-pill" style="color:${pc}">${decision}</span>
+        </div>
       </div>
     </div>`;
   });
@@ -576,6 +598,32 @@ async function analyzeStock() {
       </div>
     </div>`;
 
+    if (d.trade_plan) {
+      const p = d.trade_plan;
+      const dc = planColor(p.decision);
+      html += `<div class="card">
+        <div class="card-title">操作计划</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          <span class="plan-pill" style="color:${dc}">${p.decision}</span>
+          <span style="font-size:11px;color:var(--dim)">${p.confidence}信心</span>
+          <span style="font-size:11px;color:var(--dim)">建议仓位 <b style="color:var(--text)">${p.position_pct}%</b></span>
+          <span style="font-size:11px;color:var(--dim)">最多 ${p.max_holding_days} 个交易日</span>
+        </div>
+        <div class="plan-box">
+          <div class="plan-line"><span class="plan-strong">买入：</span>${p.buy_plan}</div>
+          <div class="plan-line"><span class="plan-strong">卖出：</span>${p.sell_plan}</div>
+          <div class="plan-line"><span class="plan-strong">止损：</span>${p.stop_loss_price || '-'}　
+            <span class="plan-strong">止盈：</span>${p.take_profit_price || '-'}</div>
+        </div>`;
+      if (p.drivers && p.drivers.length) {
+        html += `<div class="plan-line"><span class="plan-strong">主要理由：</span>${p.drivers.join('；')}</div>`;
+      }
+      if (p.invalidations && p.invalidations.length) {
+        html += `<div class="risk-list">${p.invalidations.slice(0,4).map(x=>`<span class="risk-tag">${x}</span>`).join('')}</div>`;
+      }
+      html += `</div>`;
+    }
+
     // 主力资金流向图
     if (d.capital_flow && d.capital_flow.length > 0) {
       html += `<div class="card"><div class="card-title">主力资金净流入（亿元）</div>`;
@@ -604,11 +652,16 @@ async function analyzeStock() {
     html += `</div>`;
 
     // 模拟买入按钮
-    html += `<button onclick="openBuyModal('${d.code}','${(d.name||d.code).replace(/'/g,"\\'")}','${d.market||"A股"}',${d.price||0},${d.score||0},'${d.rec||""}')"
-      style="width:100%;padding:12px;background:#1a3a1a;border:1px solid var(--buy);border-radius:10px;
-        color:var(--buy);font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px">
-      💰 模拟买入
-    </button>`;
+    const canBuy = d.decision === '买入' || d.decision === '尾盘确认';
+    if (canBuy) {
+      html += `<button onclick="openBuyModal('${d.code}','${(d.name||d.code).replace(/'/g,"\\'")}','${d.market||"A股"}',${d.price||0},${d.score||0},'${d.rec||""}')"
+        style="width:100%;padding:12px;background:#1a3a1a;border:1px solid var(--buy);border-radius:10px;
+          color:var(--buy);font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px">
+        按计划模拟买入
+      </button>`;
+    } else {
+      html += `<div class="empty" style="padding:10px;margin-bottom:8px">当前计划为「${d.decision || '观察'}」，不建议模拟买入</div>`;
+    }
 
     // AI 分析
     if (d.ai_analysis) {

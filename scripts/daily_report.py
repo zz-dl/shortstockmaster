@@ -96,6 +96,11 @@ def _is_bearish_signal(signal):
     score = _num(signal.get("score"))
     return "短线做空" in rec or "偏空" in rec or score <= -10
 
+def _is_buyable_signal(signal):
+    plan = signal.get("trade_plan") or {}
+    decision = str(signal.get("decision") or plan.get("decision") or "")
+    return decision == "买入"
+
 def _sell_reason(position, signal, rank_available=True):
     rec = str((signal or {}).get("rec") or position.get("rec", ""))
     score = _num((signal or {}).get("score", position.get("score", 0)))
@@ -137,6 +142,8 @@ def _buy_position(signal, rank, quote):
         "rank_at_buy": rank,
         "score_at_buy": signal.get("score", 0),
         "rec_at_buy": signal.get("rec", ""),
+        "decision_at_buy": signal.get("decision", ""),
+        "trade_plan_at_buy": signal.get("trade_plan", {}),
         "bought_today": True,
     }
 
@@ -242,6 +249,7 @@ buy_candidates = [
     (rank, s) for rank, s in ranked
     if s.get("code") not in held_codes and not _is_bearish_signal(s) and _is_a_share(s)
        and _num(s.get("score")) >= MIN_BUY_SCORE   # 低分中性股不买,宁可空仓
+       and _is_buyable_signal(s)                    # 早盘只观察/尾盘确认,不再自动追高买入
 ]
 slots = max(0, MAX_POSITIONS - len(positions))
 to_buy = buy_candidates[:slots]

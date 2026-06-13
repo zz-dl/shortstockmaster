@@ -40,6 +40,22 @@ def jdump(obj):
     return json.dumps(_sanitize(obj), cls=SafeEncoder, ensure_ascii=False)
 
 
+def _to_float(value, default=0.0):
+    try:
+        if value is None:
+            return default
+        v = float(value)
+        if math.isnan(v) or math.isinf(v):
+            return default
+        return v
+    except Exception:
+        return default
+
+
+def _clip(value, low, high):
+    return max(low, min(high, value))
+
+
 # ── 腾讯行情解析 ─────────────────────────────────────────────────────────────
 
 def _tencent_quote(codes: list) -> dict:
@@ -174,6 +190,199 @@ def _detect_market(code: str) -> str:
     if code.startswith("6"): return "SH"
     if code.startswith("0") or code.startswith("3"): return "SZ"
     return "SH"
+
+
+def _beijing_now() -> datetime:
+    return datetime.utcnow() + timedelta(hours=8)
+
+
+def _in_tail_window(now: datetime | None = None) -> bool:
+    now = now or _beijing_now()
+    minutes = now.hour * 60 + now.minute
+    return 14 * 60 + 30 <= minutes <= 14 * 60 + 55
+
+
+def _news_stats(news: list | None) -> dict:
+    neg_kw = ["立案", "调查", "违规", "处罚", "下调", "警示", "问询", "亏损", "暴跌", "崩盘",
+              "退市", "造假", "虚假陈述", "被罚", "减持", "质押", "违约"]
+    pos_kw = ["涨停", "大涨", "突破", "创新高", "买入", "上调", "超预期", "爆发", "龙头",
+              "获批", "利好", "战略合作", "业绩预增", "扭亏", "回购", "增持", "重大合同"]
+    items = news or []
+    neg_hits = sum(1 for n in items if any(kw in str(n.get("title", "")) for kw in neg_kw))
+    pos_hits = sum(1 for n in items if any(kw in str(n.get("title", "")) for kw in pos_kw))
+    return {"positive": pos_hits, "negative": neg_hits}
+
+
+def _build_trade_plan(stock: dict, market_sentiment: dict | None = None,
+                      now: datetime | None = None, news_stats: dict | None = None) -> dict:
+    """Turn a raw short-term score into an actionable, risk-aware trade plan."""
+    price = _to_float(stock.get("price") or stock.get("current_price"), 0)
+    score = _to_float(stock.get("score"), 0)
+    chg_pct = _to_float(stock.get("chg_pct") or stock.get("chg"), 0)
+    vol_ratio = _to_float(stock.get("vol_ratio"), 1)
+    turnover = _to_float(stock.get("turnover") or stock.get("turnover_rate"), 0)
+    capital_net = _to_float(stock.get("capital_net") or stock.get("main_net"), 0)
+    market = str(stock.get("market", ""))
+    is_astock = market in ("A股", "科创板", "A股SH", "A股SZ") or re.match(r"^\d{6}$", str(stock.get("code", "")))
+    sentiment_score = _to_float((market_sentiment or {}).get("score"), 50)
+    sentiment_label = str((market_sentiment or {}).get("label", "中性"))
+    news_stats = news_stats or {"positive": 0, "negative": 0}
+
+    drivers = []
+    risk_flags = []
+    factor_scores = {"technical": 0, "capital": 0, "market": 0, "news": 0, "risk": 0}
+
+    if 2 <= chg_pct <= 6.5 and 1.2 <= vol_ratio <= 3.5:
+        factor_scores["technical"] += 25
+        drivers.append("量价温和放大")
+    elif 0.5 <= chg_pct < 2 and 0.8 <= vol_ratio <= 2.5:
+        factor_scores["technical"] += 12
+        drivers.append("低位启动观察")
+    elif chg_pct >= 7 and is_astock:
+        factor_scores["technical"] -= 18
+        risk_flags.append("涨幅过热，次日回落风险高")
+    elif chg_pct <= -2:
+        factor_scores["technical"] -= 14
+        risk_flags.append("日内走势转弱")
+
+    if vol_ratio >= 5:
+        factor_scores["risk"] -= 14
+        risk_flags.append("量比过高，可能是情绪冲顶")
+    elif vol_ratio < 0.7:
+        factor_scores["risk"] -= 8
+        risk_flags.append("量能不足")
+
+    if 3 <= turnover <= 12:
+        factor_scores["technical"] += 8
+        drivers.append("换手活跃但未失控")
+    elif turnover >= 18:
+        factor_scores["risk"] -= 16
+        risk_flags.append("换手过高，追高风险大")
+
+    if capital_net > 2:
+        factor_scores["capital"] += 28
+        drivers.append("主力大幅净流入")
+    elif capital_net > 0.5:
+        factor_scores["capital"] += 20
+        drivers.append("主力净流入")
+    elif capital_net > 0.1:
+        factor_scores["capital"] += 10
+        drivers.append("主力小幅净流入")
+    elif capital_net < -0.5:
+        factor_scores["capital"] -= 24
+        risk_flags.append("主力资金净流出")
+    elif capital_net < -0.1:
+        factor_scores["capital"] -= 10
+        risk_flags.append("主力资金偏流出")
+
+    if sentiment_score >= 55:
+        factor_scores["market"] += 8
+        drivers.append(f"市场情绪{sentiment_label}")
+    elif sentiment_score < 35:
+        factor_scores["market"] -= 14
+        risk_flags.append(f"市场情绪{sentiment_label}")
+
+    if news_stats.get("negative", 0) >= 2 and news_stats.get("negative", 0) > news_stats.get("positive", 0):
+        factor_scores["news"] -= 18
+        risk_flags.append("近期利空新闻占优")
+    elif news_stats.get("positive", 0) > news_stats.get("negative", 0):
+        factor_scores["news"] += min(14, news_stats.get("positive", 0) * 6)
+        drivers.append("消息面偏多")
+
+    composite = score + sum(factor_scores.values()) * 0.35
+    hard_reject = (
+        price <= 0 or
+        (is_astock and chg_pct >= 8) or
+        vol_ratio >= 6 or
+        turnover >= 22 or
+        news_stats.get("negative", 0) >= 3
+    )
+
+    if hard_reject or composite < 18:
+        decision = "回避"
+        confidence = "低"
+        position_pct = 0
+    elif capital_net < -0.5 or len(risk_flags) >= 3 or sentiment_score < 30:
+        decision = "观察"
+        confidence = "低"
+        position_pct = 0
+    elif composite >= 58 and capital_net > 0.5 and len(risk_flags) <= 1:
+        decision = "买入" if _in_tail_window(now) else "尾盘确认"
+        confidence = "高"
+        position_pct = 20
+    elif composite >= 38 and capital_net >= 0 and len(risk_flags) <= 2:
+        decision = "买入" if _in_tail_window(now) else "尾盘确认"
+        confidence = "中"
+        position_pct = 10 if risk_flags else 15
+    else:
+        decision = "观察"
+        confidence = "低"
+        position_pct = 0
+
+    stop_loss_pct = 3.2 if confidence == "高" else 2.6
+    take_profit_pct = 6.5 if confidence == "高" else 4.8
+    stop_loss_price = round(price * (1 - stop_loss_pct / 100), 2) if price else None
+    take_profit_price = round(price * (1 + take_profit_pct / 100), 2) if price else None
+
+    if decision == "买入":
+        buy_plan = f"14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。"
+    elif decision == "尾盘确认":
+        buy_plan = f"先观察，14:30-14:55 再确认；若仍在现价±1.0%内、未放量跳水、主力不转流出，再考虑买入。"
+    elif decision == "观察":
+        buy_plan = "暂不买入；等尾盘重新确认资金和价格是否继续共振。"
+    else:
+        buy_plan = "不建议买入；当前风险收益比不合适。"
+
+    sell_plan = (
+        f"止损参考 {stop_loss_price}（约-{stop_loss_pct:.1f}%）；"
+        f"止盈先看 {take_profit_price}（约+{take_profit_pct:.1f}%）。"
+        "若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。"
+    )
+
+    invalidations = []
+    invalidations.extend(risk_flags[:3])
+    if capital_net <= 0:
+        invalidations.append("主力资金转为净流出")
+    invalidations.append("跌破买入日收盘价或盘中VWAP")
+    invalidations.append("板块热度退潮或出现突发利空")
+
+    return {
+        "decision": decision,
+        "confidence": confidence,
+        "position_pct": position_pct,
+        "buy_plan": buy_plan,
+        "sell_plan": sell_plan,
+        "stop_loss_pct": stop_loss_pct,
+        "stop_loss_price": stop_loss_price,
+        "take_profit_pct": take_profit_pct,
+        "take_profit_price": take_profit_price,
+        "max_holding_days": 3,
+        "drivers": drivers[:4],
+        "risk_flags": risk_flags[:5],
+        "invalidations": invalidations[:5],
+        "factor_scores": factor_scores,
+        "composite_score": round(composite, 1),
+    }
+
+
+def _apply_plan_to_rank_item(stock: dict, market_sentiment: dict | None = None,
+                             now: datetime | None = None) -> dict:
+    plan = _build_trade_plan(stock, market_sentiment=market_sentiment, now=now)
+    enriched = dict(stock)
+    enriched["trade_plan"] = plan
+    enriched["decision"] = plan["decision"]
+    enriched["confidence"] = plan["confidence"]
+    enriched["position_pct"] = plan["position_pct"]
+    if plan["decision"] in ("买入", "尾盘确认"):
+        enriched["rec"] = plan["decision"]
+        enriched["rec_color"] = "#00cc55" if plan["confidence"] == "高" else "#55ee99"
+    elif plan["decision"] == "观察":
+        enriched["rec"] = "观察"
+        enriched["rec_color"] = "#ffcc00"
+    else:
+        enriched["rec"] = "回避"
+        enriched["rec_color"] = "#ff4455"
+    return enriched
 
 
 # ── 板块新闻 ─────────────────────────────────────────────────────────────────
@@ -508,12 +717,36 @@ def _short_signal_score(code: str) -> dict:
     elif score >= -40: rec, rc = "偏空观望", "#ff9944"
     else:              rec, rc = "短线做空", "#ff4444"
 
+    market_label = "A股" if mkt in ("SH", "SZ") else ("港股" if mkt == "HK" else "美股")
+    market_sentiment = _market_sentiment() if market_label == "A股" else None
+    plan_stock = {
+        "code": code,
+        "name": name,
+        "market": market_label,
+        "price": price,
+        "score": score,
+        "chg_pct": chg_pct,
+        "vol_ratio": vol_ratio,
+        "turnover": turnover,
+        "capital_net": (cf[-1].get("main_net") if cf else 0),
+    }
+    trade_plan = _build_trade_plan(
+        plan_stock,
+        market_sentiment=market_sentiment,
+        news_stats={"positive": pos_hits, "negative": neg_hits},
+    )
+
     return {
-        "code": code, "name": name, "price": price,
+        "code": code, "name": name, "market": market_label, "price": price,
         "chg_pct": chg_pct, "vol_ratio": vol_ratio, "turnover": turnover,
         "score": score, "rec": rec, "rec_color": rc,
         "signals": signals, "news": news[:6],
         "capital_flow": cf,
+        "market_sentiment": market_sentiment,
+        "trade_plan": trade_plan,
+        "decision": trade_plan["decision"],
+        "confidence": trade_plan["confidence"],
+        "position_pct": trade_plan["position_pct"],
     }
 
 
@@ -836,11 +1069,26 @@ def _rank_score_quick(code: str, market: str, tencent_data: dict, capital_net: f
 def _is_rank_candidate(stock: dict) -> bool:
     """Apply the full-history backtest-supported A-share candidate filter."""
     market = stock.get("market", "")
+    if stock.get("decision") == "回避":
+        return False
     if market not in ("A股", "科创板", "A股SH", "A股SZ"):
         return True
     chg_pct = float(stock.get("chg_pct") or 0)
     vol_ratio = float(stock.get("vol_ratio") or 0)
-    return 3.0 <= chg_pct < 7.0 and 1.5 <= vol_ratio < 4.0
+    turnover = float(stock.get("turnover") or 0)
+    capital_net = float(stock.get("capital_net") or 0)
+    score = float(stock.get("score") or 0)
+    if not (0.5 <= chg_pct < 7.0):
+        return False
+    if not (0.7 <= vol_ratio < 5.0):
+        return False
+    if turnover >= 20:
+        return False
+    if capital_net < -0.5:
+        return False
+    if stock.get("decision") == "观察" and score < 35:
+        return False
+    return True
 
 
 def _run_rank_job(job_id: str, markets: list):
@@ -967,7 +1215,7 @@ def api_rank():
     tencent_codes = []
     seen_codes: set = set()
 
-    def _add_candidate(code, name, mkt):
+    def _add_candidate(code, name, mkt, seed_capital_net=0):
         if not code or code in seen_codes:
             return
         clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
@@ -980,7 +1228,7 @@ def api_rank():
             m2, tk = "港股", f"hk{clean.lstrip('0').zfill(5)}"
         else:
             m2, tk = "美股", f"us{clean}"
-        candidates.append((code, name, m2))
+        candidates.append((code, name, m2, seed_capital_net))
         tencent_codes.append(tk)
         seen_codes.add(code)
 
@@ -998,7 +1246,7 @@ def api_rank():
                     "fid": "f62", "po": 1, "pz": 50, "pn": 1,
                     "np": 1, "fltt": 2, "invt": 2,
                     "fs": "m:1+t:2,m:0+t:6,m:0+t:80,m:1+t:23",
-                    "fields": "f2,f3,f5,f6,f8,f10,f12,f13,f14,f20,f21",
+                    "fields": "f2,f3,f5,f6,f8,f10,f12,f13,f14,f20,f21,f62",
                     "ut": "bd1d9ddb04089700cf9c27f6f7426281",
                 },
                 timeout=8,
@@ -1007,7 +1255,7 @@ def api_rank():
                 code = str(s.get("f12") or "")
                 name = str(s.get("f14") or "")
                 if code and "ST" not in name.upper():
-                    _add_candidate(code, name, "A股")
+                    _add_candidate(code, name, "A股", _to_float(s.get("f62"), 0) / 1e8)
         except Exception as e:
             print(f"Capital flow supplement failed: {e}")
 
@@ -1017,13 +1265,13 @@ def api_rank():
 
     # 第一阶段：用腾讯数据打分，取 Top30 候选
     phase1 = []
-    for code, name, market in candidates:
-        r = _rank_score_quick(code, market, all_tencent)
+    for code, name, market, seed_capital_net in candidates:
+        r = _rank_score_quick(code, market, all_tencent, capital_net=seed_capital_net)
         if r and r.get("price", 0) > 0:
             phase1.append(r)
     phase1 = [r for r in phase1 if _is_rank_candidate(r)]
     phase1.sort(key=lambda x: x["score"], reverse=True)
-    top30 = phase1[:30]
+    top30 = phase1[:50]
 
     # 第二阶段：并行拉主力资金净流入，仅 A股/科创板
     capital_nets: dict = {}
@@ -1043,9 +1291,11 @@ def api_rank():
     for t in cf_threads: t.start()
     for t in cf_threads: t.join(timeout=10)
 
-    # 第三阶段：把资金流加入评分，重新排序
+    market_sentiment = _market_sentiment()
+
+    # 第三阶段：把资金流加入评分，重新排序，并生成买卖计划
     for r in top30:
-        net = capital_nets.get(r["code"], 0)
+        net = capital_nets.get(r["code"], r.get("capital_net", 0))
         r["capital_net"] = round(net, 2)
         if net > 2.0:    delta = 18
         elif net > 0.5:  delta = 12
@@ -1061,6 +1311,7 @@ def api_rank():
         elif s >= -10: r["rec"], r["rec_color"] = "中性",     "#ffcc00"
         elif s >= -30: r["rec"], r["rec_color"] = "偏空观望", "#ff9944"
         else:          r["rec"], r["rec_color"] = "短线做空", "#ff4444"
+        r.update(_apply_plan_to_rank_item(r, market_sentiment))
 
     top30 = [r for r in top30 if _is_rank_candidate(r)]
     top30.sort(key=lambda x: x["score"], reverse=True)
