@@ -3,7 +3,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app import _apply_plan_to_rank_item, _build_trade_plan, _is_rank_candidate, _rank_score_quick
+from app import (
+    _apply_plan_to_rank_item,
+    _build_trade_plan,
+    _is_rank_candidate,
+    _merge_rank_item_with_detail,
+    _rank_score_quick,
+)
 
 
 def _quote(chg_pct, vol_ratio, turnover=6):
@@ -102,3 +108,52 @@ def test_apply_plan_to_rank_item_reprices_recommendation_and_candidate_gate():
     assert enriched["trade_plan"]["position_pct"] >= 10
     assert enriched["rec"] in ("尾盘确认", "短线做多")
     assert _is_rank_candidate(enriched)
+
+
+def test_rank_item_uses_detail_score_and_plan_as_canonical_display():
+    tail_confirm = chr(23614) + chr(30424) + chr(30830) + chr(35748)
+    avoid = chr(22238) + chr(36991)
+    high = chr(39640)
+    low = chr(20302)
+    a_share = chr(65) + chr(32929)
+    rank_item = {
+        "code": "002617",
+        "name": "TEST",
+        "market": a_share,
+        "price": 8.5,
+        "score": 49,
+        "rec": "rank-rec",
+        "decision": tail_confirm,
+        "confidence": high,
+        "position_pct": 20,
+        "trade_plan": {"decision": tail_confirm},
+        "capital_net": 3.35,
+    }
+    detail = {
+        "code": "002617",
+        "name": "TEST",
+        "market": a_share,
+        "price": 8.5,
+        "score": 20,
+        "rec": "detail-rec",
+        "decision": avoid,
+        "confidence": low,
+        "position_pct": 0,
+        "trade_plan": {
+            "decision": avoid,
+            "confidence": low,
+            "position_pct": 0,
+        },
+        "capital_net": 3.35,
+    }
+
+    merged = _merge_rank_item_with_detail(rank_item, detail)
+
+    assert merged["quick_score"] == 49
+    assert merged["score"] == 20
+    assert merged["rec"] == "detail-rec"
+    assert merged["decision"] == avoid
+    assert merged["confidence"] == low
+    assert merged["position_pct"] == 0
+    assert merged["trade_plan"]["decision"] == avoid
+    assert merged["capital_net"] == 3.35

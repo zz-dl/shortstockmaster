@@ -1,6 +1,7 @@
 # app.py — ShortStockMaster Flask backend
 # Short-term trading signals: sentiment, capital flow, momentum, news, AI
 import json, math, os, re, threading, uuid
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timedelta
 import numpy as np
 import pandas as pd
@@ -385,6 +386,59 @@ def _apply_plan_to_rank_item(stock: dict, market_sentiment: dict | None = None,
     return enriched
 
 
+def _merge_rank_item_with_detail(rank_item: dict, detail: dict) -> dict:
+    """Use the stock detail analysis as the canonical rank-row display state."""
+    merged = dict(rank_item)
+    merged["quick_score"] = rank_item.get("score")
+    merged["quick_rec"] = rank_item.get("rec")
+    merged["quick_decision"] = rank_item.get("decision")
+
+    canonical_fields = (
+        "name", "market", "price", "chg_pct", "vol_ratio", "turnover",
+        "score", "rec", "rec_color", "trade_plan", "decision", "confidence",
+        "position_pct", "market_sentiment",
+    )
+    for field in canonical_fields:
+        if field in detail and detail[field] is not None:
+            merged[field] = detail[field]
+
+    detail_capital = detail.get("capital_net")
+    if detail_capital is None:
+        flows = detail.get("capital_flow") or []
+        if flows:
+            detail_capital = flows[-1].get("main_net")
+    if detail_capital is not None:
+        merged["capital_net"] = round(_to_float(detail_capital), 2)
+
+    merged["detail_synced"] = True
+    return merged
+
+
+def _sync_rank_items_with_detail(items: list[dict], limit: int = 15) -> list[dict]:
+    """Hydrate rank rows with the same detailed score used by /api/stock."""
+    selected = list(items[:limit])
+    if not selected:
+        return []
+
+    def _load(stock: dict) -> dict:
+        try:
+            detail = _short_signal_score(str(stock.get("code", "")))
+            return _merge_rank_item_with_detail(stock, detail)
+        except Exception as exc:
+            fallback = dict(stock)
+            fallback["detail_synced"] = False
+            fallback["detail_sync_error"] = str(exc)
+            return fallback
+
+    max_workers = min(6, len(selected))
+    output: list[dict | None] = [None] * len(selected)
+    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+        futures = {pool.submit(_load, stock): idx for idx, stock in enumerate(selected)}
+        for future in as_completed(futures):
+            output[futures[future]] = future.result()
+    return [item for item in output if item]
+
+
 # ── 板块新闻 ─────────────────────────────────────────────────────────────────
 
 def _sector_news(code: str, info: dict, n: int = 8) -> list:
@@ -742,6 +796,7 @@ def _short_signal_score(code: str) -> dict:
         "score": score, "rec": rec, "rec_color": rc,
         "signals": signals, "news": news[:6],
         "capital_flow": cf,
+        "capital_net": plan_stock["capital_net"],
         "market_sentiment": market_sentiment,
         "trade_plan": trade_plan,
         "decision": trade_plan["decision"],
@@ -1315,6 +1370,11 @@ def api_rank():
 
     top30 = [r for r in top30 if _is_rank_candidate(r)]
     top30.sort(key=lambda x: x["score"], reverse=True)
+    detailed_top = _sync_rank_items_with_detail(top30, limit=15)
+    if detailed_top:
+        top30 = detailed_top
+        top30 = [r for r in top30 if _is_rank_candidate(r)]
+        top30.sort(key=lambda x: x["score"], reverse=True)
     return Response(jdump({"status": "done", "total": len(candidates),
                             "results": top30[:15]}), mimetype="application/json")
 
