@@ -115,14 +115,16 @@ def _capital_flow(code: str, market: str, days: int = 5) -> list:
               "fields1": "f1,f2,f3,f7",
               "fields2": "f51,f52,f53,f54,f55,f56,f57,f58"}
     headers = {**_HEADERS, "Referer": "https://quote.eastmoney.com/"}
-    # 务必 https：Render 出口不放行明文 http（排行榜用 https 能工作，本函数原先用 http→
-    # 失败→退假代理）。多节点 + 重试，最大化拿到真实主力净流入（与中信同口径：超大+大单）。
-    for host in ("push2his.eastmoney.com", "1.push2his.eastmoney.com", "7.push2his.eastmoney.com"):
+    # 与中信同口径（主力=超大+大单净额）。务必 https。主机顺序有讲究：
+    #   push2his = 历史主机，给完整多日，但 Render 出口连不通（秒级 RemoteDisconnected，不拖慢）；
+    #   push2/push2delay = Render 可达（排行榜同款主机），fflow daykline 只回当日，但是真实值。
+    # 故先试 push2his 拿全历史，连不通就退到 push2 至少拿到真实的当日主力净流入。
+    for host in ("push2his.eastmoney.com", "push2.eastmoney.com", "push2delay.eastmoney.com"):
         for _attempt in range(2):
             try:
                 r = _req.get(
                     f"https://{host}/api/qt/stock/fflow/daykline/get",
-                    params=params, headers=headers, timeout=12,
+                    params=params, headers=headers, timeout=8,
                 )
                 klines = r.json().get("data", {}).get("klines", []) or []
                 result = []
