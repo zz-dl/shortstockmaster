@@ -1,0 +1,10 @@
+{
+  "date": "2026-06-16",
+  "source_app": "short_stockmaster",
+  "strategy": "daily_report_top10",
+  "rank_available": true,
+  "rank_status": "done",
+  "rank_total": 60,
+  "rank_error": "",
+  "records": []
+}
