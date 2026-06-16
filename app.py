@@ -111,67 +111,41 @@ def _capital_flow(code: str, market: str, days: int = 5) -> list:
     mkt = mkt_map.get(market.upper(), "0")
     clean = re.sub(r"\.(SS|SZ|HK)$", "", code)
 
-    try:
-        r = _req.get(
-            "http://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get",
-            params={"secid": f"{mkt}.{clean}", "lmt": days, "klt": 101,
-                    "fields1": "f1,f2,f3,f7",
-                    "fields2": "f51,f52,f53,f54,f55,f56,f57,f58"},
-            headers=_HEADERS, timeout=8,
-        )
-        klines = r.json().get("data", {}).get("klines", []) or []
-        result = []
-        for kl in klines:
-            p = kl.split(",")
-            if len(p) < 7:
+    params = {"secid": f"{mkt}.{clean}", "lmt": days, "klt": 101,
+              "fields1": "f1,f2,f3,f7",
+              "fields2": "f51,f52,f53,f54,f55,f56,f57,f58"}
+    headers = {**_HEADERS, "Referer": "https://quote.eastmoney.com/"}
+    # 务必 https：Render 出口不放行明文 http（排行榜用 https 能工作，本函数原先用 http→
+    # 失败→退假代理）。多节点 + 重试，最大化拿到真实主力净流入（与中信同口径：超大+大单）。
+    for host in ("push2his.eastmoney.com", "1.push2his.eastmoney.com", "7.push2his.eastmoney.com"):
+        for _attempt in range(2):
+            try:
+                r = _req.get(
+                    f"https://{host}/api/qt/stock/fflow/daykline/get",
+                    params=params, headers=headers, timeout=12,
+                )
+                klines = r.json().get("data", {}).get("klines", []) or []
+                result = []
+                for kl in klines:
+                    p = kl.split(",")
+                    if len(p) < 7:
+                        continue
+                    result.append({
+                        "date":      p[0],
+                        "main_net":  round(float(p[1]) / 1e8, 3),   # 主力净=超大+大单（亿）f52
+                        "small_net": round(float(p[2]) / 1e8, 3),   # 小单净（亿）f53
+                        "mid_net":   round(float(p[3]) / 1e8, 3),   # 中单净（亿）f54
+                        "large_net": round(float(p[4]) / 1e8, 3),   # 大单净（亿）f55
+                        "super_net": round(float(p[5]) / 1e8, 3),   # 超大单净（亿）f56
+                        "main_pct":  round(float(p[6]), 2),          # 主力净占比% f57
+                    })
+                if result:
+                    return result
+            except Exception:
                 continue
-            result.append({
-                "date":      p[0],
-                "main_net":  round(float(p[1]) / 1e8, 3),   # 主力净=超大+大单（亿）f52
-                "small_net": round(float(p[2]) / 1e8, 3),   # 小单净（亿）f53
-                "mid_net":   round(float(p[3]) / 1e8, 3),   # 中单净（亿）f54
-                "large_net": round(float(p[4]) / 1e8, 3),   # 大单净（亿）f55
-                "super_net": round(float(p[5]) / 1e8, 3),   # 超大单净（亿）f56
-                "main_pct":  round(float(p[6]), 2),          # 主力净占比% f57
-            })
-        if result:
-            return result
-    except Exception:
-        pass
-
-    # push2his 不可用时的备用：使用真实日涨跌幅（昨收→今收）而非开收差
-    try:
-        yf_code = code if "." in code else (
-            code + ".SS" if market == "SH" else
-            code + ".SZ" if market == "SZ" else code
-        )
-        df = yf.Ticker(yf_code).history(period=f"{days + 5}d", auto_adjust=True)
-        if df is None or df.empty:
-            return []
-        result = []
-        for i in range(max(1, len(df) - days), len(df)):
-            prev_close = float(df["Close"].iloc[i - 1])
-            curr_close = float(df["Close"].iloc[i])
-            if math.isnan(prev_close) or math.isnan(curr_close) or prev_close == 0:
-                continue
-            chg = (curr_close - prev_close) / prev_close
-            vol = float(df["Volume"].iloc[i])
-            if math.isnan(vol):
-                continue
-            amount_bn = vol * curr_close / 1e8
-            main_net = round(amount_bn * chg, 3)
-            result.append({
-                "date":      str(df.index[i])[:10],
-                "super_net": round(main_net * 0.4, 3),
-                "large_net": round(main_net * 0.3, 3),
-                "mid_net":   round(main_net * 0.2, 3),
-                "small_net": round(main_net * 0.1, 3),
-                "main_net":  main_net,
-                "main_pct":  round(chg * 100, 2),
-            })
-        return result
-    except Exception:
-        return []
+    # 拿不到真实数据时绝不用「涨跌幅×成交额」假代理（常与真实主力净流入反号、误导交易）。
+    # 宁可返回空、前端显示「暂无主力资金数据」，也不展示方向错误的资金流。
+    return []
 
 
 def _detect_market(code: str) -> str:

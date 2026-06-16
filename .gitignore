@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+trade.json
+ssm_stock.json
