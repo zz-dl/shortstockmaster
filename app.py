@@ -150,6 +150,167 @@ def _capital_flow(code: str, market: str, days: int = 5) -> list:
     return []
 
 
+def _analyze_main_fund_flow(capital_flow: list, quote: dict | None = None) -> dict:
+    """Convert raw main-fund-flow rows into an actionable short-term reading."""
+    quote = quote or {}
+    if not capital_flow:
+        return {
+            "label": "暂无主力资金数据",
+            "rating": "neutral",
+            "score_delta": 0,
+            "summary": "未取得真实主力资金数据，本项不参与加减分。",
+            "metrics": {"rows": 0},
+            "drivers": [],
+            "risks": ["暂无真实主力资金数据"],
+        }
+
+    rows = [r for r in capital_flow if isinstance(r, dict)]
+    recent3 = rows[-3:] if len(rows) >= 3 else rows
+    today = rows[-1]
+
+    today_net = _to_float(today.get("main_net"), 0.0)
+    today_pct = _to_float(today.get("main_pct"), 0.0)
+    large_net = _to_float(today.get("large_net"), 0.0)
+    super_net = _to_float(today.get("super_net"), 0.0)
+    small_net = _to_float(today.get("small_net"), 0.0)
+    large_super_net = large_net + super_net
+    net3 = sum(_to_float(x.get("main_net"), 0.0) for x in recent3)
+    positive_days_3 = sum(1 for x in recent3 if _to_float(x.get("main_net"), 0.0) > 0)
+
+    chg_pct = _to_float(quote.get("chg_pct"), 0.0)
+    vol_ratio = _to_float(quote.get("vol_ratio"), 1.0)
+    turnover = _to_float(quote.get("turnover"), 0.0)
+
+    drivers: list[str] = []
+    risks: list[str] = []
+    delta = 0
+
+    if today_net >= 2.0:
+        delta += 16; drivers.append(f"今日主力大幅净流入{today_net:.2f}亿")
+    elif today_net >= 0.8:
+        delta += 12; drivers.append(f"今日主力净流入{today_net:.2f}亿")
+    elif today_net >= 0.3:
+        delta += 8; drivers.append(f"今日主力温和净流入{today_net:.2f}亿")
+    elif today_net <= -1.0:
+        delta -= 16; risks.append(f"今日主力大幅净流出{abs(today_net):.2f}亿")
+    elif today_net <= -0.3:
+        delta -= 10; risks.append(f"今日主力净流出{abs(today_net):.2f}亿")
+
+    if today_pct >= 8:
+        delta += 8; drivers.append(f"主力净占比{today_pct:.1f}%较强")
+    elif today_pct >= 5:
+        delta += 6; drivers.append(f"主力净占比{today_pct:.1f}%")
+    elif today_pct >= 2:
+        delta += 3
+    elif today_pct <= -5:
+        delta -= 8; risks.append(f"主力净占比{today_pct:.1f}%偏弱")
+    elif today_pct <= -2:
+        delta -= 4
+
+    if net3 >= 2.0:
+        delta += 5; drivers.append(f"近3日主力合计净流入{net3:.2f}亿")
+    elif net3 >= 0.8:
+        delta += 3; drivers.append(f"近3日主力持续偏流入{net3:.2f}亿")
+    elif net3 <= -1.0:
+        delta -= 5; risks.append(f"近3日主力合计净流出{abs(net3):.2f}亿")
+
+    if positive_days_3 == 3:
+        delta += 4; drivers.append("近3日主力连续净流入")
+    elif positive_days_3 == 2:
+        delta += 2; drivers.append("近3日有2日主力净流入")
+    elif positive_days_3 == 0 and net3 < 0:
+        delta -= 4; risks.append("近3日主力未出现净流入")
+
+    if large_super_net >= 0.8:
+        delta += 5; drivers.append(f"超大单+大单合计净流入{large_super_net:.2f}亿")
+    elif large_super_net >= 0.2:
+        delta += 3; drivers.append("超大单/大单同步流入")
+    elif large_super_net <= -0.3:
+        delta -= 4; risks.append("超大单/大单同步流出")
+
+    if small_net <= -0.2:
+        delta += 2; drivers.append("小单净流出，筹码向大资金集中")
+    elif small_net >= 0.2:
+        delta -= 2; risks.append("小单净流入，资金结构偏散")
+
+    if chg_pct >= 1:
+        delta += 3; drivers.append(f"价格上涨{chg_pct:+.2f}%确认资金方向")
+    elif -1 <= chg_pct <= 0.5 and today_net > 0 and large_super_net > 0:
+        delta += 2; drivers.append("价格未明显上涨但大单承接，偏吸筹观察")
+    elif chg_pct <= -1 and today_net < 0:
+        delta -= 5; risks.append(f"价格下跌{chg_pct:+.2f}%且主力流出")
+
+    if 1.2 <= vol_ratio < 4:
+        delta += 2; drivers.append(f"量比{vol_ratio:.1f}，活跃但未过热")
+    elif vol_ratio >= 6:
+        delta -= 6; risks.append(f"量比{vol_ratio:.1f}过热，追高风险大")
+
+    if turnover >= 20:
+        delta -= 8; risks.append(f"换手{turnover:.1f}%过高，可能存在派发")
+    elif turnover >= 15:
+        delta -= 4; risks.append(f"换手{turnover:.1f}%偏高")
+
+    overheated = chg_pct >= 7 or vol_ratio >= 6 or turnover >= 20
+    outflow = today_net <= -0.5 or today_pct <= -3 or (net3 <= -1 and chg_pct < 0)
+    strong = (
+        today_net >= 0.8 and today_pct >= 5 and positive_days_3 >= 2
+        and large_super_net > 0 and chg_pct >= 1 and 1.0 <= vol_ratio < 5
+        and turnover < 20
+    )
+    accumulation = (
+        today_net >= 0.3 and today_pct >= 2 and large_super_net > 0
+        and -1 <= chg_pct <= 1.5 and not overheated
+    )
+
+    if outflow:
+        label, rating = "主力流出", "bearish"
+        delta = min(delta, -20)
+        summary = "主力资金正在净流出，短线以回避或减仓为主。"
+    elif today_net > 0.5 and overheated:
+        label, rating = "诱多风险", "bearish"
+        delta = min(delta, -8)
+        summary = "主力资金虽流入，但涨幅/量比/换手过热，警惕拉高派发。"
+    elif strong:
+        label, rating = "强资金共振", "bullish"
+        delta = max(delta, 24)
+        summary = "主力资金、价格和量能同步确认，短线资金共振较强。"
+    elif accumulation:
+        label, rating = "吸筹观察", "watch"
+        delta = _clip(max(delta, 10), 8, 18)
+        summary = "主力资金流入但价格未明显上涨，可能处于承接吸筹阶段，适合尾盘确认。"
+    elif today_net > 0.1:
+        label, rating = "温和流入", "bullish"
+        delta = _clip(delta, 4, 16)
+        summary = "主力资金温和流入，但需要价格和板块继续确认。"
+    else:
+        label, rating = "资金不足", "neutral"
+        delta = _clip(delta, -8, 4)
+        summary = "主力资金方向不强，暂不构成独立买入理由。"
+
+    return {
+        "label": label,
+        "rating": rating,
+        "score_delta": int(round(_clip(delta, -28, 30))),
+        "summary": summary,
+        "metrics": {
+            "rows": len(rows),
+            "today_net": round(today_net, 3),
+            "today_pct": round(today_pct, 2),
+            "net3": round(net3, 3),
+            "positive_days_3": positive_days_3,
+            "large_super_net": round(large_super_net, 3),
+            "large_net": round(large_net, 3),
+            "super_net": round(super_net, 3),
+            "small_net": round(small_net, 3),
+            "chg_pct": round(chg_pct, 2),
+            "vol_ratio": round(vol_ratio, 2),
+            "turnover": round(turnover, 2),
+        },
+        "drivers": drivers[:8],
+        "risks": risks[:8],
+    }
+
+
 def _detect_market(code: str) -> str:
     """根据代码推断市场标识。HK/US扩展名优先，防止被A股前缀误判。"""
     # 扩展名优先（避免 0700.HK 被误判为 SZ）
@@ -224,6 +385,10 @@ def _build_trade_plan(stock: dict, market_sentiment: dict | None = None,
     vol_ratio = _to_float(stock.get("vol_ratio"), 1)
     turnover = _to_float(stock.get("turnover") or stock.get("turnover_rate"), 0)
     capital_net = _to_float(stock.get("capital_net") or stock.get("main_net"), 0)
+    fund_analysis = stock.get("fund_flow_analysis") if isinstance(stock.get("fund_flow_analysis"), dict) else None
+    fund_label = str((fund_analysis or {}).get("label", ""))
+    fund_rating = str((fund_analysis or {}).get("rating", ""))
+    fund_delta = _to_float((fund_analysis or {}).get("score_delta"), 0)
     market = str(stock.get("market", ""))
     is_astock = market in ("A股", "科创板", "A股SH", "A股SZ") or re.match(r"^\d{6}$", str(stock.get("code", "")))
     sentiment_score = _to_float((market_sentiment or {}).get("score"), 50)
@@ -261,7 +426,19 @@ def _build_trade_plan(stock: dict, market_sentiment: dict | None = None,
         factor_scores["risk"] -= 16
         risk_flags.append("换手过高，追高风险大")
 
-    if capital_net > 2:
+    if fund_analysis:
+        factor_scores["capital"] += int(round(fund_delta))
+        if fund_rating in ("bullish", "watch"):
+            drivers.append(fund_label)
+        elif fund_rating == "bearish":
+            risk_flags.append(fund_label)
+        for item in (fund_analysis.get("drivers") or [])[:2]:
+            if item not in drivers:
+                drivers.append(item)
+        for item in (fund_analysis.get("risks") or [])[:2]:
+            if item not in risk_flags:
+                risk_flags.append(item)
+    elif capital_net > 2:
         factor_scores["capital"] += 28
         drivers.append("主力大幅净流入")
     elif capital_net > 0.5:
@@ -297,22 +474,27 @@ def _build_trade_plan(stock: dict, market_sentiment: dict | None = None,
         (is_astock and chg_pct >= 8) or
         vol_ratio >= 6 or
         turnover >= 22 or
-        news_stats.get("negative", 0) >= 3
+        news_stats.get("negative", 0) >= 3 or
+        fund_label == "诱多风险"
+    )
+    capital_confirmed = (
+        fund_rating in ("bullish", "watch") or
+        (not fund_analysis and capital_net >= 0)
     )
 
     if hard_reject or composite < 18:
         decision = "回避"
         confidence = "低"
         position_pct = 0
-    elif capital_net < -0.5 or len(risk_flags) >= 3 or sentiment_score < 30:
+    elif fund_rating == "bearish" or capital_net < -0.5 or len(risk_flags) >= 3 or sentiment_score < 30:
         decision = "观察"
         confidence = "低"
         position_pct = 0
-    elif composite >= 58 and capital_net > 0.5 and len(risk_flags) <= 1:
+    elif composite >= 58 and capital_confirmed and len(risk_flags) <= 1:
         decision = "买入" if _in_tail_window(now) else "尾盘确认"
         confidence = "高"
         position_pct = 20
-    elif composite >= 38 and capital_net >= 0 and len(risk_flags) <= 2:
+    elif composite >= 38 and capital_confirmed and len(risk_flags) <= 2:
         decision = "买入" if _in_tail_window(now) else "尾盘确认"
         confidence = "中"
         position_pct = 10 if risk_flags else 15
@@ -343,6 +525,8 @@ def _build_trade_plan(stock: dict, market_sentiment: dict | None = None,
 
     invalidations = []
     invalidations.extend(risk_flags[:3])
+    if fund_rating == "bearish":
+        invalidations.append(f"{fund_label}未解除")
     if capital_net <= 0:
         invalidations.append("主力资金转为净流出")
     invalidations.append("跌破买入日收盘价或盘中VWAP")
@@ -397,7 +581,7 @@ def _merge_rank_item_with_detail(rank_item: dict, detail: dict) -> dict:
     canonical_fields = (
         "name", "market", "price", "chg_pct", "vol_ratio", "turnover",
         "score", "rec", "rec_color", "trade_plan", "decision", "confidence",
-        "position_pct", "market_sentiment",
+        "position_pct", "market_sentiment", "fund_flow_analysis",
     )
     for field in canonical_fields:
         if field in detail and detail[field] is not None:
@@ -684,28 +868,21 @@ def _short_signal_score(code: str, now: datetime | None = None) -> dict:
             signals.append({"name": "恒生指数", "rating": "中性",
                 "detail": f"恒生指数今日{hsi_chg:+.2f}%，港股大盘中性"})
 
-    # ── 2. 主力资金净流入（近3日）
+    # ── 2. 主力资金流向分析（真实资金流 + 价格/量能确认）
     cf = _capital_flow(code, mkt, days=5)
-    if cf:
-        recent3 = cf[-3:] if len(cf) >= 3 else cf
-        def _safe_num(v): return 0 if (v is None or (isinstance(v, float) and math.isnan(v))) else v
-        net3 = sum(_safe_num(x.get("main_net", 0)) for x in recent3)
-        today = cf[-1] if cf else {}
-        today_net = _safe_num(today.get("main_net", 0))
-        today_pct = _safe_num(today.get("main_pct", 0))
-
-        if today_net > 0.5:
-            score += 20; signals.append({"name": "主力净流入", "rating": "积极",
-                "detail": f"今日主力净流入{today_net:.2f}亿（占比{today_pct:.1f}%），近3日合计{net3:.2f}亿"})
-        elif today_net > 0:
-            score += 8;  signals.append({"name": "主力小幅流入", "rating": "积极",
-                "detail": f"今日主力净流入{today_net:.2f}亿"})
-        elif today_net < -0.5:
-            score -= 20; signals.append({"name": "主力净流出", "rating": "消极",
-                "detail": f"今日主力净流出{abs(today_net):.2f}亿（占比{today_pct:.1f}%），近3日合计{net3:.2f}亿"})
-        else:
-            score -= 5;  signals.append({"name": "主力小幅流出", "rating": "消极",
-                "detail": f"今日主力净流出{abs(today_net):.2f}亿"})
+    fund_flow_analysis = _analyze_main_fund_flow(cf, q)
+    score += fund_flow_analysis["score_delta"]
+    fund_rating_text = {
+        "bullish": "积极",
+        "watch": "中性",
+        "neutral": "中性",
+        "bearish": "消极",
+    }.get(fund_flow_analysis["rating"], "中性")
+    signals.append({
+        "name": f"主力资金分析：{fund_flow_analysis['label']}",
+        "rating": fund_rating_text,
+        "detail": fund_flow_analysis["summary"],
+    })
 
     # ── 3. 近期价格动量（用yfinance）
     try:
@@ -789,6 +966,7 @@ def _short_signal_score(code: str, now: datetime | None = None) -> dict:
         "vol_ratio": vol_ratio,
         "turnover": turnover,
         "capital_net": (cf[-1].get("main_net") if cf else 0),
+        "fund_flow_analysis": fund_flow_analysis,
     }
     trade_plan = _build_trade_plan(
         plan_stock,
@@ -804,6 +982,7 @@ def _short_signal_score(code: str, now: datetime | None = None) -> dict:
         "signals": signals, "news": news[:6],
         "capital_flow": cf,
         "capital_net": plan_stock["capital_net"],
+        "fund_flow_analysis": fund_flow_analysis,
         "market_sentiment": market_sentiment,
         "trade_plan": trade_plan,
         "decision": trade_plan["decision"],
@@ -1336,8 +1515,8 @@ def api_rank():
     phase1.sort(key=lambda x: x["score"], reverse=True)
     top30 = phase1[:50]
 
-    # 第二阶段：并行拉主力资金净流入，仅 A股/科创板
-    capital_nets: dict = {}
+    # 第二阶段：并行拉主力资金流分析，仅 A股/科创板
+    fund_flow_analyses: dict = {}
     cf_lock = threading.Lock()
 
     def _fetch_cf(stock: dict) -> None:
@@ -1345,10 +1524,11 @@ def api_rank():
         if stock["market"] not in ("A股", "科创板"):
             return
         mkt_str = _detect_market(code)
-        cf = _capital_flow(code, mkt_str, days=1)
+        cf = _capital_flow(code, mkt_str, days=5)
         if cf:
+            analysis = _analyze_main_fund_flow(cf, stock)
             with cf_lock:
-                capital_nets[code] = cf[-1].get("main_net", 0)
+                fund_flow_analyses[code] = analysis
 
     cf_threads = [threading.Thread(target=_fetch_cf, args=(s,), daemon=True) for s in top30]
     for t in cf_threads: t.start()
@@ -1356,18 +1536,17 @@ def api_rank():
 
     market_sentiment = _market_sentiment()
 
-    # 第三阶段：把资金流加入评分，重新排序，并生成买卖计划
+    # 第三阶段：把资金流分析加入评分，重新排序，并生成买卖计划
     for r in top30:
-        net = capital_nets.get(r["code"], r.get("capital_net", 0))
+        analysis = fund_flow_analyses.get(r["code"])
+        if analysis is None:
+            seed_net = _to_float(r.get("capital_net"), 0)
+            seed_flow = [{"date": "", "main_net": seed_net, "main_pct": 0, "large_net": 0, "super_net": 0, "small_net": 0}] if seed_net else []
+            analysis = _analyze_main_fund_flow(seed_flow, r)
+        net = _to_float((analysis.get("metrics") or {}).get("today_net"), r.get("capital_net", 0))
         r["capital_net"] = round(net, 2)
-        if net > 2.0:    delta = 18
-        elif net > 0.5:  delta = 12
-        elif net > 0.1:  delta = 6
-        elif net < -2.0: delta = -18
-        elif net < -0.5: delta = -12
-        elif net < -0.1: delta = -6
-        else:            delta = 0
-        r["score"] = max(-100, min(100, r["score"] + delta))
+        r["fund_flow_analysis"] = analysis
+        r["score"] = max(-100, min(100, r["score"] + analysis.get("score_delta", 0)))
         s = r["score"]
         if s >= 30:    r["rec"], r["rec_color"] = "短线做多", "#00cc55"
         elif s >= 10:  r["rec"], r["rec_color"] = "偏多观望", "#55ee99"

@@ -5,6 +5,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app import (
     _apply_plan_to_rank_item,
+    _analyze_main_fund_flow,
     _build_trade_plan,
     _is_rank_candidate,
     _merge_rank_item_with_detail,
@@ -88,6 +89,41 @@ def test_trade_plan_rejects_overheated_or_capital_outflow_candidate():
     assert _build_trade_plan(outflow)["decision"] in ("观察", "回避")
 
 
+def test_trade_plan_uses_structured_fund_flow_analysis():
+    strong_analysis = _analyze_main_fund_flow(
+        [
+            {"date": "2026-06-15", "main_net": 0.55, "main_pct": 2.8, "large_net": 0.20, "super_net": 0.18, "small_net": -0.24},
+            {"date": "2026-06-16", "main_net": 0.86, "main_pct": 4.6, "large_net": 0.36, "super_net": 0.32, "small_net": -0.45},
+            {"date": "2026-06-17", "main_net": 1.62, "main_pct": 8.6, "large_net": 0.72, "super_net": 0.68, "small_net": -0.90},
+        ],
+        {"chg_pct": 4.1, "vol_ratio": 2.2, "turnover": 7.5},
+    )
+    risk_analysis = _analyze_main_fund_flow(
+        [
+            {"date": "2026-06-15", "main_net": 0.40, "main_pct": 1.9, "large_net": 0.15, "super_net": 0.12, "small_net": -0.18},
+            {"date": "2026-06-16", "main_net": 1.10, "main_pct": 4.5, "large_net": 0.30, "super_net": 0.38, "small_net": -0.44},
+            {"date": "2026-06-17", "main_net": 2.80, "main_pct": 9.5, "large_net": 0.95, "super_net": 1.10, "small_net": -1.20},
+        ],
+        {"chg_pct": 8.3, "vol_ratio": 6.4, "turnover": 24.0},
+    )
+
+    strong_plan = _build_trade_plan({
+        "code": "600000", "name": "TEST", "market": "A股", "price": 10.0,
+        "score": 42, "chg_pct": 4.1, "vol_ratio": 2.2, "turnover": 7.5,
+        "capital_net": 1.62, "fund_flow_analysis": strong_analysis,
+    }, market_sentiment={"score": 56, "label": "贪婪"})
+    risk_plan = _build_trade_plan({
+        "code": "600000", "name": "TEST", "market": "A股", "price": 10.0,
+        "score": 42, "chg_pct": 8.3, "vol_ratio": 6.4, "turnover": 24.0,
+        "capital_net": 2.80, "fund_flow_analysis": risk_analysis,
+    }, market_sentiment={"score": 56, "label": "贪婪"})
+
+    assert strong_plan["decision"] == "尾盘确认"
+    assert "强资金共振" in strong_plan["drivers"]
+    assert risk_plan["decision"] == "回避"
+    assert any("诱多风险" in x for x in risk_plan["invalidations"])
+
+
 def test_apply_plan_to_rank_item_reprices_recommendation_and_candidate_gate():
     stock = {
         "code": "600000",
@@ -145,6 +181,7 @@ def test_rank_item_uses_detail_score_and_plan_as_canonical_display():
             "position_pct": 0,
         },
         "capital_net": 3.35,
+        "fund_flow_analysis": {"label": "强资金共振", "rating": "bullish", "score_delta": 24},
     }
 
     merged = _merge_rank_item_with_detail(rank_item, detail)
@@ -157,3 +194,15 @@ def test_rank_item_uses_detail_score_and_plan_as_canonical_display():
     assert merged["position_pct"] == 0
     assert merged["trade_plan"]["decision"] == avoid
     assert merged["capital_net"] == 3.35
+    assert merged["fund_flow_analysis"]["label"] == "强资金共振"
+
+
+if __name__ == "__main__":
+    test_rank_candidate_requires_backtested_gain_and_volume_ranges()
+    test_extreme_volume_and_overheat_gain_are_downgraded()
+    test_trade_plan_prefers_tail_confirmation_for_quality_candidate()
+    test_trade_plan_rejects_overheated_or_capital_outflow_candidate()
+    test_trade_plan_uses_structured_fund_flow_analysis()
+    test_apply_plan_to_rank_item_reprices_recommendation_and_candidate_gate()
+    test_rank_item_uses_detail_score_and_plan_as_canonical_display()
+    print("ALL TESTS PASSED")

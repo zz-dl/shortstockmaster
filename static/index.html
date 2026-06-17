@@ -77,6 +77,13 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .cf-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
 .cf-fill{height:100%;border-radius:3px;transition:width .4s}
 .cf-val{font-size:11px;width:55px;text-align:right}
+.fund-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.fund-label{font-size:13px;font-weight:800}
+.fund-summary{font-size:11px;color:var(--dim);line-height:1.5;margin-top:4px}
+.fund-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.fund-metric{background:#0f1520;border:1px solid var(--border);border-radius:7px;padding:7px}
+.fund-metric small{display:block;color:var(--dim);font-size:10px;margin-bottom:3px}
+.fund-metric b{font-size:12px}
 .sector-card{background:var(--card);border-radius:10px;padding:12px;margin-bottom:8px;
   border:1px solid var(--border)}
 .sector-name{font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)}
@@ -235,6 +242,10 @@ function chgColor(v){return v>0?'var(--buy)':v<0?'var(--sell)':'var(--dim)'}
 function chgClass(v){return v>0?'up':v<0?'dn':'neutral'}
 function fmtChg(v){return (v>0?'+':'')+v.toFixed(2)+'%'}
 function fmtNet(v){return (v>0?'+':'')+v.toFixed(2)+'亿'}
+function fmtPct(v){return (v>0?'+':'')+Number(v||0).toFixed(1)+'%'}
+function fundColor(rating){
+  return rating==='bullish'?'var(--buy)':rating==='watch'?'#55ee99':rating==='bearish'?'var(--sell)':'var(--hold)';
+}
 function planColor(decision){
   return decision==='买入'?'var(--buy)':decision==='尾盘确认'?'#55ee99':decision==='观察'?'var(--hold)':'var(--sell)';
 }
@@ -286,8 +297,11 @@ function renderRank(results) {
   results.forEach((r, i) => {
     const rc = r.rec_color || rcMap[r.rec] || 'var(--dim)';
     const plan = r.trade_plan || {};
+    const fund = r.fund_flow_analysis || {};
+    const fm = fund.metrics || {};
     const decision = r.decision || plan.decision || r.rec || '';
     const pc = planColor(decision);
+    const fc = fundColor(fund.rating);
     const drivers = (plan.drivers || []).slice(0, 2).join(' · ');
     html += `
     <div class="rank-item" onclick="pickRankStock('${r.code}','${r.name}')">
@@ -296,6 +310,8 @@ function renderRank(results) {
         <div style="flex:1;min-width:0">
           <div style="font-size:13px;font-weight:700">${r.name}</div>
           <div style="font-size:10px;color:var(--dim)">${r.code} · ${r.market} · 量比${r.vol_ratio.toFixed(1)} · 主力${fmtNet(r.capital_net||0)}</div>
+          ${fund.label?`<div class="plan-line"><span class="plan-strong" style="color:${fc}">${fund.label}</span>
+            · ${fmtNet(fm.today_net||0)} · 占比${fmtPct(fm.today_pct||0)}</div>`:''}
           <div class="plan-line"><span class="plan-strong" style="color:${pc}">${decision}</span>
             ${plan.confidence?` · ${plan.confidence}信心`:''}${plan.position_pct?` · 仓位${plan.position_pct}%`:''}</div>
           ${drivers?`<div class="plan-line">${drivers}</div>`:''}
@@ -622,6 +638,31 @@ async function analyzeStock() {
         html += `<div class="risk-list">${p.invalidations.slice(0,4).map(x=>`<span class="risk-tag">${x}</span>`).join('')}</div>`;
       }
       html += `</div>`;
+    }
+
+    // 主力资金分析结论
+    if (d.fund_flow_analysis) {
+      const f = d.fund_flow_analysis;
+      const fm = f.metrics || {};
+      const fc = fundColor(f.rating);
+      const fDrivers = (f.drivers || []).slice(0, 3).map(x=>`<span class="risk-tag" style="color:${fc};border-color:${fc};background:rgba(91,156,255,.08)">${x}</span>`).join('');
+      const fRisks = (f.risks || []).slice(0, 3).map(x=>`<span class="risk-tag">${x}</span>`).join('');
+      html += `<div class="card">
+        <div class="fund-head">
+          <div class="card-title" style="margin-bottom:0">主力资金分析</div>
+          <span class="plan-pill" style="color:${fc}">${f.label}</span>
+        </div>
+        <div class="fund-summary">${f.summary || ''}</div>
+        <div class="fund-metrics">
+          <div class="fund-metric"><small>今日主力</small><b style="color:${chgColor(fm.today_net||0)}">${fmtNet(fm.today_net||0)}</b></div>
+          <div class="fund-metric"><small>净占比</small><b style="color:${chgColor(fm.today_pct||0)}">${fmtPct(fm.today_pct||0)}</b></div>
+          <div class="fund-metric"><small>近3日</small><b style="color:${chgColor(fm.net3||0)}">${fmtNet(fm.net3||0)}</b></div>
+          <div class="fund-metric"><small>超大+大单</small><b style="color:${chgColor(fm.large_super_net||0)}">${fmtNet(fm.large_super_net||0)}</b></div>
+          <div class="fund-metric"><small>连续流入</small><b>${fm.positive_days_3||0}/3</b></div>
+          <div class="fund-metric"><small>分析加分</small><b style="color:${chgColor(f.score_delta||0)}">${(f.score_delta||0)>0?'+':''}${f.score_delta||0}</b></div>
+        </div>
+        ${(fDrivers||fRisks)?`<div class="risk-list">${fDrivers}${fRisks}</div>`:''}
+      </div>`;
     }
 
     // 主力资金流向图
