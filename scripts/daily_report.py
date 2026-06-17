@@ -201,7 +201,7 @@ rank_error = ""
 try:
     # 模拟交易只做 A 股(2026-06-12 起,用户要求剔除美股/港股)
     resp = requests.post("https://shortstockmaster.onrender.com/api/rank",
-                         json={"markets":["A"]}, timeout=90).json()
+                         json={"markets":["A"], "as_of_time": REPORT_TIME}, timeout=90).json()
     rank_status = resp.get("status", "")
     rank_total = resp.get("total")
     rank_error = str(resp.get("error", "") or "")

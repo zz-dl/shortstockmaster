@@ -179,6 +179,31 @@ def _in_tail_window(now: datetime | None = None) -> bool:
     return 14 * 60 + 30 <= minutes <= 14 * 60 + 55
 
 
+def _parse_beijing_time_override(value) -> datetime | None:
+    """Parse a caller-provided Beijing report time for deterministic signal decisions."""
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text:
+        return None
+    for fmt in ("%H:%M:%S", "%H:%M", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"):
+        try:
+            parsed = datetime.strptime(text, fmt)
+            if fmt.startswith("%H"):
+                return datetime.combine(date.today(), parsed.time())
+            return parsed
+        except ValueError:
+            continue
+    return None
+
+
+def _plan_now_from_payload(payload: dict | None) -> datetime | None:
+    payload = payload or {}
+    return _parse_beijing_time_override(
+        payload.get("as_of_time") or payload.get("report_time") or payload.get("as_of")
+    )
+
+
 def _news_stats(news: list | None) -> dict:
     neg_kw = ["立案", "调查", "违规", "处罚", "下调", "警示", "问询", "亏损", "暴跌", "崩盘",
               "退市", "造假", "虚假陈述", "被罚", "减持", "质押", "违约"]
@@ -390,7 +415,9 @@ def _merge_rank_item_with_detail(rank_item: dict, detail: dict) -> dict:
     return merged
 
 
-def _sync_rank_items_with_detail(items: list[dict], limit: int = 15) -> list[dict]:
+def _sync_rank_items_with_detail(
+    items: list[dict], limit: int = 15, now: datetime | None = None
+) -> list[dict]:
     """Hydrate rank rows with the same detailed score used by /api/stock."""
     selected = list(items[:limit])
     if not selected:
@@ -398,7 +425,7 @@ def _sync_rank_items_with_detail(items: list[dict], limit: int = 15) -> list[dic
 
     def _load(stock: dict) -> dict:
         try:
-            detail = _short_signal_score(str(stock.get("code", "")))
+            detail = _short_signal_score(str(stock.get("code", "")), now=now)
             return _merge_rank_item_with_detail(stock, detail)
         except Exception as exc:
             fallback = dict(stock)
@@ -568,11 +595,14 @@ def _market_sentiment() -> dict:
     try:
         hgt = yf.Ticker("513500.SS").history(period="2d")  # 标普500 ETF 代理外资情绪
         if len(hgt) >= 2:
-            chg = float(hgt["Close"].iloc[-1]) / float(hgt["Close"].iloc[-2]) - 1
-            if chg > 0.01:  score += 5; north_label = f"外资ETF +{chg*100:.1f}% 流入信号"
-            elif chg < -0.01: score -= 5; north_label = f"外资ETF {chg*100:.1f}% 流出信号"
-            else: north_label = f"外资ETF {chg*100:.1f}% 中性"
-            details.append({"label": "外资情绪", "value": north_label})
+            latest = _to_float(hgt["Close"].iloc[-1], 0)
+            previous = _to_float(hgt["Close"].iloc[-2], 0)
+            if previous > 0 and latest > 0:
+                chg = latest / previous - 1
+                if chg > 0.01:  score += 5; north_label = f"外资ETF +{chg*100:.1f}% 流入信号"
+                elif chg < -0.01: score -= 5; north_label = f"外资ETF {chg*100:.1f}% 流出信号"
+                else: north_label = f"外资ETF {chg*100:.1f}% 中性"
+                details.append({"label": "外资情绪", "value": north_label})
     except Exception:
         pass
 
@@ -588,7 +618,7 @@ def _market_sentiment() -> dict:
 
 # ── 短线信号评分 ─────────────────────────────────────────────────────────────
 
-def _short_signal_score(code: str) -> dict:
+def _short_signal_score(code: str, now: datetime | None = None) -> dict:
     """
     综合评分：资金流向(35%) + 量价动量(30%) + 消息面(20%) + 市场情绪(15%)
     返回 score(-100~+100), signals, recommendation
@@ -763,6 +793,7 @@ def _short_signal_score(code: str) -> dict:
     trade_plan = _build_trade_plan(
         plan_stock,
         market_sentiment=market_sentiment,
+        now=now,
         news_stats={"positive": pos_hits, "negative": neg_hits},
     )
 
@@ -1234,6 +1265,7 @@ def api_quotes():
 def api_rank():
     """同步扫描并直接返回结果（无轮询，无跨 worker 状态问题）。"""
     body = request.get_json(silent=True, force=True) or {}
+    plan_now = _plan_now_from_payload(body)
     raw_markets = body.get("markets", ["A"])
     mkt_alias = {"A": "A股", "HK": "港股", "US": "美股", "STAR": "科创板",
                  "A股": "A股", "港股": "港股", "美股": "美股", "科创板": "科创板"}
@@ -1342,11 +1374,11 @@ def api_rank():
         elif s >= -10: r["rec"], r["rec_color"] = "中性",     "#ffcc00"
         elif s >= -30: r["rec"], r["rec_color"] = "偏空观望", "#ff9944"
         else:          r["rec"], r["rec_color"] = "短线做空", "#ff4444"
-        r.update(_apply_plan_to_rank_item(r, market_sentiment))
+        r.update(_apply_plan_to_rank_item(r, market_sentiment, now=plan_now))
 
     top30 = [r for r in top30 if _is_rank_candidate(r)]
     top30.sort(key=lambda x: x["score"], reverse=True)
-    detailed_top = _sync_rank_items_with_detail(top30, limit=15)
+    detailed_top = _sync_rank_items_with_detail(top30, limit=15, now=plan_now)
     if detailed_top:
         top30 = detailed_top
         top30 = [r for r in top30 if _is_rank_candidate(r)]
@@ -1394,8 +1426,11 @@ def api_stock():
     code = request.args.get("code", "").strip().upper()
     if not code:
         return jsonify({"error": "缺少 code 参数"}), 400
+    plan_now = _parse_beijing_time_override(
+        request.args.get("as_of_time") or request.args.get("report_time") or request.args.get("as_of")
+    )
     try:
-        data = _short_signal_score(code)
+        data = _short_signal_score(code, now=plan_now)
         ai = _ai_short_analyze(code, data.get("name", code), data, data.get("news", []))
         data["ai_analysis"] = ai
         return Response(jdump(data), mimetype="application/json")
