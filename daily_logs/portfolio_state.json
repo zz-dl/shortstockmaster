@@ -2,23 +2,23 @@
   "created": "2026-05-19",
   "positions": [
     {
-      "code": "002177",
-      "name": "御银股份",
+      "code": "002486",
+      "name": "嘉麟杰",
       "market": "A股",
-      "tk": "sz002177",
-      "score": 67,
+      "tk": "sz002486",
+      "score": 56,
       "rec": "短线做多",
-      "entry_price": 6.52,
-      "entry_date": "2026-06-17",
+      "entry_price": 2.39,
+      "entry_date": "2026-06-18",
       "buy_time": "14:45:00",
       "amount": 10000,
-      "shares": 1533.74,
-      "cur_price": 6.52,
-      "chg_today": 6.36,
+      "shares": 4184.1,
+      "cur_price": 2.39,
+      "chg_today": 6.7,
       "pnl": 0.0,
       "pnl_pct": 0.0,
       "rank_at_buy": 1,
-      "score_at_buy": 67,
+      "score_at_buy": 56,
       "rec_at_buy": "短线做多",
       "decision_at_buy": "买入",
       "trade_plan_at_buy": {
@@ -26,15 +26,16 @@
         "confidence": "高",
         "position_pct": 20,
         "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 6.31（约-3.2%）；止盈先看 6.94（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+        "sell_plan": "止损参考 2.31（约-3.2%）；止盈先看 2.55（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
         "stop_loss_pct": 3.2,
-        "stop_loss_price": 6.31,
+        "stop_loss_price": 2.31,
         "take_profit_pct": 6.5,
-        "take_profit_price": 6.94,
+        "take_profit_price": 2.55,
         "max_holding_days": 3,
         "drivers": [
-          "量价温和放大",
-          "主力净流入",
+          "温和流入",
+          "今日主力温和净流入0.47亿",
+          "主力净占比19.0%较强",
           "市场情绪贪婪"
         ],
         "risk_flags": [],
@@ -43,34 +44,34 @@
           "板块热度退潮或出现突发利空"
         ],
         "factor_scores": {
-          "technical": 25,
-          "capital": 20,
+          "technical": 0,
+          "capital": 16,
           "market": 8,
           "news": 0,
           "risk": 0
         },
-        "composite_score": 85.5
+        "composite_score": 64.4
       },
       "bought_today": true
     },
     {
-      "code": "002976",
-      "name": "瑞玛精密",
+      "code": "000679",
+      "name": "大连友谊",
       "market": "A股",
-      "tk": "sz002976",
-      "score": 51,
+      "tk": "sz000679",
+      "score": 52,
       "rec": "短线做多",
-      "entry_price": 28.67,
-      "entry_date": "2026-06-17",
+      "entry_price": 7.58,
+      "entry_date": "2026-06-18",
       "buy_time": "14:45:00",
       "amount": 10000,
-      "shares": 348.8,
-      "cur_price": 28.67,
-      "chg_today": 5.83,
+      "shares": 1319.26,
+      "cur_price": 7.58,
+      "chg_today": 3.13,
       "pnl": 0.0,
       "pnl_pct": 0.0,
       "rank_at_buy": 2,
-      "score_at_buy": 51,
+      "score_at_buy": 52,
       "rec_at_buy": "短线做多",
       "decision_at_buy": "买入",
       "trade_plan_at_buy": {
@@ -78,211 +79,52 @@
         "confidence": "高",
         "position_pct": 20,
         "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 27.75（约-3.2%）；止盈先看 30.53（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+        "sell_plan": "止损参考 7.34（约-3.2%）；止盈先看 8.07（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
         "stop_loss_pct": 3.2,
-        "stop_loss_price": 27.75,
+        "stop_loss_price": 7.34,
         "take_profit_pct": 6.5,
-        "take_profit_price": 30.53,
+        "take_profit_price": 8.07,
         "max_holding_days": 3,
         "drivers": [
-          "量价温和放大",
-          "主力净流入",
-          "市场情绪贪婪",
-          "消息面偏多"
+          "温和流入",
+          "主力净占比6.8%",
+          "超大单/大单同步流入",
+          "市场情绪贪婪"
         ],
-        "risk_flags": [
-          "换手过高，追高风险大"
-        ],
+        "risk_flags": [],
         "invalidations": [
-          "换手过高，追高风险大",
           "跌破买入日收盘价或盘中VWAP",
           "板块热度退潮或出现突发利空"
         ],
         "factor_scores": {
-          "technical": 25,
-          "capital": 20,
+          "technical": 0,
+          "capital": 14,
           "market": 8,
           "news": 14,
-          "risk": -16
+          "risk": 0
         },
-        "composite_score": 68.8
+        "composite_score": 64.6
       },
       "bought_today": true
     },
     {
-      "code": "002303",
-      "name": "美盈森",
+      "code": "603316",
+      "name": "诚邦股份",
       "market": "A股",
-      "tk": "sz002303",
-      "score": 47,
-      "rec": "短线做多",
-      "entry_price": 3.83,
-      "entry_date": "2026-06-17",
+      "tk": "sh603316",
+      "score": 36,
+      "rec": "偏多观望",
+      "entry_price": 21.16,
+      "entry_date": "2026-06-18",
       "buy_time": "14:45:00",
       "amount": 10000,
-      "shares": 2610.97,
-      "cur_price": 3.83,
-      "chg_today": 5.22,
+      "shares": 472.59,
+      "cur_price": 21.16,
+      "chg_today": 2.07,
       "pnl": 0.0,
       "pnl_pct": 0.0,
       "rank_at_buy": 3,
-      "score_at_buy": 47,
-      "rec_at_buy": "短线做多",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
-        "confidence": "高",
-        "position_pct": 20,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 3.71（约-3.2%）；止盈先看 4.08（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 3.2,
-        "stop_loss_price": 3.71,
-        "take_profit_pct": 6.5,
-        "take_profit_price": 4.08,
-        "max_holding_days": 3,
-        "drivers": [
-          "换手活跃但未失控",
-          "主力净流入",
-          "市场情绪贪婪"
-        ],
-        "risk_flags": [],
-        "invalidations": [
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 8,
-          "capital": 20,
-          "market": 8,
-          "news": 0,
-          "risk": 0
-        },
-        "composite_score": 59.6
-      },
-      "bought_today": true
-    },
-    {
-      "code": "603082",
-      "name": "北自科技",
-      "market": "A股",
-      "tk": "sh603082",
-      "score": 38,
-      "rec": "偏多观望",
-      "entry_price": 37.3,
-      "entry_date": "2026-06-17",
-      "buy_time": "14:45:00",
-      "amount": 10000,
-      "shares": 268.1,
-      "cur_price": 37.3,
-      "chg_today": 5.04,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
-      "rank_at_buy": 4,
-      "score_at_buy": 38,
-      "rec_at_buy": "偏多观望",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
-        "confidence": "中",
-        "position_pct": 15,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 36.33（约-2.6%）；止盈先看 39.09（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 2.6,
-        "stop_loss_price": 36.33,
-        "take_profit_pct": 4.8,
-        "take_profit_price": 39.09,
-        "max_holding_days": 3,
-        "drivers": [
-          "量价温和放大",
-          "主力小幅净流入",
-          "市场情绪贪婪"
-        ],
-        "risk_flags": [],
-        "invalidations": [
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 25,
-          "capital": 10,
-          "market": 8,
-          "news": 0,
-          "risk": 0
-        },
-        "composite_score": 53.0
-      },
-      "bought_today": true
-    },
-    {
-      "code": "301041",
-      "name": "金百泽",
-      "market": "A股",
-      "tk": "sz301041",
-      "score": 38,
-      "rec": "偏多观望",
-      "entry_price": 36.06,
-      "entry_date": "2026-06-17",
-      "buy_time": "14:45:00",
-      "amount": 10000,
-      "shares": 277.32,
-      "cur_price": 36.06,
-      "chg_today": 2.44,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
-      "rank_at_buy": 5,
-      "score_at_buy": 38,
-      "rec_at_buy": "偏多观望",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
-        "confidence": "中",
-        "position_pct": 15,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 35.12（约-2.6%）；止盈先看 37.79（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 2.6,
-        "stop_loss_price": 35.12,
-        "take_profit_pct": 4.8,
-        "take_profit_price": 37.79,
-        "max_holding_days": 3,
-        "drivers": [
-          "量价温和放大",
-          "主力小幅净流入",
-          "市场情绪贪婪"
-        ],
-        "risk_flags": [],
-        "invalidations": [
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 25,
-          "capital": 10,
-          "market": 8,
-          "news": 0,
-          "risk": 0
-        },
-        "composite_score": 53.0
-      },
-      "bought_today": true
-    },
-    {
-      "code": "002824",
-      "name": "和胜股份",
-      "market": "A股",
-      "tk": "sz002824",
-      "score": 30,
-      "rec": "偏多观望",
-      "entry_price": 35.94,
-      "entry_date": "2026-06-17",
-      "buy_time": "14:45:00",
-      "amount": 10000,
-      "shares": 278.24,
-      "cur_price": 35.94,
-      "chg_today": 2.95,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
-      "rank_at_buy": 6,
-      "score_at_buy": 30,
+      "score_at_buy": 36,
       "rec_at_buy": "偏多观望",
       "decision_at_buy": "买入",
       "trade_plan_at_buy": {
@@ -290,33 +132,150 @@
         "confidence": "中",
         "position_pct": 10,
         "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 35.01（约-2.6%）；止盈先看 37.67（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+        "sell_plan": "止损参考 20.61（约-2.6%）；止盈先看 22.18（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
         "stop_loss_pct": 2.6,
-        "stop_loss_price": 35.01,
+        "stop_loss_price": 20.61,
         "take_profit_pct": 4.8,
-        "take_profit_price": 37.67,
+        "take_profit_price": 22.18,
         "max_holding_days": 3,
         "drivers": [
           "量价温和放大",
-          "主力净流入",
-          "市场情绪贪婪"
+          "温和流入",
+          "今日主力净流入1.16亿",
+          "主力净占比11.0%较强"
         ],
         "risk_flags": [
-          "换手过高，追高风险大"
+          "换手过高，追高风险大",
+          "换手18.9%偏高"
         ],
         "invalidations": [
           "换手过高，追高风险大",
+          "换手18.9%偏高",
           "跌破买入日收盘价或盘中VWAP",
           "板块热度退潮或出现突发利空"
         ],
         "factor_scores": {
           "technical": 25,
-          "capital": 20,
+          "capital": 16,
           "market": 8,
           "news": 0,
           "risk": -16
         },
-        "composite_score": 43.0
+        "composite_score": 47.5
+      },
+      "bought_today": true
+    },
+    {
+      "code": "301468",
+      "name": "博盈特焊",
+      "market": "A股",
+      "tk": "sz301468",
+      "score": 33,
+      "rec": "偏多观望",
+      "entry_price": 48.89,
+      "entry_date": "2026-06-18",
+      "buy_time": "14:45:00",
+      "amount": 10000,
+      "shares": 204.54,
+      "cur_price": 48.89,
+      "chg_today": 0.53,
+      "pnl": 0.0,
+      "pnl_pct": 0.0,
+      "rank_at_buy": 4,
+      "score_at_buy": 33,
+      "rec_at_buy": "偏多观望",
+      "decision_at_buy": "买入",
+      "trade_plan_at_buy": {
+        "decision": "买入",
+        "confidence": "中",
+        "position_pct": 10,
+        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+        "sell_plan": "止损参考 47.62（约-2.6%）；止盈先看 51.24（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+        "stop_loss_pct": 2.6,
+        "stop_loss_price": 47.62,
+        "take_profit_pct": 4.8,
+        "take_profit_price": 51.24,
+        "max_holding_days": 3,
+        "drivers": [
+          "低位启动观察",
+          "吸筹观察",
+          "今日主力净流入0.92亿",
+          "主力净占比9.4%较强"
+        ],
+        "risk_flags": [
+          "换手过高，追高风险大",
+          "换手19.8%偏高"
+        ],
+        "invalidations": [
+          "换手过高，追高风险大",
+          "换手19.8%偏高",
+          "跌破买入日收盘价或盘中VWAP",
+          "板块热度退潮或出现突发利空"
+        ],
+        "factor_scores": {
+          "technical": 12,
+          "capital": 18,
+          "market": 8,
+          "news": 12,
+          "risk": -16
+        },
+        "composite_score": 44.9
+      },
+      "bought_today": true
+    },
+    {
+      "code": "603779",
+      "name": "威龙股份",
+      "market": "A股",
+      "tk": "sh603779",
+      "score": 28,
+      "rec": "偏多观望",
+      "entry_price": 7.85,
+      "entry_date": "2026-06-18",
+      "buy_time": "14:45:00",
+      "amount": 10000,
+      "shares": 1273.89,
+      "cur_price": 7.85,
+      "chg_today": 1.42,
+      "pnl": 0.0,
+      "pnl_pct": 0.0,
+      "rank_at_buy": 5,
+      "score_at_buy": 28,
+      "rec_at_buy": "偏多观望",
+      "decision_at_buy": "买入",
+      "trade_plan_at_buy": {
+        "decision": "买入",
+        "confidence": "中",
+        "position_pct": 10,
+        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+        "sell_plan": "止损参考 7.65（约-2.6%）；止盈先看 8.23（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+        "stop_loss_pct": 2.6,
+        "stop_loss_price": 7.65,
+        "take_profit_pct": 4.8,
+        "take_profit_price": 8.23,
+        "max_holding_days": 3,
+        "drivers": [
+          "低位启动观察",
+          "吸筹观察",
+          "今日主力温和净流入0.54亿",
+          "主力净占比12.7%较强"
+        ],
+        "risk_flags": [
+          "换手16.2%偏高"
+        ],
+        "invalidations": [
+          "换手16.2%偏高",
+          "跌破买入日收盘价或盘中VWAP",
+          "板块热度退潮或出现突发利空"
+        ],
+        "factor_scores": {
+          "technical": 12,
+          "capital": 18,
+          "market": 8,
+          "news": 0,
+          "risk": 0
+        },
+        "composite_score": 41.3
       },
       "bought_today": true
     }
@@ -444,6 +403,12 @@
     },
     {
       "date": "2026-06-17",
+      "total_pnl": 0.0,
+      "pct": 0.0,
+      "anomalies": 0
+    },
+    {
+      "date": "2026-06-18",
       "total_pnl": 0.0,
       "pct": 0.0,
       "anomalies": 0
