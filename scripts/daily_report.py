@@ -4,6 +4,7 @@ from datetime import date, datetime
 from trade_history import build_trade_history_records
 from signal_snapshot import build_signal_snapshot_records
 from report_health import normalize_rank_error, summarize_rank_health
+from report_insights import build_big_move_suggestion, format_buy_direction
 
 GH_TOKEN = os.environ["GH_TOKEN"]
 GH_REPO  = os.environ.get("GH_REPO", "zz-dl/shortstockmaster")
@@ -330,7 +331,7 @@ if bought_positions:
     for p in bought_positions:
         md.append(
             f"- {p['name']}（{p['code']}）@ {p.get('entry_price', 0):.2f}，"
-            f"排名 {p.get('rank_at_buy')}，评分 {p.get('score_at_buy')}，方向：{p.get('rec_at_buy', '')}"
+            f"排名 {p.get('rank_at_buy')}，评分 {p.get('score_at_buy')}，{format_buy_direction(p)}"
         )
 else:
     md.append("- 自动买入：无")
@@ -369,10 +370,9 @@ md += ["", "## 💡 软件分析盲点 & 改进建议", ""]
 suggestions = []
 if rank_health["suggestion"]:
     suggestions.append(rank_health["suggestion"])
-big_moves = [p for p in positions if abs(p.get("chg_today",0)) > 5]
-if big_moves:
-    names = "、".join(p["name"] for p in big_moves)
-    suggestions.append(f"**{names}** 今日波动超 5%，系统未提前识别——可考虑加强实时新闻触发检测")
+big_move_suggestion = build_big_move_suggestion(positions, today=today)
+if big_move_suggestion:
+    suggestions.append(big_move_suggestion)
 if len(anomalies) > 1:
     suggestions.append(f"{len(anomalies)} 只股票出现方向错误，新闻情绪加权（±10~18分）机制已激活，请关注后续改善效果")
 elif anomalies:
