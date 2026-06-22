@@ -1,24 +1,26 @@
 """每日 StockMaster 跟踪日报脚本，由 GitHub Actions 自动运行。"""
-import requests, json, base64, re, os
+import requests, json, base64, re, os, time
 from datetime import date, datetime
 from trade_history import build_trade_history_records
 from signal_snapshot import build_signal_snapshot_records
 from report_health import normalize_rank_error, summarize_rank_health
 from report_insights import build_big_move_suggestion, format_buy_direction
+from rank_client import fetch_rank
+from report_runtime import beijing_now, plan_report_runtime
 
 GH_TOKEN = os.environ["GH_TOKEN"]
 GH_REPO  = os.environ.get("GH_REPO", "zz-dl/shortstockmaster")
 GH_HDR   = {"Authorization": f"Bearer {GH_TOKEN}", "Accept": "application/vnd.github.v3+json"}
 TQ_HDR   = {"User-Agent": "Mozilla/5.0"}
 EM_HDR   = {"User-Agent": "Mozilla/5.0"}
-today    = date.today().isoformat()
 MAX_POSITIONS = 10
 MIN_BUY_SCORE = 20   # 评分低于此不买,宁可空仓(避免为凑满仓位买低分中性股)
 BUY_AMOUNT = 10000
-REPORT_TIME = os.environ.get("REPORT_TIME", "10:00:00")
+REPORT_TIME = os.environ.get("REPORT_TIME", "14:45:00")
 REPORT_TIME_LABEL = REPORT_TIME[:5]
-BUY_TIME = REPORT_TIME
-SELL_TIME = REPORT_TIME
+RANK_TIMEOUT_SECONDS = int(os.environ.get("RANK_TIMEOUT_SECONDS", "180"))
+RANK_ATTEMPTS = int(os.environ.get("RANK_ATTEMPTS", "2"))
+MAX_REPORT_WAIT_MINUTES = int(os.environ.get("MAX_REPORT_WAIT_MINUTES", "30"))
 
 def gh_get(path):
     r = requests.get(f"https://api.github.com/repos/{GH_REPO}/contents/{path}",
@@ -183,6 +185,42 @@ def cninfo_news(code, exchange, n=3):
     except:
         return []
 
+runtime_plan = plan_report_runtime(
+    beijing_now(),
+    target_time=REPORT_TIME,
+    max_wait_minutes=MAX_REPORT_WAIT_MINUTES,
+)
+if runtime_plan["action"] == "skip":
+    print(
+        f"当前北京时间距离目标 {REPORT_TIME_LABEL} 超过 "
+        f"{MAX_REPORT_WAIT_MINUTES} 分钟，提前触发不生成日报"
+    )
+    raise SystemExit(0)
+if runtime_plan["action"] == "wait":
+    print(f"等待 {runtime_plan['wait_seconds']} 秒，对齐北京时间 {REPORT_TIME_LABEL}")
+    time.sleep(runtime_plan["wait_seconds"])
+
+run_now = beijing_now()
+runtime_plan = plan_report_runtime(
+    run_now,
+    target_time=REPORT_TIME,
+    max_wait_minutes=MAX_REPORT_WAIT_MINUTES,
+)
+today = run_now.date().isoformat()
+ACTUAL_REPORT_TIME = run_now.strftime("%H:%M:%S")
+ACTUAL_REPORT_TIME_LABEL = ACTUAL_REPORT_TIME[:5]
+TRADE_EXECUTION_ENABLED = runtime_plan["trade_execution_enabled"]
+BUY_TIME = ACTUAL_REPORT_TIME
+SELL_TIME = ACTUAL_REPORT_TIME
+
+existing_snapshot, _ = gh_get(f"daily_logs/signal_snapshots/{today}.json")
+if existing_snapshot and (
+    existing_snapshot.get("trade_execution_enabled") is True
+    or existing_snapshot.get("rank_status") == "market_closed"
+):
+    print(f"{today} 已有有效日报，本次重复触发跳过")
+    raise SystemExit(0)
+
 print(f"=== 日报生成 {today} ===")
 
 state, state_sha = gh_get("daily_logs/portfolio_state.json")
@@ -199,13 +237,22 @@ top10 = []
 rank_status = ""
 rank_total = None
 rank_error = ""
+market_date = ""
+market_time = ""
 try:
     # 模拟交易只做 A 股(2026-06-12 起,用户要求剔除美股/港股)
-    resp = requests.post("https://shortstockmaster.onrender.com/api/rank",
-                         json={"markets":["A"], "as_of_time": REPORT_TIME}, timeout=90).json()
+    resp = fetch_rank(
+        requests,
+        "https://shortstockmaster.onrender.com/api/rank",
+        {"markets": ["A"], "as_of_time": ACTUAL_REPORT_TIME},
+        timeout_seconds=RANK_TIMEOUT_SECONDS,
+        attempts=RANK_ATTEMPTS,
+    )
     rank_status = resp.get("status", "")
     rank_total = resp.get("total")
     rank_error = str(resp.get("error", "") or "")
+    market_date = str(resp.get("market_date", "") or "")
+    market_time = str(resp.get("market_time", "") or "")
     top10 = resp.get("results", [])[:10]
     print(f"排行榜获取：{len(top10)} 只")
 except Exception as e:
@@ -213,8 +260,12 @@ except Exception as e:
     print(f"排行榜失败：{e}")
 
 rank_available = bool(top10)
-rank_error = normalize_rank_error(rank_available, rank_error)
+rank_error = normalize_rank_error(rank_available, rank_error, rank_status)
 rank_health = summarize_rank_health(rank_available, rank_status, rank_total, rank_error)
+trade_execution_enabled = (
+    TRADE_EXECUTION_ENABLED
+    and rank_status != "market_closed"
+)
 ranked = [(i + 1, s) for i, s in enumerate(top10 or [])]
 top_by_code = {s.get("code"): (rank, s) for rank, s in ranked if s.get("code")}
 
@@ -227,7 +278,11 @@ for p in positions:
     rank_signal = top_by_code.get(p.get("code"))
     rank, signal = rank_signal if rank_signal else (None, None)
     _apply_rank_signal(p, signal, rank)
-    reason = _sell_reason(p, signal, rank_available=rank_available)
+    reason = (
+        _sell_reason(p, signal, rank_available=rank_available)
+        if trade_execution_enabled
+        else ""
+    )
     if reason:
         sold = dict(p)
         sold["sell_date"] = today
@@ -248,7 +303,8 @@ def _is_a_share(signal) -> bool:
 
 buy_candidates = [
     (rank, s) for rank, s in ranked
-    if s.get("code") not in held_codes and not _is_bearish_signal(s) and _is_a_share(s)
+    if trade_execution_enabled
+       and s.get("code") not in held_codes and not _is_bearish_signal(s) and _is_a_share(s)
        and _num(s.get("score")) >= MIN_BUY_SCORE   # 低分中性股不买,宁可空仓
        and _is_buyable_signal(s)                    # 早盘只观察/尾盘确认,不再自动追高买入
 ]
@@ -292,12 +348,15 @@ for p in positions:
 total_pnl = sum(p.get("pnl",0) for p in positions)
 total_inv = sum(p.get("amount",10000) for p in positions)
 total_pct = total_pnl/total_inv*100 if total_inv else 0
-day_num   = (date.today()-date.fromisoformat(state["created"])).days + 1
+day_num   = (run_now.date()-date.fromisoformat(state["created"])).days + 1
 
 md = [
     f"# StockMaster 每日日报 {today}",
     "",
-    f"> 北京时间 {REPORT_TIME_LABEL} 自动生成 · 跟踪第 **{day_num}** 天",
+    (
+        f"> 北京时间 {ACTUAL_REPORT_TIME_LABEL} 采集"
+        f"（目标 {REPORT_TIME_LABEL}）· 跟踪第 **{day_num}** 天"
+    ),
     "",
     "## 📊 持仓总览",
     "",
@@ -339,6 +398,13 @@ if rank_health["warning"]:
     md.append("")
     md.append("**排行榜状态**")
     md.append(rank_health["warning"])
+if not trade_execution_enabled and rank_status != "market_closed":
+    md.append("")
+    md.append("**模拟交易状态**")
+    md.append(
+        f"- ⚠️ 实际采集时间 {ACTUAL_REPORT_TIME_LABEL} 不在 14:30-14:55 尾盘窗口，"
+        "本次暂停全部模拟买卖"
+    )
 
 md += ["", "## ⚠️ 预想外变化", ""]
 if anomalies:
@@ -370,6 +436,11 @@ md += ["", "## 💡 软件分析盲点 & 改进建议", ""]
 suggestions = []
 if rank_health["suggestion"]:
     suggestions.append(rank_health["suggestion"])
+if not trade_execution_enabled and rank_status != "market_closed":
+    suggestions.append(
+        f"GitHub Actions 实际在 {ACTUAL_REPORT_TIME_LABEL} 运行，偏离目标 {REPORT_TIME_LABEL}；"
+        "本次已阻止使用非尾盘行情执行模拟交易"
+    )
 big_move_suggestion = build_big_move_suggestion(positions, today=today)
 if big_move_suggestion:
     suggestions.append(big_move_suggestion)
@@ -414,6 +485,11 @@ trade_history = {
     "rank_status": rank_status,
     "rank_total": rank_total,
     "rank_error": rank_error,
+    "scheduled_report_time": REPORT_TIME,
+    "generated_at_beijing": f"{today} {ACTUAL_REPORT_TIME}",
+    "market_date": market_date,
+    "market_time": market_time,
+    "trade_execution_enabled": trade_execution_enabled,
     "records": build_trade_history_records(
         today, positions, previous_positions, top10, is_day1,
         sold_positions=sold_positions,
@@ -433,7 +509,12 @@ signal_snapshot = {
     "rank_status": rank_status,
     "rank_total": rank_total,
     "rank_error": rank_error,
-    "records": build_signal_snapshot_records(today, top10, snapshot_time=REPORT_TIME),
+    "scheduled_report_time": REPORT_TIME,
+    "generated_at_beijing": f"{today} {ACTUAL_REPORT_TIME}",
+    "market_date": market_date,
+    "market_time": market_time,
+    "trade_execution_enabled": trade_execution_enabled,
+    "records": build_signal_snapshot_records(today, top10, snapshot_time=ACTUAL_REPORT_TIME),
 }
 snapshot_path = f"daily_logs/signal_snapshots/{today}.json"
 _, snapshot_sha = gh_get(snapshot_path)
@@ -442,7 +523,10 @@ ok_snapshot = gh_put(snapshot_path, json.dumps(signal_snapshot, ensure_ascii=Fal
 print(f"信号快照：{'✅' if ok_snapshot else '❌'} → {snapshot_path}")
 
 state["positions"] = positions
-state["history"] = state.get("history", []) + [{
+state["history"] = [
+    item for item in state.get("history", [])
+    if item.get("date") != today
+] + [{
     "date": today, "total_pnl": total_pnl,
     "pct": total_pct, "anomalies": len(anomalies)
 }]

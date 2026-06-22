@@ -25,11 +25,17 @@ check("empty rank suggestion is actionable", "检查 API 可用性或候选过�
 failed = summarize_rank_health(False, "", None, "timeout")
 check("rank error includes cause", "timeout" in failed["warning"])
 
+closed = summarize_rank_health(False, "market_closed", 0, "")
+check("market holiday is not reported as API failure", "A股休市" in closed["warning"])
+check("market holiday has no software-failure suggestion", closed["suggestion"] == "")
+
 check("available rank does not synthesize error",
-      normalize_rank_error(True, "") == "")
+      normalize_rank_error(True, "", "done") == "")
 check("empty rank records synthetic cause",
-      normalize_rank_error(False, "") == "rank returned no effective results during daily report run")
+      normalize_rank_error(False, "", "done") == "rank returned no effective results during daily report run")
 check("existing rank error is preserved",
-      normalize_rank_error(False, "timeout") == "timeout")
+      normalize_rank_error(False, "timeout", "") == "timeout")
+check("market holiday does not synthesize an error",
+      normalize_rank_error(False, "", "market_closed") == "")
 
 print("ALL TESTS PASSED")

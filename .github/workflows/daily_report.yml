@@ -2,6 +2,7 @@ name: StockMaster 每日跟踪日报
 
 on:
   schedule:
+    - cron: '0 2 * * 1-5'   # 预触发：GitHub 当前常延迟约 4-5 小时，脚本会在接近 14:45 时等待对齐
     - cron: '45 6 * * 1-5'  # 北京时间 14:45，周一到周五，尾盘确认后再模拟买入
   workflow_dispatch:          # 允许手动触发
 
@@ -11,7 +12,7 @@ permissions:
 jobs:
   daily-report:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 45
 
     steps:
       - name: Checkout repo

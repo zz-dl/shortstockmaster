@@ -1,7 +1,9 @@
-def normalize_rank_error(rank_available: bool, rank_error="") -> str:
+def normalize_rank_error(rank_available: bool, rank_error="", rank_status="") -> str:
     """Return a durable reason when the rank endpoint yields no effective results."""
     if rank_error:
         return str(rank_error)
+    if rank_status == "market_closed":
+        return ""
     if not rank_available:
         return "rank returned no effective results during daily report run"
     return ""
@@ -11,6 +13,11 @@ def summarize_rank_health(rank_available: bool, rank_status="", rank_total=None,
     """Return daily-report text for rank data availability."""
     if rank_available:
         return {"warning": "", "suggestion": ""}
+    if rank_status == "market_closed":
+        return {
+            "warning": "- ℹ️ A股休市，今日不生成排行榜信号，也不执行模拟买卖",
+            "suggestion": "",
+        }
 
     details = []
     if rank_status:

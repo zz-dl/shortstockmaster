@@ -94,6 +94,7 @@ def _tencent_quote(codes: list) -> dict:
                 "vol_ratio": safe_float(parts[49]) if len(parts) > 49 and safe_float(parts[49]) < 30 else 1.0,
                 "pe":        safe_float(parts[52]) if len(parts) > 52 else 0,
                 "pb":        safe_float(parts[46]) if len(parts) > 46 else 0,
+                "quote_time": parts[30] if len(parts) > 30 else "",
             }
         return result
     except Exception:
@@ -332,6 +333,25 @@ def _detect_market(code: str) -> str:
 
 def _beijing_now() -> datetime:
     return datetime.utcnow() + timedelta(hours=8)
+
+
+def _a_share_market_session() -> dict:
+    quote = _tencent_quote(["sh000001"]).get("sh000001", {})
+    raw_time = str(quote.get("quote_time") or "")
+    try:
+        parsed = datetime.strptime(raw_time, "%Y%m%d%H%M%S")
+    except ValueError:
+        return {
+            "market_date": "",
+            "market_time": "",
+            "is_trading_day": None,
+        }
+    now = _beijing_now()
+    return {
+        "market_date": parsed.date().isoformat(),
+        "market_time": parsed.strftime("%Y-%m-%d %H:%M:%S"),
+        "is_trading_day": parsed.date() == now.date(),
+    }
 
 
 def _in_tail_window(now: datetime | None = None) -> bool:
@@ -1453,6 +1473,21 @@ def api_rank():
     if not markets:
         markets = ["A股"]
 
+    market_session = None
+    if markets and all(market in ("A股", "科创板") for market in markets):
+        market_session = _a_share_market_session()
+        if market_session.get("is_trading_day") is False:
+            return Response(
+                jdump({
+                    "status": "market_closed",
+                    "total": 0,
+                    "results": [],
+                    "market_date": market_session.get("market_date", ""),
+                    "market_time": market_session.get("market_time", ""),
+                }),
+                mimetype="application/json",
+            )
+
     candidates = []
     tencent_codes = []
     seen_codes: set = set()
@@ -1562,8 +1597,17 @@ def api_rank():
         top30 = detailed_top
         top30 = [r for r in top30 if _is_rank_candidate(r)]
         top30.sort(key=lambda x: x["score"], reverse=True)
-    return Response(jdump({"status": "done", "total": len(candidates),
-                            "results": top30[:15]}), mimetype="application/json")
+    payload = {
+        "status": "done",
+        "total": len(candidates),
+        "results": top30[:15],
+    }
+    if market_session:
+        payload.update({
+            "market_date": market_session.get("market_date", ""),
+            "market_time": market_session.get("market_time", ""),
+        })
+    return Response(jdump(payload), mimetype="application/json")
 
 
 # 兼容旧接口

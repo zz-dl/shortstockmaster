@@ -15,21 +15,21 @@ def test_daily_report_runs_in_tail_confirmation_window():
     text = WORKFLOW.read_text(encoding="utf-8")
 
     report_match = re.search(r'REPORT_TIME:\s*"(\d{2}:\d{2}:\d{2})"', text)
-    cron_match = re.search(r"cron:\s*'(\d+)\s+(\d+)\s+\*\s+\*\s+1-5'", text)
+    cron_matches = re.findall(r"cron:\s*'(\d+)\s+(\d+)\s+\*\s+\*\s+1-5'", text)
+    timeout_match = re.search(r"timeout-minutes:\s*(\d+)", text)
 
     assert report_match, "REPORT_TIME must be set in daily_report workflow"
-    assert cron_match, "weekday cron must be set in daily_report workflow"
+    assert cron_matches, "weekday cron must be set in daily_report workflow"
+    assert timeout_match, "workflow timeout must be explicit"
 
     report_time = report_match.group(1)
     report_minutes = _minutes(report_time)
     assert _minutes("14:30:00") <= report_minutes <= _minutes("14:55:00")
 
-    cron_minute = int(cron_match.group(1))
-    cron_hour = int(cron_match.group(2))
-    utc_minutes = (report_minutes - 8 * 60) % (24 * 60)
-
-    assert cron_hour == utc_minutes // 60
-    assert cron_minute == utc_minutes % 60
+    cron_times = {(int(hour), int(minute)) for minute, hour in cron_matches}
+    assert (2, 0) in cron_times, "keep an early trigger to absorb observed GitHub schedule delay"
+    assert (6, 45) in cron_times, "keep the exact 14:45 Beijing fallback trigger"
+    assert int(timeout_match.group(1)) >= 45, "allow 30-minute alignment wait plus rank retries"
 
 
 if __name__ == "__main__":
