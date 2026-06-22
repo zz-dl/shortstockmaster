@@ -197,6 +197,63 @@ def test_rank_item_uses_detail_score_and_plan_as_canonical_display():
     assert merged["fund_flow_analysis"]["label"] == "强资金共振"
 
 
+def test_rank_item_keeps_real_rank_flow_when_detail_flow_is_missing():
+    rank_item = {
+        "code": "600030",
+        "name": "中信证券",
+        "market": "A股",
+        "price": 27.92,
+        "score": 58,
+        "rec": "买入",
+        "decision": "买入",
+        "confidence": "高",
+        "position_pct": 20,
+        "trade_plan": {
+            "decision": "买入",
+            "confidence": "高",
+            "position_pct": 20,
+        },
+        "capital_net": 9.98,
+        "fund_flow_analysis": {
+            "label": "强资金共振",
+            "rating": "bullish",
+            "score_delta": 24,
+            "metrics": {"rows": 1, "today_net": 9.98},
+        },
+    }
+    detail = {
+        "code": "600030",
+        "name": "中信证券",
+        "market": "A股",
+        "price": 27.92,
+        "score": 46,
+        "rec": "短线做多",
+        "decision": "观察",
+        "confidence": "低",
+        "position_pct": 0,
+        "trade_plan": {
+            "decision": "观察",
+            "confidence": "低",
+            "position_pct": 0,
+        },
+        "capital_net": 0,
+        "capital_flow": [],
+        "fund_flow_analysis": {
+            "label": "暂无主力资金数据",
+            "rating": "neutral",
+            "score_delta": 0,
+            "metrics": {"rows": 0},
+        },
+    }
+
+    merged = _merge_rank_item_with_detail(rank_item, detail)
+
+    assert merged["capital_net"] == 9.98
+    assert merged["fund_flow_analysis"]["label"] == "强资金共振"
+    assert merged["decision"] == "买入"
+    assert merged["trade_plan"]["decision"] == "买入"
+
+
 if __name__ == "__main__":
     test_rank_candidate_requires_backtested_gain_and_volume_ranges()
     test_extreme_volume_and_overheat_gain_are_downgraded()
@@ -205,4 +262,5 @@ if __name__ == "__main__":
     test_trade_plan_uses_structured_fund_flow_analysis()
     test_apply_plan_to_rank_item_reprices_recommendation_and_candidate_gate()
     test_rank_item_uses_detail_score_and_plan_as_canonical_display()
+    test_rank_item_keeps_real_rank_flow_when_detail_flow_is_missing()
     print("ALL TESTS PASSED")

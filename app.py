@@ -598,16 +598,34 @@ def _merge_rank_item_with_detail(rank_item: dict, detail: dict) -> dict:
     merged["quick_rec"] = rank_item.get("rec")
     merged["quick_decision"] = rank_item.get("decision")
 
+    rank_fund = rank_item.get("fund_flow_analysis") or {}
+    detail_fund = detail.get("fund_flow_analysis") or {}
+    rank_has_real_flow = (
+        _to_float(rank_item.get("capital_net"), 0) != 0
+        or _to_float((rank_fund.get("metrics") or {}).get("rows"), 0) > 0
+    )
+    detail_has_real_flow = (
+        _to_float(detail.get("capital_net"), 0) != 0
+        or bool(detail.get("capital_flow"))
+        or _to_float((detail_fund.get("metrics") or {}).get("rows"), 0) > 0
+    )
+    preserve_rank_flow = rank_has_real_flow and not detail_has_real_flow
+    flow_dependent_fields = {
+        "trade_plan", "decision", "confidence", "position_pct",
+        "fund_flow_analysis",
+    }
     canonical_fields = (
         "name", "market", "price", "chg_pct", "vol_ratio", "turnover",
         "score", "rec", "rec_color", "trade_plan", "decision", "confidence",
         "position_pct", "market_sentiment", "fund_flow_analysis",
     )
     for field in canonical_fields:
+        if preserve_rank_flow and field in flow_dependent_fields:
+            continue
         if field in detail and detail[field] is not None:
             merged[field] = detail[field]
 
-    detail_capital = detail.get("capital_net")
+    detail_capital = None if preserve_rank_flow else detail.get("capital_net")
     if detail_capital is None:
         flows = detail.get("capital_flow") or []
         if flows:
