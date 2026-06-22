@@ -1,0 +1,161 @@
+{
+  "date": "2026-06-22",
+  "source_app": "short_stockmaster",
+  "strategy": "daily_report_top10",
+  "rank_available": true,
+  "rank_status": "done",
+  "rank_total": 60,
+  "rank_error": "",
+  "scheduled_report_time": "14:45:00",
+  "generated_at_beijing": "2026-06-22 20:37:44",
+  "market_date": "2026-06-22",
+  "market_time": "2026-06-22 16:14:18",
+  "trade_execution_enabled": false,
+  "records": [
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-06-22",
+      "snapshot_time": "20:37:44",
+      "sequence": 1,
+      "code": "000889",
+      "name": "中嘉博创",
+      "market": "A股",
+      "industry": "",
+      "rank": 1,
+      "score": 46,
+      "recommendation": "短线做多",
+      "signal_action": "daily_rank",
+      "price": 4.26,
+      "open": null,
+      "close": null,
+      "chg_pct": 5.97,
+      "vol_ratio": 3.53,
+      "turnover": 17.29,
+      "capital_net": 0.28,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "000889",
+        "name": "中嘉博创",
+        "market": "A股",
+        "price": 4.26,
+        "chg_pct": 5.97,
+        "vol_ratio": 3.53,
+        "turnover": 17.29,
+        "capital_net": 0.28,
+        "score": 46,
+        "rec": "短线做多",
+        "rec_color": "#00cc55",
+        "fund_flow_analysis": {
+          "label": "温和流入",
+          "rating": "bullish",
+          "score_delta": 9,
+          "summary": "主力资金温和流入，但需要价格和板块继续确认。",
+          "metrics": {
+            "rows": 1,
+            "today_net": 0.277,
+            "today_pct": 4.5,
+            "net3": 0.277,
+            "positive_days_3": 1,
+            "large_super_net": 0.277,
+            "large_net": 0.203,
+            "super_net": 0.074,
+            "small_net": -0.407,
+            "chg_pct": 5.97,
+            "vol_ratio": 3.53,
+            "turnover": 17.29
+          },
+          "drivers": [
+            "超大单/大单同步流入",
+            "小单净流出，筹码向大资金集中",
+            "价格上涨+5.97%确认资金方向",
+            "量比3.5，活跃但未过热"
+          ],
+          "risks": [
+            "换手17.3%偏高"
+          ]
+        },
+        "trade_plan": {
+          "decision": "尾盘确认",
+          "confidence": "中",
+          "position_pct": 10,
+          "buy_plan": "先观察，14:30-14:55 再确认；若仍在现价±1.0%内、未放量跳水、主力不转流出，再考虑买入。",
+          "sell_plan": "止损参考 4.15（约-2.6%）；止盈先看 4.46（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 2.6,
+          "stop_loss_price": 4.15,
+          "take_profit_pct": 4.8,
+          "take_profit_price": 4.46,
+          "max_holding_days": 3,
+          "drivers": [
+            "温和流入",
+            "超大单/大单同步流入",
+            "小单净流出，筹码向大资金集中",
+            "市场情绪极度贪婪"
+          ],
+          "risk_flags": [
+            "换手17.3%偏高"
+          ],
+          "invalidations": [
+            "换手17.3%偏高",
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 0,
+            "capital": 9,
+            "market": 8,
+            "news": 12,
+            "risk": 0
+          },
+          "composite_score": 56.1
+        },
+        "decision": "尾盘确认",
+        "confidence": "中",
+        "position_pct": 10,
+        "quick_score": 46,
+        "quick_rec": "尾盘确认",
+        "quick_decision": "尾盘确认",
+        "market_sentiment": {
+          "score": 79,
+          "label": "极度贪婪",
+          "color": "#ff4444",
+          "details": [
+            {
+              "label": "上证",
+              "value": "+1.78%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "+2.13%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "+2.52%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 17.1 乐观"
+            },
+            {
+              "label": "外资情绪",
+              "value": "外资ETF 0.0% 中性"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    }
+  ]
+}
