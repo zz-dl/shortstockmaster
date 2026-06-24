@@ -7,6 +7,7 @@ from report_health import normalize_rank_error, summarize_rank_health
 from report_insights import build_big_move_suggestion, format_buy_direction
 from rank_client import fetch_rank
 from report_runtime import beijing_now, plan_report_runtime
+from trade_rules import sell_reason as evaluate_sell_reason
 
 GH_TOKEN = os.environ["GH_TOKEN"]
 GH_REPO  = os.environ.get("GH_REPO", "zz-dl/shortstockmaster")
@@ -103,23 +104,6 @@ def _is_buyable_signal(signal):
     plan = signal.get("trade_plan") or {}
     decision = str(signal.get("decision") or plan.get("decision") or "")
     return decision == "买入"
-
-def _sell_reason(position, signal, rank_available=True):
-    rec = str((signal or {}).get("rec") or position.get("rec", ""))
-    score = _num((signal or {}).get("score", position.get("score", 0)))
-    pnl = _num(position.get("pnl_pct"))
-    chg = _num(position.get("chg_today"))
-    if signal is not None and ("短线做空" in rec or score <= -30):
-        return "bearish_signal"
-    if signal is not None and "偏空" in rec and pnl > 0:
-        return "weakening_take_profit"
-    if pnl <= -6:
-        return "stop_loss"
-    if pnl >= 8 and chg <= 0:
-        return "profit_protection"
-    if signal is None and rank_available:
-        return "dropped_from_top10"
-    return ""
 
 def _buy_position(signal, rank, quote):
     price = _num(signal.get("price") or signal.get("current_price") or quote.get("price"), 0)
@@ -279,7 +263,7 @@ for p in positions:
     rank, signal = rank_signal if rank_signal else (None, None)
     _apply_rank_signal(p, signal, rank)
     reason = (
-        _sell_reason(p, signal, rank_available=rank_available)
+        evaluate_sell_reason(p, signal, rank_available=rank_available, today=today)
         if trade_execution_enabled
         else ""
     )

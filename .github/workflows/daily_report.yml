@@ -12,7 +12,7 @@ permissions:
 jobs:
   daily-report:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 120
 
     steps:
       - name: Checkout repo
@@ -33,5 +33,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: zz-dl/shortstockmaster
           REPORT_TIME: "14:45:00"
+          MAX_REPORT_WAIT_MINUTES: "90"
         run: python scripts/daily_report.py
         # 脚本通过 GitHub API 直接提交文件，无需额外 git push
