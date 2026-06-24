@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 
 def _num(value, default=0):
@@ -12,9 +12,20 @@ def _holding_days(today: str | None, entry_date) -> int | None:
     if not today or not entry_date:
         return None
     try:
-        return (date.fromisoformat(today) - date.fromisoformat(str(entry_date)[:10])).days
+        start = date.fromisoformat(str(entry_date)[:10])
+        end = date.fromisoformat(today)
     except Exception:
         return None
+    if end <= start:
+        return 0
+
+    days = 0
+    current = start + timedelta(days=1)
+    while current <= end:
+        if current.weekday() < 5:
+            days += 1
+        current += timedelta(days=1)
+    return days
 
 
 def sell_reason(position, signal, rank_available=True, today: str | None = None):

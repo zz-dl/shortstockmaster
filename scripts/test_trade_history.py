@@ -43,6 +43,21 @@ check("snapshot fields normalized", records[0]["action"] == "snapshot" and
 check("same-day snapshot includes holding days", records[0]["holding_days"] == 0,
       f"={records[0]['holding_days']}")
 
+stale_flag_position = dict(
+    positions[0],
+    entry_date="2026-06-18",
+    bought_today=True,
+)
+records = build_trade_history_records(
+    "2026-06-23",
+    [stale_flag_position],
+    [stale_flag_position],
+    [],
+    False,
+)
+check("stale bought_today flag does not create repeat buy", records[0]["action"] == "snapshot",
+      f"={records[0]['action']}")
+
 older_positions = [dict(positions[0], entry_date="2026-05-19")]
 records = build_trade_history_records("2026-06-08", older_positions, older_positions, [], False)
 check("multi-day snapshot includes holding days", records[0]["holding_days"] == 20,

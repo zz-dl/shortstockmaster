@@ -59,7 +59,12 @@ def build_trade_history_records(today: str, positions: list, previous_positions:
 
     for p in positions or []:
         code = p.get("code", "")
-        is_new = p.get("bought_today") or is_day1 or code not in previous_codes
+        entry_date = str(p.get("entry_date", ""))[:10]
+        is_new = (
+            is_day1
+            or code not in previous_codes
+            or (bool(p.get("bought_today")) and entry_date == str(today)[:10])
+        )
         action = "buy" if is_new else "snapshot"
         entry_price = p.get("entry_price")
         current_price = p.get("cur_price", entry_price)

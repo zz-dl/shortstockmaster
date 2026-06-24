@@ -41,11 +41,22 @@ def test_trade_plan_max_holding_days_triggers_sell():
         "trade_plan_at_buy": {"max_holding_days": 3},
     }
 
-    assert sell_reason(position, signal={}, rank_available=True, today="2026-06-22") == "max_holding_days"
+    assert sell_reason(position, signal={}, rank_available=True, today="2026-06-24") == "max_holding_days"
+
+
+def test_trade_plan_max_holding_uses_market_days_not_calendar_days():
+    position = {
+        "entry_date": "2026-06-18",
+        "pnl_pct": 1.2,
+        "trade_plan_at_buy": {"max_holding_days": 3},
+    }
+
+    assert sell_reason(position, signal={}, rank_available=True, today="2026-06-22") == ""
 
 
 if __name__ == "__main__":
     test_trade_plan_take_profit_triggers_sell()
     test_trade_plan_stop_loss_triggers_sell()
     test_trade_plan_max_holding_days_triggers_sell()
+    test_trade_plan_max_holding_uses_market_days_not_calendar_days()
     print("ALL TESTS PASSED")
