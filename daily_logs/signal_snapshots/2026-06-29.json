@@ -1,0 +1,1331 @@
+{
+  "date": "2026-06-29",
+  "source_app": "short_stockmaster",
+  "strategy": "daily_report_top10",
+  "rank_available": true,
+  "rank_status": "done",
+  "rank_total": 60,
+  "rank_error": "",
+  "scheduled_report_time": "14:45:00",
+  "generated_at_beijing": "2026-06-29 14:44:59",
+  "market_date": "2026-06-29",
+  "market_time": "2026-06-29 14:46:00",
+  "trade_execution_enabled": true,
+  "records": [
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-06-29",
+      "snapshot_time": "14:44:59",
+      "sequence": 1,
+      "code": "300655",
+      "name": "晶瑞电材",
+      "market": "A股",
+      "industry": "",
+      "rank": 1,
+      "score": 68,
+      "recommendation": "短线做多",
+      "signal_action": "daily_rank",
+      "price": 19.38,
+      "open": null,
+      "close": null,
+      "chg_pct": 4.59,
+      "vol_ratio": 1.59,
+      "turnover": 17.85,
+      "capital_net": 1.63,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "300655",
+        "name": "晶瑞电材",
+        "market": "A股",
+        "price": 19.38,
+        "chg_pct": 4.59,
+        "vol_ratio": 1.59,
+        "turnover": 17.85,
+        "capital_net": 1.63,
+        "score": 68,
+        "rec": "短线做多",
+        "rec_color": "#00cc55",
+        "fund_flow_analysis": {
+          "label": "强资金共振",
+          "rating": "bullish",
+          "score_delta": 28,
+          "summary": "主力资金、价格和量能同步确认，短线资金共振较强。",
+          "metrics": {
+            "rows": 5,
+            "today_net": 1.631,
+            "today_pct": 5.17,
+            "net3": -0.005,
+            "positive_days_3": 2,
+            "large_super_net": 1.631,
+            "large_net": 0.825,
+            "super_net": 0.806,
+            "small_net": -1.532,
+            "chg_pct": 4.59,
+            "vol_ratio": 1.59,
+            "turnover": 17.85
+          },
+          "drivers": [
+            "今日主力净流入1.63亿",
+            "主力净占比5.2%",
+            "近3日有2日主力净流入",
+            "超大单+大单合计净流入1.63亿",
+            "小单净流出，筹码向大资金集中",
+            "价格上涨+4.59%确认资金方向",
+            "量比1.6，活跃但未过热"
+          ],
+          "risks": [
+            "换手17.9%偏高"
+          ]
+        },
+        "trade_plan": {
+          "decision": "买入",
+          "confidence": "高",
+          "position_pct": 20,
+          "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+          "sell_plan": "止损参考 18.76（约-3.2%）；止盈先看 20.64（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 3.2,
+          "stop_loss_price": 18.76,
+          "take_profit_pct": 6.5,
+          "take_profit_price": 20.64,
+          "max_holding_days": 3,
+          "drivers": [
+            "量价温和放大",
+            "强资金共振",
+            "今日主力净流入1.63亿",
+            "主力净占比5.2%"
+          ],
+          "risk_flags": [
+            "换手17.9%偏高"
+          ],
+          "invalidations": [
+            "换手17.9%偏高",
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 25,
+            "capital": 28,
+            "market": 0,
+            "news": 6,
+            "risk": 0
+          },
+          "composite_score": 88.7
+        },
+        "decision": "买入",
+        "confidence": "高",
+        "position_pct": 20,
+        "quick_score": 59,
+        "quick_rec": "买入",
+        "quick_decision": "买入",
+        "market_sentiment": {
+          "score": 54,
+          "label": "中性",
+          "color": "#ffcc00",
+          "details": [
+            {
+              "label": "上证",
+              "value": "+0.97%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "-0.01%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "+0.39%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 18.4 中性"
+            },
+            {
+              "label": "外资情绪",
+              "value": "外资ETF 0.0% 中性"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    },
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-06-29",
+      "snapshot_time": "14:44:59",
+      "sequence": 2,
+      "code": "002129",
+      "name": "TCL中环",
+      "market": "A股",
+      "industry": "",
+      "rank": 2,
+      "score": 58,
+      "recommendation": "短线做多",
+      "signal_action": "daily_rank",
+      "price": 11.68,
+      "open": null,
+      "close": null,
+      "chg_pct": 4.38,
+      "vol_ratio": 1.9,
+      "turnover": 13.19,
+      "capital_net": 11.21,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "002129",
+        "name": "TCL中环",
+        "market": "A股",
+        "price": 11.68,
+        "chg_pct": 4.38,
+        "vol_ratio": 1.9,
+        "turnover": 13.19,
+        "capital_net": 11.21,
+        "score": 58,
+        "rec": "短线做多",
+        "rec_color": "#00cc55",
+        "fund_flow_analysis": {
+          "label": "强资金共振",
+          "rating": "bullish",
+          "score_delta": 30,
+          "summary": "主力资金、价格和量能同步确认，短线资金共振较强。",
+          "metrics": {
+            "rows": 5,
+            "today_net": 11.209,
+            "today_pct": 19.58,
+            "net3": 11.45,
+            "positive_days_3": 2,
+            "large_super_net": 11.209,
+            "large_net": -3.326,
+            "super_net": 14.535,
+            "small_net": -4.28,
+            "chg_pct": 4.38,
+            "vol_ratio": 1.9,
+            "turnover": 13.19
+          },
+          "drivers": [
+            "今日主力大幅净流入11.21亿",
+            "主力净占比19.6%较强",
+            "近3日主力合计净流入11.45亿",
+            "近3日有2日主力净流入",
+            "超大单+大单合计净流入11.21亿",
+            "小单净流出，筹码向大资金集中",
+            "价格上涨+4.38%确认资金方向",
+            "量比1.9，活跃但未过热"
+          ],
+          "risks": []
+        },
+        "trade_plan": {
+          "decision": "买入",
+          "confidence": "高",
+          "position_pct": 20,
+          "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+          "sell_plan": "止损参考 11.31（约-3.2%）；止盈先看 12.44（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 3.2,
+          "stop_loss_price": 11.31,
+          "take_profit_pct": 6.5,
+          "take_profit_price": 12.44,
+          "max_holding_days": 3,
+          "drivers": [
+            "量价温和放大",
+            "强资金共振",
+            "今日主力大幅净流入11.21亿",
+            "主力净占比19.6%较强"
+          ],
+          "risk_flags": [],
+          "invalidations": [
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 25,
+            "capital": 30,
+            "market": 0,
+            "news": 14,
+            "risk": 0
+          },
+          "composite_score": 82.2
+        },
+        "decision": "买入",
+        "confidence": "高",
+        "position_pct": 20,
+        "quick_score": 71,
+        "quick_rec": "买入",
+        "quick_decision": "买入",
+        "market_sentiment": {
+          "score": 54,
+          "label": "中性",
+          "color": "#ffcc00",
+          "details": [
+            {
+              "label": "上证",
+              "value": "+0.96%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "-0.01%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "+0.39%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 18.4 中性"
+            },
+            {
+              "label": "外资情绪",
+              "value": "外资ETF 0.0% 中性"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    },
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-06-29",
+      "snapshot_time": "14:44:59",
+      "sequence": 3,
+      "code": "600343",
+      "name": "航天动力",
+      "market": "A股",
+      "industry": "",
+      "rank": 3,
+      "score": 58,
+      "recommendation": "短线做多",
+      "signal_action": "daily_rank",
+      "price": 27.03,
+      "open": null,
+      "close": null,
+      "chg_pct": 2.89,
+      "vol_ratio": 2.36,
+      "turnover": 12.38,
+      "capital_net": 3.49,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "600343",
+        "name": "航天动力",
+        "market": "A股",
+        "price": 27.03,
+        "chg_pct": 2.89,
+        "vol_ratio": 2.36,
+        "turnover": 12.38,
+        "capital_net": 3.49,
+        "score": 58,
+        "rec": "短线做多",
+        "rec_color": "#00cc55",
+        "fund_flow_analysis": {
+          "label": "强资金共振",
+          "rating": "bullish",
+          "score_delta": 30,
+          "summary": "主力资金、价格和量能同步确认，短线资金共振较强。",
+          "metrics": {
+            "rows": 5,
+            "today_net": 3.489,
+            "today_pct": 22.28,
+            "net3": 3.344,
+            "positive_days_3": 2,
+            "large_super_net": 3.489,
+            "large_net": -0.004,
+            "super_net": 3.493,
+            "small_net": -2.118,
+            "chg_pct": 2.89,
+            "vol_ratio": 2.36,
+            "turnover": 12.38
+          },
+          "drivers": [
+            "今日主力大幅净流入3.49亿",
+            "主力净占比22.3%较强",
+            "近3日主力合计净流入3.34亿",
+            "近3日有2日主力净流入",
+            "超大单+大单合计净流入3.49亿",
+            "小单净流出，筹码向大资金集中",
+            "价格上涨+2.89%确认资金方向",
+            "量比2.4，活跃但未过热"
+          ],
+          "risks": []
+        },
+        "trade_plan": {
+          "decision": "买入",
+          "confidence": "高",
+          "position_pct": 20,
+          "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+          "sell_plan": "止损参考 26.17（约-3.2%）；止盈先看 28.79（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 3.2,
+          "stop_loss_price": 26.17,
+          "take_profit_pct": 6.5,
+          "take_profit_price": 28.79,
+          "max_holding_days": 3,
+          "drivers": [
+            "量价温和放大",
+            "强资金共振",
+            "今日主力大幅净流入3.49亿",
+            "主力净占比22.3%较强"
+          ],
+          "risk_flags": [],
+          "invalidations": [
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 25,
+            "capital": 30,
+            "market": 0,
+            "news": 14,
+            "risk": 0
+          },
+          "composite_score": 82.2
+        },
+        "decision": "买入",
+        "confidence": "高",
+        "position_pct": 20,
+        "quick_score": 61,
+        "quick_rec": "买入",
+        "quick_decision": "买入",
+        "market_sentiment": {
+          "score": 54,
+          "label": "中性",
+          "color": "#ffcc00",
+          "details": [
+            {
+              "label": "上证",
+              "value": "+0.96%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "-0.01%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "+0.39%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 18.4 中性"
+            },
+            {
+              "label": "外资情绪",
+              "value": "外资ETF 0.0% 中性"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    },
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-06-29",
+      "snapshot_time": "14:44:59",
+      "sequence": 4,
+      "code": "002635",
+      "name": "安洁科技",
+      "market": "A股",
+      "industry": "",
+      "rank": 4,
+      "score": 52,
+      "recommendation": "短线做多",
+      "signal_action": "daily_rank",
+      "price": 19.9,
+      "open": null,
+      "close": null,
+      "chg_pct": 1.79,
+      "vol_ratio": 1.66,
+      "turnover": 15.76,
+      "capital_net": 1.58,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "002635",
+        "name": "安洁科技",
+        "market": "A股",
+        "price": 19.9,
+        "chg_pct": 1.79,
+        "vol_ratio": 1.66,
+        "turnover": 15.76,
+        "capital_net": 1.58,
+        "score": 52,
+        "rec": "短线做多",
+        "rec_color": "#00cc55",
+        "fund_flow_analysis": {
+          "label": "强资金共振",
+          "rating": "bullish",
+          "score_delta": 30,
+          "summary": "主力资金、价格和量能同步确认，短线资金共振较强。",
+          "metrics": {
+            "rows": 5,
+            "today_net": 1.582,
+            "today_pct": 12.43,
+            "net3": 2.106,
+            "positive_days_3": 3,
+            "large_super_net": 1.582,
+            "large_net": 1.206,
+            "super_net": 0.376,
+            "small_net": -1.784,
+            "chg_pct": 1.79,
+            "vol_ratio": 1.66,
+            "turnover": 15.76
+          },
+          "drivers": [
+            "今日主力净流入1.58亿",
+            "主力净占比12.4%较强",
+            "近3日主力合计净流入2.11亿",
+            "近3日主力连续净流入",
+            "超大单+大单合计净流入1.58亿",
+            "小单净流出，筹码向大资金集中",
+            "价格上涨+1.79%确认资金方向",
+            "量比1.7，活跃但未过热"
+          ],
+          "risks": [
+            "换手15.8%偏高"
+          ]
+        },
+        "trade_plan": {
+          "decision": "买入",
+          "confidence": "高",
+          "position_pct": 20,
+          "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+          "sell_plan": "止损参考 19.26（约-3.2%）；止盈先看 21.19（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 3.2,
+          "stop_loss_price": 19.26,
+          "take_profit_pct": 6.5,
+          "take_profit_price": 21.19,
+          "max_holding_days": 3,
+          "drivers": [
+            "低位启动观察",
+            "强资金共振",
+            "今日主力净流入1.58亿",
+            "主力净占比12.4%较强"
+          ],
+          "risk_flags": [
+            "换手15.8%偏高"
+          ],
+          "invalidations": [
+            "换手15.8%偏高",
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 12,
+            "capital": 30,
+            "market": 0,
+            "news": 0,
+            "risk": 0
+          },
+          "composite_score": 66.7
+        },
+        "decision": "买入",
+        "confidence": "高",
+        "position_pct": 20,
+        "quick_score": 51,
+        "quick_rec": "买入",
+        "quick_decision": "买入",
+        "market_sentiment": {
+          "score": 54,
+          "label": "中性",
+          "color": "#ffcc00",
+          "details": [
+            {
+              "label": "上证",
+              "value": "+0.97%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "-0.01%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "+0.39%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 18.4 中性"
+            },
+            {
+              "label": "外资情绪",
+              "value": "外资ETF 0.0% 中性"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    },
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-06-29",
+      "snapshot_time": "14:44:59",
+      "sequence": 5,
+      "code": "300540",
+      "name": "蜀道装备",
+      "market": "A股",
+      "industry": "",
+      "rank": 5,
+      "score": 50,
+      "recommendation": "短线做多",
+      "signal_action": "daily_rank",
+      "price": 31.3,
+      "open": null,
+      "close": null,
+      "chg_pct": 2.62,
+      "vol_ratio": 1.56,
+      "turnover": 16.25,
+      "capital_net": 1.2,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "300540",
+        "name": "蜀道装备",
+        "market": "A股",
+        "price": 31.3,
+        "chg_pct": 2.62,
+        "vol_ratio": 1.56,
+        "turnover": 16.25,
+        "capital_net": 1.2,
+        "score": 50,
+        "rec": "短线做多",
+        "rec_color": "#00cc55",
+        "fund_flow_analysis": {
+          "label": "强资金共振",
+          "rating": "bullish",
+          "score_delta": 30,
+          "summary": "主力资金、价格和量能同步确认，短线资金共振较强。",
+          "metrics": {
+            "rows": 5,
+            "today_net": 1.198,
+            "today_pct": 11.37,
+            "net3": 1.333,
+            "positive_days_3": 2,
+            "large_super_net": 1.198,
+            "large_net": -0.262,
+            "super_net": 1.46,
+            "small_net": -0.368,
+            "chg_pct": 2.62,
+            "vol_ratio": 1.56,
+            "turnover": 16.25
+          },
+          "drivers": [
+            "今日主力净流入1.20亿",
+            "主力净占比11.4%较强",
+            "近3日主力持续偏流入1.33亿",
+            "近3日有2日主力净流入",
+            "超大单+大单合计净流入1.20亿",
+            "小单净流出，筹码向大资金集中",
+            "价格上涨+2.62%确认资金方向",
+            "量比1.6，活跃但未过热"
+          ],
+          "risks": [
+            "换手16.2%偏高"
+          ]
+        },
+        "trade_plan": {
+          "decision": "买入",
+          "confidence": "高",
+          "position_pct": 20,
+          "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+          "sell_plan": "止损参考 30.3（约-3.2%）；止盈先看 33.33（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 3.2,
+          "stop_loss_price": 30.3,
+          "take_profit_pct": 6.5,
+          "take_profit_price": 33.33,
+          "max_holding_days": 3,
+          "drivers": [
+            "量价温和放大",
+            "强资金共振",
+            "今日主力净流入1.20亿",
+            "主力净占比11.4%较强"
+          ],
+          "risk_flags": [
+            "换手16.2%偏高"
+          ],
+          "invalidations": [
+            "换手16.2%偏高",
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 25,
+            "capital": 30,
+            "market": 0,
+            "news": 12,
+            "risk": 0
+          },
+          "composite_score": 73.5
+        },
+        "decision": "买入",
+        "confidence": "高",
+        "position_pct": 20,
+        "quick_score": 51,
+        "quick_rec": "买入",
+        "quick_decision": "买入",
+        "market_sentiment": {
+          "score": 54,
+          "label": "中性",
+          "color": "#ffcc00",
+          "details": [
+            {
+              "label": "上证",
+              "value": "+0.95%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "-0.01%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "+0.39%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 18.4 中性"
+            },
+            {
+              "label": "外资情绪",
+              "value": "外资ETF 0.0% 中性"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    },
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-06-29",
+      "snapshot_time": "14:44:59",
+      "sequence": 6,
+      "code": "301257",
+      "name": "普蕊斯",
+      "market": "A股",
+      "industry": "",
+      "rank": 6,
+      "score": 41,
+      "recommendation": "短线做多",
+      "signal_action": "daily_rank",
+      "price": 45.96,
+      "open": null,
+      "close": null,
+      "chg_pct": 6.44,
+      "vol_ratio": 2.21,
+      "turnover": 11.37,
+      "capital_net": 0.02,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "301257",
+        "name": "普蕊斯",
+        "market": "A股",
+        "price": 45.96,
+        "chg_pct": 6.44,
+        "vol_ratio": 2.21,
+        "turnover": 11.37,
+        "capital_net": 0.02,
+        "score": 41,
+        "rec": "短线做多",
+        "rec_color": "#00cc55",
+        "fund_flow_analysis": {
+          "label": "资金不足",
+          "rating": "neutral",
+          "score_delta": 4,
+          "summary": "主力资金方向不强，暂不构成独立买入理由。",
+          "metrics": {
+            "rows": 5,
+            "today_net": 0.021,
+            "today_pct": 0.63,
+            "net3": 0.179,
+            "positive_days_3": 2,
+            "large_super_net": 0.021,
+            "large_net": 0.101,
+            "super_net": -0.08,
+            "small_net": -0.33,
+            "chg_pct": 6.44,
+            "vol_ratio": 2.21,
+            "turnover": 11.37
+          },
+          "drivers": [
+            "近3日有2日主力净流入",
+            "小单净流出，筹码向大资金集中",
+            "价格上涨+6.44%确认资金方向",
+            "量比2.2，活跃但未过热"
+          ],
+          "risks": []
+        },
+        "trade_plan": {
+          "decision": "观察",
+          "confidence": "低",
+          "position_pct": 0,
+          "buy_plan": "暂不买入；等尾盘重新确认资金和价格是否继续共振。",
+          "sell_plan": "止损参考 44.77（约-2.6%）；止盈先看 48.17（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 2.6,
+          "stop_loss_price": 44.77,
+          "take_profit_pct": 4.8,
+          "take_profit_price": 48.17,
+          "max_holding_days": 3,
+          "drivers": [
+            "量价温和放大",
+            "换手活跃但未失控",
+            "近3日有2日主力净流入",
+            "小单净流出，筹码向大资金集中"
+          ],
+          "risk_flags": [],
+          "invalidations": [
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 33,
+            "capital": 4,
+            "market": 0,
+            "news": 0,
+            "risk": 0
+          },
+          "composite_score": 54.0
+        },
+        "decision": "观察",
+        "confidence": "低",
+        "position_pct": 0,
+        "quick_score": 49,
+        "quick_rec": "观察",
+        "quick_decision": "观察",
+        "market_sentiment": {
+          "score": 54,
+          "label": "中性",
+          "color": "#ffcc00",
+          "details": [
+            {
+              "label": "上证",
+              "value": "+0.95%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "-0.02%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "+0.39%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 18.4 中性"
+            },
+            {
+              "label": "外资情绪",
+              "value": "外资ETF 0.0% 中性"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    },
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-06-29",
+      "snapshot_time": "14:44:59",
+      "sequence": 7,
+      "code": "603903",
+      "name": "中持股份",
+      "market": "A股",
+      "industry": "",
+      "rank": 7,
+      "score": 30,
+      "recommendation": "偏多观望",
+      "signal_action": "daily_rank",
+      "price": 12.99,
+      "open": null,
+      "close": null,
+      "chg_pct": 1.17,
+      "vol_ratio": 2.86,
+      "turnover": 10.34,
+      "capital_net": 0.58,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "603903",
+        "name": "中持股份",
+        "market": "A股",
+        "price": 12.99,
+        "chg_pct": 1.17,
+        "vol_ratio": 2.86,
+        "turnover": 10.34,
+        "capital_net": 0.58,
+        "score": 30,
+        "rec": "偏多观望",
+        "rec_color": "#55ee99",
+        "fund_flow_analysis": {
+          "label": "吸筹观察",
+          "rating": "watch",
+          "score_delta": 18,
+          "summary": "主力资金流入但价格未明显上涨，可能处于承接吸筹阶段，适合尾盘确认。",
+          "metrics": {
+            "rows": 5,
+            "today_net": 0.578,
+            "today_pct": 29.13,
+            "net3": 0.673,
+            "positive_days_3": 2,
+            "large_super_net": 0.578,
+            "large_net": 0.166,
+            "super_net": 0.412,
+            "small_net": -0.271,
+            "chg_pct": 1.17,
+            "vol_ratio": 2.86,
+            "turnover": 10.34
+          },
+          "drivers": [
+            "今日主力温和净流入0.58亿",
+            "主力净占比29.1%较强",
+            "近3日有2日主力净流入",
+            "超大单/大单同步流入",
+            "小单净流出，筹码向大资金集中",
+            "价格上涨+1.17%确认资金方向",
+            "量比2.9，活跃但未过热"
+          ],
+          "risks": []
+        },
+        "trade_plan": {
+          "decision": "买入",
+          "confidence": "中",
+          "position_pct": 15,
+          "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+          "sell_plan": "止损参考 12.65（约-2.6%）；止盈先看 13.61（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 2.6,
+          "stop_loss_price": 12.65,
+          "take_profit_pct": 4.8,
+          "take_profit_price": 13.61,
+          "max_holding_days": 3,
+          "drivers": [
+            "换手活跃但未失控",
+            "吸筹观察",
+            "今日主力温和净流入0.58亿",
+            "主力净占比29.1%较强"
+          ],
+          "risk_flags": [],
+          "invalidations": [
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 8,
+            "capital": 18,
+            "market": 0,
+            "news": 6,
+            "risk": 0
+          },
+          "composite_score": 41.2
+        },
+        "decision": "买入",
+        "confidence": "中",
+        "position_pct": 15,
+        "quick_score": 51,
+        "quick_rec": "买入",
+        "quick_decision": "买入",
+        "market_sentiment": {
+          "score": 54,
+          "label": "中性",
+          "color": "#ffcc00",
+          "details": [
+            {
+              "label": "上证",
+              "value": "+0.97%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "-0.01%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "+0.39%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 18.4 中性"
+            },
+            {
+              "label": "外资情绪",
+              "value": "外资ETF 0.0% 中性"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    },
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-06-29",
+      "snapshot_time": "14:44:59",
+      "sequence": 8,
+      "code": "002361",
+      "name": "神剑股份",
+      "market": "A股",
+      "industry": "",
+      "rank": 8,
+      "score": 29,
+      "recommendation": "偏多观望",
+      "signal_action": "daily_rank",
+      "price": 14.41,
+      "open": null,
+      "close": null,
+      "chg_pct": 4.8,
+      "vol_ratio": 1.39,
+      "turnover": 18.63,
+      "capital_net": 1.07,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "002361",
+        "name": "神剑股份",
+        "market": "A股",
+        "price": 14.41,
+        "chg_pct": 4.8,
+        "vol_ratio": 1.39,
+        "turnover": 18.63,
+        "capital_net": 1.07,
+        "score": 29,
+        "rec": "偏多观望",
+        "rec_color": "#55ee99",
+        "fund_flow_analysis": {
+          "label": "温和流入",
+          "rating": "bullish",
+          "score_delta": 16,
+          "summary": "主力资金温和流入，但需要价格和板块继续确认。",
+          "metrics": {
+            "rows": 5,
+            "today_net": 1.072,
+            "today_pct": 5.21,
+            "net3": 0.37,
+            "positive_days_3": 1,
+            "large_super_net": 1.072,
+            "large_net": 1.042,
+            "super_net": 0.03,
+            "small_net": -1.846,
+            "chg_pct": 4.8,
+            "vol_ratio": 1.39,
+            "turnover": 18.63
+          },
+          "drivers": [
+            "今日主力净流入1.07亿",
+            "主力净占比5.2%",
+            "超大单+大单合计净流入1.07亿",
+            "小单净流出，筹码向大资金集中",
+            "价格上涨+4.80%确认资金方向",
+            "量比1.4，活跃但未过热"
+          ],
+          "risks": [
+            "换手18.6%偏高"
+          ]
+        },
+        "trade_plan": {
+          "decision": "买入",
+          "confidence": "中",
+          "position_pct": 10,
+          "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+          "sell_plan": "止损参考 14.04（约-2.6%）；止盈先看 15.1（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 2.6,
+          "stop_loss_price": 14.04,
+          "take_profit_pct": 4.8,
+          "take_profit_price": 15.1,
+          "max_holding_days": 3,
+          "drivers": [
+            "量价温和放大",
+            "温和流入",
+            "今日主力净流入1.07亿",
+            "主力净占比5.2%"
+          ],
+          "risk_flags": [
+            "换手过高，追高风险大",
+            "换手18.6%偏高"
+          ],
+          "invalidations": [
+            "换手过高，追高风险大",
+            "换手18.6%偏高",
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 25,
+            "capital": 16,
+            "market": 0,
+            "news": 6,
+            "risk": -16
+          },
+          "composite_score": 39.9
+        },
+        "decision": "买入",
+        "confidence": "中",
+        "position_pct": 10,
+        "quick_score": 37,
+        "quick_rec": "买入",
+        "quick_decision": "买入",
+        "market_sentiment": {
+          "score": 54,
+          "label": "中性",
+          "color": "#ffcc00",
+          "details": [
+            {
+              "label": "上证",
+              "value": "+0.95%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "-0.02%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "+0.39%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 18.4 中性"
+            },
+            {
+              "label": "外资情绪",
+              "value": "外资ETF 0.0% 中性"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    },
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-06-29",
+      "snapshot_time": "14:44:59",
+      "sequence": 9,
+      "code": "600545",
+      "name": "卓郎智能",
+      "market": "A股",
+      "industry": "",
+      "rank": 9,
+      "score": 28,
+      "recommendation": "偏多观望",
+      "signal_action": "daily_rank",
+      "price": 7.41,
+      "open": null,
+      "close": null,
+      "chg_pct": 4.37,
+      "vol_ratio": 1.93,
+      "turnover": 16.01,
+      "capital_net": 2.02,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "600545",
+        "name": "卓郎智能",
+        "market": "A股",
+        "price": 7.41,
+        "chg_pct": 4.37,
+        "vol_ratio": 1.93,
+        "turnover": 16.01,
+        "capital_net": 2.02,
+        "score": 28,
+        "rec": "偏多观望",
+        "rec_color": "#55ee99",
+        "fund_flow_analysis": {
+          "label": "强资金共振",
+          "rating": "bullish",
+          "score_delta": 30,
+          "summary": "主力资金、价格和量能同步确认，短线资金共振较强。",
+          "metrics": {
+            "rows": 5,
+            "today_net": 2.016,
+            "today_pct": 46.01,
+            "net3": 1.325,
+            "positive_days_3": 2,
+            "large_super_net": 2.016,
+            "large_net": -0.347,
+            "super_net": 2.363,
+            "small_net": -1.084,
+            "chg_pct": 4.37,
+            "vol_ratio": 1.93,
+            "turnover": 16.01
+          },
+          "drivers": [
+            "今日主力大幅净流入2.02亿",
+            "主力净占比46.0%较强",
+            "近3日主力持续偏流入1.33亿",
+            "近3日有2日主力净流入",
+            "超大单+大单合计净流入2.02亿",
+            "小单净流出，筹码向大资金集中",
+            "价格上涨+4.37%确认资金方向",
+            "量比1.9，活跃但未过热"
+          ],
+          "risks": [
+            "换手16.0%偏高"
+          ]
+        },
+        "trade_plan": {
+          "decision": "买入",
+          "confidence": "中",
+          "position_pct": 10,
+          "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+          "sell_plan": "止损参考 7.22（约-2.6%）；止盈先看 7.77（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 2.6,
+          "stop_loss_price": 7.22,
+          "take_profit_pct": 4.8,
+          "take_profit_price": 7.77,
+          "max_holding_days": 3,
+          "drivers": [
+            "量价温和放大",
+            "强资金共振",
+            "今日主力大幅净流入2.02亿",
+            "主力净占比46.0%较强"
+          ],
+          "risk_flags": [
+            "换手16.0%偏高"
+          ],
+          "invalidations": [
+            "换手16.0%偏高",
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 25,
+            "capital": 30,
+            "market": 0,
+            "news": 0,
+            "risk": 0
+          },
+          "composite_score": 47.2
+        },
+        "decision": "买入",
+        "confidence": "中",
+        "position_pct": 10,
+        "quick_score": 61,
+        "quick_rec": "买入",
+        "quick_decision": "买入",
+        "market_sentiment": {
+          "score": 54,
+          "label": "中性",
+          "color": "#ffcc00",
+          "details": [
+            {
+              "label": "上证",
+              "value": "+0.97%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "-0.01%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "+0.39%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 18.4 中性"
+            },
+            {
+              "label": "外资情绪",
+              "value": "外资ETF 0.0% 中性"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    }
+  ]
+}
