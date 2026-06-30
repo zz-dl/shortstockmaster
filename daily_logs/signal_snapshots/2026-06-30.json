@@ -1,0 +1,159 @@
+{
+  "date": "2026-06-30",
+  "source_app": "short_stockmaster",
+  "strategy": "daily_report_top10",
+  "rank_available": true,
+  "rank_status": "done",
+  "rank_total": 60,
+  "rank_error": "",
+  "scheduled_report_time": "14:45:00",
+  "generated_at_beijing": "2026-06-30 14:45:00",
+  "market_date": "2026-06-30",
+  "market_time": "2026-06-30 14:45:48",
+  "trade_execution_enabled": true,
+  "records": [
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-06-30",
+      "snapshot_time": "14:45:00",
+      "sequence": 1,
+      "code": "603726",
+      "name": "朗迪集团",
+      "market": "A股",
+      "industry": "",
+      "rank": 1,
+      "score": 43,
+      "recommendation": "短线做多",
+      "signal_action": "daily_rank",
+      "price": 34.05,
+      "open": null,
+      "close": null,
+      "chg_pct": 5.26,
+      "vol_ratio": 2.52,
+      "turnover": 10.94,
+      "capital_net": 0.76,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "603726",
+        "name": "朗迪集团",
+        "market": "A股",
+        "price": 34.05,
+        "chg_pct": 5.26,
+        "vol_ratio": 2.52,
+        "turnover": 10.94,
+        "capital_net": 0.76,
+        "score": 43,
+        "rec": "短线做多",
+        "rec_color": "#00cc55",
+        "fund_flow_analysis": {
+          "label": "温和流入",
+          "rating": "bullish",
+          "score_delta": 16,
+          "summary": "主力资金温和流入，但需要价格和板块继续确认。",
+          "metrics": {
+            "rows": 5,
+            "today_net": 0.756,
+            "today_pct": 17.96,
+            "net3": 0.719,
+            "positive_days_3": 2,
+            "large_super_net": 0.756,
+            "large_net": 0.255,
+            "super_net": 0.501,
+            "small_net": -0.5,
+            "chg_pct": 5.26,
+            "vol_ratio": 2.52,
+            "turnover": 10.94
+          },
+          "drivers": [
+            "今日主力温和净流入0.76亿",
+            "主力净占比18.0%较强",
+            "近3日有2日主力净流入",
+            "超大单/大单同步流入",
+            "小单净流出，筹码向大资金集中",
+            "价格上涨+5.26%确认资金方向",
+            "量比2.5，活跃但未过热"
+          ],
+          "risks": []
+        },
+        "trade_plan": {
+          "decision": "买入",
+          "confidence": "高",
+          "position_pct": 20,
+          "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+          "sell_plan": "止损参考 32.96（约-3.2%）；止盈先看 36.26（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 3.2,
+          "stop_loss_price": 32.96,
+          "take_profit_pct": 6.5,
+          "take_profit_price": 36.26,
+          "max_holding_days": 3,
+          "drivers": [
+            "量价温和放大",
+            "换手活跃但未失控",
+            "温和流入",
+            "今日主力温和净流入0.76亿"
+          ],
+          "risk_flags": [],
+          "invalidations": [
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 33,
+            "capital": 16,
+            "market": 8,
+            "news": 6,
+            "risk": 0
+          },
+          "composite_score": 65.0
+        },
+        "decision": "买入",
+        "confidence": "高",
+        "position_pct": 20,
+        "quick_score": 47,
+        "quick_rec": "观察",
+        "quick_decision": "观察",
+        "market_sentiment": {
+          "score": 71,
+          "label": "极度贪婪",
+          "color": "#ff4444",
+          "details": [
+            {
+              "label": "上证",
+              "value": "+0.35%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "+2.45%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "+2.99%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 17.6 乐观"
+            },
+            {
+              "label": "外资情绪",
+              "value": "外资ETF 0.2% 中性"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    }
+  ]
+}
