@@ -1,0 +1,270 @@
+{
+  "date": "2026-07-01",
+  "source_app": "short_stockmaster",
+  "strategy": "daily_report_top10",
+  "rank_available": true,
+  "rank_status": "done",
+  "rank_total": 60,
+  "rank_error": "",
+  "scheduled_report_time": "14:45:00",
+  "generated_at_beijing": "2026-07-01 14:44:59",
+  "market_date": "2026-07-01",
+  "market_time": "2026-07-01 14:46:03",
+  "trade_execution_enabled": true,
+  "records": [
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-07-01",
+      "snapshot_time": "14:44:59",
+      "sequence": 1,
+      "code": "601678",
+      "name": "滨化股份",
+      "market": "A股",
+      "industry": "",
+      "rank": 1,
+      "score": 37,
+      "recommendation": "偏多观望",
+      "signal_action": "daily_rank",
+      "price": 6.99,
+      "open": null,
+      "close": null,
+      "chg_pct": 6.07,
+      "vol_ratio": 1.84,
+      "turnover": 16.99,
+      "capital_net": null,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "601678",
+        "name": "滨化股份",
+        "market": "A股",
+        "price": 6.99,
+        "chg_pct": 6.07,
+        "vol_ratio": 1.84,
+        "turnover": 16.99,
+        "capital_net": 0.0,
+        "score": 37,
+        "rec": "偏多观望",
+        "rec_color": "#55ee99",
+        "fund_flow_analysis": {
+          "label": "暂无主力资金数据",
+          "rating": "neutral",
+          "score_delta": 0,
+          "summary": "未取得真实主力资金数据，本项不参与加减分。",
+          "metrics": {
+            "rows": 0
+          },
+          "drivers": [],
+          "risks": [
+            "暂无真实主力资金数据"
+          ]
+        },
+        "trade_plan": {
+          "decision": "观察",
+          "confidence": "低",
+          "position_pct": 0,
+          "buy_plan": "暂不买入；等尾盘重新确认资金和价格是否继续共振。",
+          "sell_plan": "止损参考 6.81（约-2.6%）；止盈先看 7.33（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 2.6,
+          "stop_loss_price": 6.81,
+          "take_profit_pct": 4.8,
+          "take_profit_price": 7.33,
+          "max_holding_days": 3,
+          "drivers": [
+            "量价温和放大"
+          ],
+          "risk_flags": [
+            "暂无真实主力资金数据"
+          ],
+          "invalidations": [
+            "暂无真实主力资金数据",
+            "主力资金转为净流出",
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 25,
+            "capital": 0,
+            "market": 0,
+            "news": 0,
+            "risk": 0
+          },
+          "composite_score": 45.8
+        },
+        "decision": "观察",
+        "confidence": "低",
+        "position_pct": 0,
+        "quick_score": 35,
+        "quick_rec": "观察",
+        "quick_decision": "观察",
+        "market_sentiment": {
+          "score": 43,
+          "label": "恐慌",
+          "color": "#4488ff",
+          "details": [
+            {
+              "label": "上证",
+              "value": "+0.25%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "-0.88%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "-2.24%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 16.5 乐观"
+            },
+            {
+              "label": "外资情绪",
+              "value": "外资ETF 0.3% 中性"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    },
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-07-01",
+      "snapshot_time": "14:44:59",
+      "sequence": 2,
+      "code": "002998",
+      "name": "优彩资源",
+      "market": "A股",
+      "industry": "",
+      "rank": 2,
+      "score": 35,
+      "recommendation": "偏多观望",
+      "signal_action": "daily_rank",
+      "price": 6.96,
+      "open": null,
+      "close": null,
+      "chg_pct": 6.91,
+      "vol_ratio": 3.24,
+      "turnover": 11.16,
+      "capital_net": null,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "002998",
+        "name": "优彩资源",
+        "market": "A股",
+        "price": 6.96,
+        "chg_pct": 6.91,
+        "vol_ratio": 3.24,
+        "turnover": 11.16,
+        "capital_net": 0.0,
+        "score": 35,
+        "rec": "偏多观望",
+        "rec_color": "#55ee99",
+        "fund_flow_analysis": {
+          "label": "暂无主力资金数据",
+          "rating": "neutral",
+          "score_delta": 0,
+          "summary": "未取得真实主力资金数据，本项不参与加减分。",
+          "metrics": {
+            "rows": 0
+          },
+          "drivers": [],
+          "risks": [
+            "暂无真实主力资金数据"
+          ]
+        },
+        "trade_plan": {
+          "decision": "观察",
+          "confidence": "低",
+          "position_pct": 0,
+          "buy_plan": "暂不买入；等尾盘重新确认资金和价格是否继续共振。",
+          "sell_plan": "止损参考 6.78（约-2.6%）；止盈先看 7.29（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 2.6,
+          "stop_loss_price": 6.78,
+          "take_profit_pct": 4.8,
+          "take_profit_price": 7.29,
+          "max_holding_days": 3,
+          "drivers": [
+            "换手活跃但未失控"
+          ],
+          "risk_flags": [
+            "暂无真实主力资金数据"
+          ],
+          "invalidations": [
+            "暂无真实主力资金数据",
+            "主力资金转为净流出",
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 8,
+            "capital": 0,
+            "market": 0,
+            "news": 0,
+            "risk": 0
+          },
+          "composite_score": 37.8
+        },
+        "decision": "观察",
+        "confidence": "低",
+        "position_pct": 0,
+        "quick_score": 47,
+        "quick_rec": "观察",
+        "quick_decision": "观察",
+        "market_sentiment": {
+          "score": 43,
+          "label": "恐慌",
+          "color": "#4488ff",
+          "details": [
+            {
+              "label": "上证",
+              "value": "+0.25%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "-0.85%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "-2.20%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 16.5 乐观"
+            },
+            {
+              "label": "外资情绪",
+              "value": "外资ETF 0.3% 中性"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    }
+  ]
+}
