@@ -1,0 +1,15 @@
+{
+  "date": "2026-07-02",
+  "source_app": "short_stockmaster",
+  "strategy": "daily_report_top10",
+  "rank_available": false,
+  "rank_status": "",
+  "rank_total": null,
+  "rank_error": "HTTPSConnectionPool(host='shortstockmaster.onrender.com', port=443): Read timed out. (read timeout=180)",
+  "scheduled_report_time": "14:45:00",
+  "generated_at_beijing": "2026-07-02 14:44:59",
+  "market_date": "",
+  "market_time": "",
+  "trade_execution_enabled": true,
+  "records": []
+}
