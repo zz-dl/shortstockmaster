@@ -6,7 +6,12 @@ from signal_snapshot import build_signal_snapshot_records
 from report_health import normalize_rank_error, summarize_rank_health
 from report_insights import build_big_move_suggestion, format_buy_direction
 from rank_client import fetch_rank
-from report_runtime import beijing_now, plan_report_runtime
+from report_runtime import (
+    beijing_now,
+    plan_report_runtime,
+    plan_trade_execution,
+    report_snapshot_is_final,
+)
 from trade_rules import sell_reason as evaluate_sell_reason
 
 GH_TOKEN = os.environ["GH_TOKEN"]
@@ -198,10 +203,7 @@ BUY_TIME = ACTUAL_REPORT_TIME
 SELL_TIME = ACTUAL_REPORT_TIME
 
 existing_snapshot, _ = gh_get(f"daily_logs/signal_snapshots/{today}.json")
-if existing_snapshot and (
-    existing_snapshot.get("trade_execution_enabled") is True
-    or existing_snapshot.get("rank_status") == "market_closed"
-):
+if report_snapshot_is_final(existing_snapshot):
     print(f"{today} 已有有效日报，本次重复触发跳过")
     raise SystemExit(0)
 
@@ -246,10 +248,16 @@ except Exception as e:
 rank_available = bool(top10)
 rank_error = normalize_rank_error(rank_available, rank_error, rank_status)
 rank_health = summarize_rank_health(rank_available, rank_status, rank_total, rank_error)
-trade_execution_enabled = (
-    TRADE_EXECUTION_ENABLED
-    and rank_status != "market_closed"
+execution_plan = plan_trade_execution(
+    run_now,
+    rank_status=rank_status,
+    rank_available=rank_available,
+    market_date=market_date,
 )
+trade_execution_enabled = execution_plan["buy_execution_enabled"]
+buy_execution_enabled = execution_plan["buy_execution_enabled"]
+sell_execution_enabled = execution_plan["sell_execution_enabled"]
+late_exit_enabled = execution_plan["late_exit_enabled"]
 ranked = [(i + 1, s) for i, s in enumerate(top10 or [])]
 top_by_code = {s.get("code"): (rank, s) for rank, s in ranked if s.get("code")}
 
@@ -264,7 +272,7 @@ for p in positions:
     _apply_rank_signal(p, signal, rank)
     reason = (
         evaluate_sell_reason(p, signal, rank_available=rank_available, today=today)
-        if trade_execution_enabled
+        if sell_execution_enabled
         else ""
     )
     if reason:
@@ -287,7 +295,7 @@ def _is_a_share(signal) -> bool:
 
 buy_candidates = [
     (rank, s) for rank, s in ranked
-    if trade_execution_enabled
+    if buy_execution_enabled
        and s.get("code") not in held_codes and not _is_bearish_signal(s) and _is_a_share(s)
        and _num(s.get("score")) >= MIN_BUY_SCORE   # 低分中性股不买,宁可空仓
        and _is_buyable_signal(s)                    # 早盘只观察/尾盘确认,不再自动追高买入
@@ -382,7 +390,14 @@ if rank_health["warning"]:
     md.append("")
     md.append("**排行榜状态**")
     md.append(rank_health["warning"])
-if not trade_execution_enabled and rank_status != "market_closed":
+if late_exit_enabled:
+    md.append("")
+    md.append("**模拟交易状态**")
+    md.append(
+        f"- ⚠️ 实际采集时间 {ACTUAL_REPORT_TIME_LABEL} 不在 14:30-14:55 尾盘窗口，"
+        "本次仅执行止损/止盈/跌出榜单等风险退出，不执行新增买入"
+    )
+elif not buy_execution_enabled and rank_status != "market_closed":
     md.append("")
     md.append("**模拟交易状态**")
     md.append(
@@ -474,6 +489,9 @@ trade_history = {
     "market_date": market_date,
     "market_time": market_time,
     "trade_execution_enabled": trade_execution_enabled,
+    "buy_execution_enabled": buy_execution_enabled,
+    "sell_execution_enabled": sell_execution_enabled,
+    "late_exit_enabled": late_exit_enabled,
     "records": build_trade_history_records(
         today, positions, previous_positions, top10, is_day1,
         sold_positions=sold_positions,
@@ -498,6 +516,9 @@ signal_snapshot = {
     "market_date": market_date,
     "market_time": market_time,
     "trade_execution_enabled": trade_execution_enabled,
+    "buy_execution_enabled": buy_execution_enabled,
+    "sell_execution_enabled": sell_execution_enabled,
+    "late_exit_enabled": late_exit_enabled,
     "records": build_signal_snapshot_records(today, top10, snapshot_time=ACTUAL_REPORT_TIME),
 }
 snapshot_path = f"daily_logs/signal_snapshots/{today}.json"
