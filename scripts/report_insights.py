@@ -40,3 +40,18 @@ def build_big_move_suggestion(positions: list[dict], today: str, threshold: floa
 
     names = "、".join(str(p.get("name") or p.get("code") or "") for p in big_moves)
     return f"{names} 今日大波动均已被当日买入信号捕捉，暂无新增漏报"
+
+
+def build_trade_timing_suggestion(
+    actual_time_label: str,
+    report_time_label: str,
+    buy_execution_enabled: bool,
+    late_exit_enabled: bool,
+    rank_status: str = "",
+) -> str | None:
+    if buy_execution_enabled or rank_status == "market_closed":
+        return None
+    prefix = f"GitHub Actions 实际在 {actual_time_label} 运行，偏离目标 {report_time_label}；"
+    if late_exit_enabled:
+        return prefix + "本次仅执行风险退出，不执行新增买入"
+    return prefix + "本次已阻止使用非尾盘行情执行模拟交易"

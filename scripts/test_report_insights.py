@@ -3,7 +3,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from report_insights import build_big_move_suggestion, format_buy_direction
+from report_insights import (
+    build_big_move_suggestion,
+    build_trade_timing_suggestion,
+    format_buy_direction,
+)
 
 
 def test_format_buy_direction_prefers_trade_decision_and_keeps_rank_context():
@@ -59,8 +63,23 @@ def test_big_move_suggestion_recognizes_same_day_captured_candidates():
     assert suggestion == "御银股份、瑞玛精密 今日大波动均已被当日买入信号捕捉，暂无新增漏报"
 
 
+def test_trade_timing_suggestion_describes_late_sell_only_mode():
+    suggestion = build_trade_timing_suggestion(
+        actual_time_label="19:18",
+        report_time_label="14:45",
+        buy_execution_enabled=False,
+        late_exit_enabled=True,
+        rank_status="done",
+    )
+
+    assert "仅执行风险退出" in suggestion
+    assert "不执行新增买入" in suggestion
+    assert "暂停全部模拟买卖" not in suggestion
+
+
 if __name__ == "__main__":
     test_format_buy_direction_prefers_trade_decision_and_keeps_rank_context()
     test_big_move_suggestion_excludes_same_day_buys_from_blind_spot()
     test_big_move_suggestion_recognizes_same_day_captured_candidates()
+    test_trade_timing_suggestion_describes_late_sell_only_mode()
     print("ALL TESTS PASSED")

@@ -5,7 +5,11 @@ from github_contents import decode_github_content
 from trade_history import build_trade_history_records
 from signal_snapshot import build_signal_snapshot_records
 from report_health import normalize_rank_error, summarize_rank_health
-from report_insights import build_big_move_suggestion, format_buy_direction
+from report_insights import (
+    build_big_move_suggestion,
+    build_trade_timing_suggestion,
+    format_buy_direction,
+)
 from rank_client import fetch_rank
 from report_runtime import (
     beijing_now,
@@ -436,11 +440,15 @@ md += ["", "## 💡 软件分析盲点 & 改进建议", ""]
 suggestions = []
 if rank_health["suggestion"]:
     suggestions.append(rank_health["suggestion"])
-if not trade_execution_enabled and rank_status != "market_closed":
-    suggestions.append(
-        f"GitHub Actions 实际在 {ACTUAL_REPORT_TIME_LABEL} 运行，偏离目标 {REPORT_TIME_LABEL}；"
-        "本次已阻止使用非尾盘行情执行模拟交易"
-    )
+trade_timing_suggestion = build_trade_timing_suggestion(
+    ACTUAL_REPORT_TIME_LABEL,
+    REPORT_TIME_LABEL,
+    buy_execution_enabled=buy_execution_enabled,
+    late_exit_enabled=late_exit_enabled,
+    rank_status=rank_status,
+)
+if trade_timing_suggestion:
+    suggestions.append(trade_timing_suggestion)
 big_move_suggestion = build_big_move_suggestion(positions, today=today)
 if big_move_suggestion:
     suggestions.append(big_move_suggestion)
