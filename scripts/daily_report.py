@@ -1,6 +1,7 @@
 """每日 StockMaster 跟踪日报脚本，由 GitHub Actions 自动运行。"""
 import requests, json, base64, re, os, time
 from datetime import date, datetime
+from github_contents import decode_github_content
 from trade_history import build_trade_history_records
 from signal_snapshot import build_signal_snapshot_records
 from report_health import normalize_rank_error, summarize_rank_health
@@ -28,12 +29,12 @@ RANK_TIMEOUT_SECONDS = int(os.environ.get("RANK_TIMEOUT_SECONDS", "180"))
 RANK_ATTEMPTS = int(os.environ.get("RANK_ATTEMPTS", "2"))
 MAX_REPORT_WAIT_MINUTES = int(os.environ.get("MAX_REPORT_WAIT_MINUTES", "30"))
 
-def gh_get(path):
+def gh_get(path, parse_json=True):
     r = requests.get(f"https://api.github.com/repos/{GH_REPO}/contents/{path}",
                      headers=GH_HDR, timeout=10)
     if r.status_code == 200:
         d = r.json()
-        return json.loads(base64.b64decode(d["content"]).decode()), d["sha"]
+        return decode_github_content(d["content"], parse_json=parse_json), d["sha"]
     return None, None
 
 def gh_put(path, content, msg, sha=None):
@@ -472,7 +473,7 @@ for i, s in enumerate(suggestions, 1):
 md += ["", "---", f"*自动生成 by GitHub Actions · {today}*"]
 
 log_path = f"daily_logs/{today}.md"
-_, log_sha = gh_get(log_path)
+_, log_sha = gh_get(log_path, parse_json=False)
 ok = gh_put(log_path, "\n".join(md), f"📊 每日日报 {today}", log_sha)
 print(f"日报提交：{'✅' if ok else '❌'} → {log_path}")
 
