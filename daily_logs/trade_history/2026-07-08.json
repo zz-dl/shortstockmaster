@@ -7,27 +7,30 @@
   "rank_total": 60,
   "rank_error": "",
   "scheduled_report_time": "14:45:00",
-  "generated_at_beijing": "2026-07-08 17:12:37",
+  "generated_at_beijing": "2026-07-08 19:18:36",
   "market_date": "2026-07-08",
   "market_time": "2026-07-08 16:14:01",
   "trade_execution_enabled": false,
+  "buy_execution_enabled": false,
+  "sell_execution_enabled": true,
+  "late_exit_enabled": true,
   "records": [
     {
       "source_app": "short_stockmaster",
       "strategy": "daily_report_top10",
       "trade_date": "2026-07-08",
       "sequence": 1,
-      "action": "snapshot",
+      "action": "sell",
       "code": "000593",
       "name": "德龙汇能",
       "market": "A股",
       "industry": "",
       "buy_date": "2026-07-07",
-      "buy_time": "",
+      "buy_time": "14:44:59",
       "buy_price": 26.06,
-      "sell_date": "",
-      "sell_time": "",
-      "sell_price": null,
+      "sell_date": "2026-07-08",
+      "sell_time": "19:18:36",
+      "sell_price": 23.63,
       "current_price": 23.63,
       "return_pct": -9.32,
       "shares": 383.73,
@@ -35,7 +38,7 @@
       "rank_at_buy": 1,
       "score_at_buy": 57,
       "rec_at_buy": "短线做多",
-      "sell_reason": "",
+      "sell_reason": "planned_stop_loss",
       "holding_days": 1,
       "pnl": -932.46,
       "chg_today": -9.98,
@@ -90,7 +93,11 @@
           },
           "composite_score": 80.5
         },
-        "bought_today": true
+        "bought_today": true,
+        "sell_date": "2026-07-08",
+        "sell_time": "19:18:36",
+        "sell_price": 23.63,
+        "sell_reason": "planned_stop_loss"
       }
     }
   ]
