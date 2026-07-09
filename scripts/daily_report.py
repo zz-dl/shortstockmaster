@@ -17,6 +17,7 @@ from report_runtime import (
     plan_trade_execution,
     report_snapshot_is_final,
 )
+from portfolio_summary import build_portfolio_summary
 from trade_rules import sell_reason as evaluate_sell_reason
 
 GH_TOKEN = os.environ["GH_TOKEN"]
@@ -342,9 +343,10 @@ for p in positions:
     if p.get("chg_today", 0) >= 9.5:
         limit_up_stocks.append(p["name"])
 
-total_pnl = sum(p.get("pnl",0) for p in positions)
-total_inv = sum(p.get("amount",10000) for p in positions)
-total_pct = total_pnl/total_inv*100 if total_inv else 0
+portfolio_summary = build_portfolio_summary(positions, sold_positions=sold_positions)
+total_pnl = portfolio_summary["total_pnl"]
+total_inv = portfolio_summary["total_inv"]
+total_pct = portfolio_summary["total_pct"]
 day_num   = (run_now.date()-date.fromisoformat(state["created"])).days + 1
 
 md = [
@@ -357,8 +359,8 @@ md = [
     "",
     "## 📊 持仓总览",
     "",
-    f"- **模拟总投入**：{total_inv/10000:.0f} 万元（每只 1 万，共 {len(positions)} 只）",
-    f"- **浮动盈亏**：`{total_pnl:+.0f} 元`（{total_pct:+.2f}%）",
+    f"- **模拟统计本金**：{total_inv/10000:.0f} 万元（持仓 {len(positions)} 只，已卖出 {len(sold_positions)} 只）",
+    f"- **当日组合盈亏**：`{total_pnl:+.0f} 元`（{total_pct:+.2f}%）",
     "",
     "| 序 | 代码 | 名称 | 市场 | 买入价 | 现价 | 今日涨跌 | 累计盈亏 | 推荐方向 |",
     "|:--:|:----:|:----:|:----:|:------:|:----:|:--------:|:--------:|:--------:|",

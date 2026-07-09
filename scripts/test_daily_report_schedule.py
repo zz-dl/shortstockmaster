@@ -32,6 +32,7 @@ def test_daily_report_runs_in_tail_confirmation_window():
 
     cron_times = {(int(hour), int(minute)) for minute, hour in cron_matches}
     assert (2, 0) in cron_times, "keep an early trigger to absorb observed GitHub schedule delay"
+    assert (5, 30) in cron_times, "keep a 13:30 Beijing pre-tail trigger that can wait into 14:45"
     assert (6, 45) in cron_times, "keep the exact 14:45 Beijing fallback trigger"
     assert max_wait_minutes >= 60, "14:00 Beijing starts must be able to wait until 14:45"
     assert timeout_minutes >= max_wait_minutes + 30, "allow alignment wait plus rank retries"
