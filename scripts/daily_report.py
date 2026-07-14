@@ -277,7 +277,13 @@ for p in positions:
     rank, signal = rank_signal if rank_signal else (None, None)
     _apply_rank_signal(p, signal, rank)
     reason = (
-        evaluate_sell_reason(p, signal, rank_available=rank_available, today=today)
+        evaluate_sell_reason(
+            p,
+            signal,
+            rank_available=rank_available,
+            today=today,
+            allow_rank_drop=buy_execution_enabled,
+        )
         if sell_execution_enabled
         else ""
     )

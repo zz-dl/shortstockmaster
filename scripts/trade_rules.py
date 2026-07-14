@@ -28,7 +28,13 @@ def _holding_days(today: str | None, entry_date) -> int | None:
     return days
 
 
-def sell_reason(position, signal, rank_available=True, today: str | None = None):
+def sell_reason(
+    position,
+    signal,
+    rank_available=True,
+    today: str | None = None,
+    allow_rank_drop=True,
+):
     rec = str((signal or {}).get("rec") or position.get("rec", ""))
     score = _num((signal or {}).get("score", position.get("score", 0)))
     pnl = _num(position.get("pnl_pct"))
@@ -59,6 +65,6 @@ def sell_reason(position, signal, rank_available=True, today: str | None = None)
         return "stop_loss"
     if pnl >= 8 and chg <= 0:
         return "profit_protection"
-    if signal is None and rank_available:
+    if signal is None and rank_available and allow_rank_drop:
         return "dropped_from_top10"
     return ""
