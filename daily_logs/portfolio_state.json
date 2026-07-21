@@ -2,77 +2,21 @@
   "created": "2026-05-19",
   "positions": [
     {
-      "code": "300766",
-      "name": "每日互动",
-      "market": "A股",
-      "tk": "sz300766",
-      "score": 46,
-      "rec": "短线做多",
-      "entry_price": 22.97,
-      "entry_date": "2026-07-20",
-      "buy_time": "14:44:59",
-      "amount": 10000,
-      "shares": 435.35,
-      "cur_price": 22.97,
-      "chg_today": 4.74,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
-      "rank_at_buy": 1,
-      "score_at_buy": 46,
-      "rec_at_buy": "短线做多",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
-        "confidence": "高",
-        "position_pct": 20,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 22.23（约-3.2%）；止盈先看 24.46（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 3.2,
-        "stop_loss_price": 22.23,
-        "take_profit_pct": 6.5,
-        "take_profit_price": 24.46,
-        "max_holding_days": 3,
-        "drivers": [
-          "量价温和放大",
-          "温和流入",
-          "今日主力温和净流入0.74亿",
-          "主力净占比5.5%"
-        ],
-        "risk_flags": [
-          "换手16.4%偏高"
-        ],
-        "invalidations": [
-          "换手16.4%偏高",
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 25,
-          "capital": 16,
-          "market": 0,
-          "news": 0,
-          "risk": 0
-        },
-        "composite_score": 60.4
-      },
-      "bought_today": true
-    },
-    {
       "code": "001369",
       "name": "双欣材料",
       "market": "A股",
       "tk": "sz001369",
-      "score": 36,
-      "rec": "偏多观望",
+      "score": 44,
+      "rec": "短线做多",
       "entry_price": 13.3,
       "entry_date": "2026-07-20",
       "buy_time": "14:44:59",
       "amount": 10000,
       "shares": 751.88,
-      "cur_price": 13.3,
-      "chg_today": 2.63,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
+      "cur_price": 13.87,
+      "chg_today": 4.92,
+      "pnl": 428.57,
+      "pnl_pct": 4.29,
       "rank_at_buy": 2,
       "score_at_buy": 36,
       "rec_at_buy": "偏多观望",
@@ -108,7 +52,8 @@
         },
         "composite_score": 52.5
       },
-      "bought_today": true
+      "bought_today": true,
+      "current_rank": 2
     }
   ],
   "history": [
@@ -374,6 +319,12 @@
       "date": "2026-07-20",
       "total_pnl": 0.0,
       "pct": 0.0,
+      "anomalies": 0
+    },
+    {
+      "date": "2026-07-21",
+      "total_pnl": 1138.19,
+      "pct": 5.69095,
       "anomalies": 0
     }
   ]
