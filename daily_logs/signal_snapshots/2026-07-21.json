@@ -1,0 +1,454 @@
+{
+  "date": "2026-07-21",
+  "source_app": "short_stockmaster",
+  "strategy": "daily_report_top10",
+  "rank_available": true,
+  "rank_status": "done",
+  "rank_total": 60,
+  "rank_error": "",
+  "scheduled_report_time": "14:45:00",
+  "generated_at_beijing": "2026-07-21 15:53:41",
+  "market_date": "2026-07-21",
+  "market_time": "2026-07-21 15:54:02",
+  "trade_execution_enabled": false,
+  "buy_execution_enabled": false,
+  "sell_execution_enabled": true,
+  "late_exit_enabled": true,
+  "records": [
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-07-21",
+      "snapshot_time": "15:53:41",
+      "sequence": 1,
+      "code": "603284",
+      "name": "林平发展",
+      "market": "A股",
+      "industry": "",
+      "rank": 1,
+      "score": 46,
+      "recommendation": "短线做多",
+      "signal_action": "daily_rank",
+      "price": 39.59,
+      "open": null,
+      "close": null,
+      "chg_pct": 5.12,
+      "vol_ratio": 2.87,
+      "turnover": 16.63,
+      "capital_net": 0.13,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "603284",
+        "name": "林平发展",
+        "market": "A股",
+        "price": 39.59,
+        "chg_pct": 5.12,
+        "vol_ratio": 2.87,
+        "turnover": 16.63,
+        "capital_net": 0.13,
+        "score": 46,
+        "rec": "短线做多",
+        "rec_color": "#00cc55",
+        "fund_flow_analysis": {
+          "label": "温和流入",
+          "rating": "bullish",
+          "score_delta": 9,
+          "summary": "主力资金温和流入，但需要价格和板块继续确认。",
+          "metrics": {
+            "rows": 1,
+            "today_net": 0.13,
+            "today_pct": 10.86,
+            "net3": 0.13,
+            "positive_days_3": 1,
+            "large_super_net": 0.13,
+            "large_net": 0.083,
+            "super_net": 0.047,
+            "small_net": -0.114,
+            "chg_pct": 5.12,
+            "vol_ratio": 2.87,
+            "turnover": 16.63
+          },
+          "drivers": [
+            "主力净占比10.9%较强",
+            "价格上涨+5.12%确认资金方向",
+            "量比2.9，活跃但未过热"
+          ],
+          "risks": [
+            "换手16.6%偏高"
+          ]
+        },
+        "trade_plan": {
+          "decision": "尾盘确认",
+          "confidence": "高",
+          "position_pct": 20,
+          "buy_plan": "先观察，14:30-14:55 再确认；若仍在现价±1.0%内、未放量跳水、主力不转流出，再考虑买入。",
+          "sell_plan": "止损参考 38.32（约-3.2%）；止盈先看 42.16（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 3.2,
+          "stop_loss_price": 38.32,
+          "take_profit_pct": 6.5,
+          "take_profit_price": 42.16,
+          "max_holding_days": 3,
+          "drivers": [
+            "量价温和放大",
+            "温和流入",
+            "主力净占比10.9%较强",
+            "价格上涨+5.12%确认资金方向"
+          ],
+          "risk_flags": [
+            "换手16.6%偏高"
+          ],
+          "invalidations": [
+            "换手16.6%偏高",
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 25,
+            "capital": 9,
+            "market": 8,
+            "news": 0,
+            "risk": 0
+          },
+          "composite_score": 60.7
+        },
+        "decision": "尾盘确认",
+        "confidence": "高",
+        "position_pct": 20,
+        "quick_score": 50,
+        "quick_rec": "尾盘确认",
+        "quick_decision": "尾盘确认",
+        "market_sentiment": {
+          "score": 84,
+          "label": "极度贪婪",
+          "color": "#ff4444",
+          "details": [
+            {
+              "label": "上证",
+              "value": "+1.79%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "+4.81%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "+7.05%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 17.6 乐观"
+            },
+            {
+              "label": "外资情绪",
+              "value": "外资ETF +1.1% 流入信号"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    },
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-07-21",
+      "snapshot_time": "15:53:41",
+      "sequence": 2,
+      "code": "001369",
+      "name": "双欣材料",
+      "market": "A股",
+      "industry": "",
+      "rank": 2,
+      "score": 44,
+      "recommendation": "短线做多",
+      "signal_action": "daily_rank",
+      "price": 13.87,
+      "open": null,
+      "close": null,
+      "chg_pct": 4.92,
+      "vol_ratio": 2.38,
+      "turnover": 16.75,
+      "capital_net": 0.11,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "001369",
+        "name": "双欣材料",
+        "market": "A股",
+        "price": 13.87,
+        "chg_pct": 4.92,
+        "vol_ratio": 2.38,
+        "turnover": 16.75,
+        "capital_net": 0.11,
+        "score": 44,
+        "rec": "短线做多",
+        "rec_color": "#00cc55",
+        "fund_flow_analysis": {
+          "label": "温和流入",
+          "rating": "bullish",
+          "score_delta": 4,
+          "summary": "主力资金温和流入，但需要价格和板块继续确认。",
+          "metrics": {
+            "rows": 1,
+            "today_net": 0.111,
+            "today_pct": 2.36,
+            "net3": 0.111,
+            "positive_days_3": 1,
+            "large_super_net": 0.111,
+            "large_net": 0.126,
+            "super_net": -0.015,
+            "small_net": -0.034,
+            "chg_pct": 4.92,
+            "vol_ratio": 2.38,
+            "turnover": 16.75
+          },
+          "drivers": [
+            "价格上涨+4.92%确认资金方向",
+            "量比2.4，活跃但未过热"
+          ],
+          "risks": [
+            "换手16.8%偏高"
+          ]
+        },
+        "trade_plan": {
+          "decision": "尾盘确认",
+          "confidence": "高",
+          "position_pct": 20,
+          "buy_plan": "先观察，14:30-14:55 再确认；若仍在现价±1.0%内、未放量跳水、主力不转流出，再考虑买入。",
+          "sell_plan": "止损参考 13.43（约-3.2%）；止盈先看 14.77（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 3.2,
+          "stop_loss_price": 13.43,
+          "take_profit_pct": 6.5,
+          "take_profit_price": 14.77,
+          "max_holding_days": 3,
+          "drivers": [
+            "量价温和放大",
+            "温和流入",
+            "价格上涨+4.92%确认资金方向",
+            "量比2.4，活跃但未过热"
+          ],
+          "risk_flags": [
+            "换手16.8%偏高"
+          ],
+          "invalidations": [
+            "换手16.8%偏高",
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 25,
+            "capital": 4,
+            "market": 8,
+            "news": 6,
+            "risk": 0
+          },
+          "composite_score": 59.0
+        },
+        "decision": "尾盘确认",
+        "confidence": "高",
+        "position_pct": 20,
+        "quick_score": 35,
+        "quick_rec": "尾盘确认",
+        "quick_decision": "尾盘确认",
+        "market_sentiment": {
+          "score": 84,
+          "label": "极度贪婪",
+          "color": "#ff4444",
+          "details": [
+            {
+              "label": "上证",
+              "value": "+1.79%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "+4.81%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "+7.05%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 17.6 乐观"
+            },
+            {
+              "label": "外资情绪",
+              "value": "外资ETF +1.1% 流入信号"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    },
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-07-21",
+      "snapshot_time": "15:53:41",
+      "sequence": 3,
+      "code": "002866",
+      "name": "传艺科技",
+      "market": "A股",
+      "industry": "",
+      "rank": 3,
+      "score": 43,
+      "recommendation": "短线做多",
+      "signal_action": "daily_rank",
+      "price": 15.64,
+      "open": null,
+      "close": null,
+      "chg_pct": 5.32,
+      "vol_ratio": 4.26,
+      "turnover": 18.13,
+      "capital_net": 0.3,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "002866",
+        "name": "传艺科技",
+        "market": "A股",
+        "price": 15.64,
+        "chg_pct": 5.32,
+        "vol_ratio": 4.26,
+        "turnover": 18.13,
+        "capital_net": 0.3,
+        "score": 43,
+        "rec": "短线做多",
+        "rec_color": "#00cc55",
+        "fund_flow_analysis": {
+          "label": "温和流入",
+          "rating": "bullish",
+          "score_delta": 16,
+          "summary": "主力资金温和流入，但需要价格和板块继续确认。",
+          "metrics": {
+            "rows": 1,
+            "today_net": 0.305,
+            "today_pct": 6.0,
+            "net3": 0.305,
+            "positive_days_3": 1,
+            "large_super_net": 0.305,
+            "large_net": 0.255,
+            "super_net": 0.05,
+            "small_net": -0.383,
+            "chg_pct": 5.32,
+            "vol_ratio": 4.26,
+            "turnover": 18.13
+          },
+          "drivers": [
+            "今日主力温和净流入0.30亿",
+            "主力净占比6.0%",
+            "超大单/大单同步流入",
+            "小单净流出，筹码向大资金集中",
+            "价格上涨+5.32%确认资金方向"
+          ],
+          "risks": [
+            "换手18.1%偏高"
+          ]
+        },
+        "trade_plan": {
+          "decision": "尾盘确认",
+          "confidence": "中",
+          "position_pct": 10,
+          "buy_plan": "先观察，14:30-14:55 再确认；若仍在现价±1.0%内、未放量跳水、主力不转流出，再考虑买入。",
+          "sell_plan": "止损参考 15.23（约-2.6%）；止盈先看 16.39（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 2.6,
+          "stop_loss_price": 15.23,
+          "take_profit_pct": 4.8,
+          "take_profit_price": 16.39,
+          "max_holding_days": 3,
+          "drivers": [
+            "温和流入",
+            "今日主力温和净流入0.30亿",
+            "主力净占比6.0%",
+            "市场情绪极度贪婪"
+          ],
+          "risk_flags": [
+            "换手过高，追高风险大",
+            "换手18.1%偏高"
+          ],
+          "invalidations": [
+            "换手过高，追高风险大",
+            "换手18.1%偏高",
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 0,
+            "capital": 16,
+            "market": 8,
+            "news": 0,
+            "risk": -16
+          },
+          "composite_score": 45.8
+        },
+        "decision": "尾盘确认",
+        "confidence": "中",
+        "position_pct": 10,
+        "quick_score": 37,
+        "quick_rec": "尾盘确认",
+        "quick_decision": "尾盘确认",
+        "market_sentiment": {
+          "score": 84,
+          "label": "极度贪婪",
+          "color": "#ff4444",
+          "details": [
+            {
+              "label": "上证",
+              "value": "+1.79%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "+4.81%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "+7.05%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 17.6 乐观"
+            },
+            {
+              "label": "外资情绪",
+              "value": "外资ETF +1.1% 流入信号"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    }
+  ]
+}
