@@ -1,0 +1,158 @@
+{
+  "date": "2026-07-22",
+  "source_app": "short_stockmaster",
+  "strategy": "daily_report_top10",
+  "rank_available": true,
+  "rank_status": "done",
+  "rank_total": 60,
+  "rank_error": "",
+  "scheduled_report_time": "14:45:00",
+  "generated_at_beijing": "2026-07-22 15:53:32",
+  "market_date": "2026-07-22",
+  "market_time": "2026-07-22 15:54:02",
+  "trade_execution_enabled": false,
+  "buy_execution_enabled": false,
+  "sell_execution_enabled": true,
+  "late_exit_enabled": true,
+  "records": [
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-07-22",
+      "snapshot_time": "15:53:32",
+      "sequence": 1,
+      "code": "603123",
+      "name": "翠微股份",
+      "market": "A股",
+      "industry": "",
+      "rank": 1,
+      "score": 45,
+      "recommendation": "短线做多",
+      "signal_action": "daily_rank",
+      "price": 8.98,
+      "open": null,
+      "close": null,
+      "chg_pct": 3.58,
+      "vol_ratio": 3.62,
+      "turnover": 11.44,
+      "capital_net": 0.11,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "603123",
+        "name": "翠微股份",
+        "market": "A股",
+        "price": 8.98,
+        "chg_pct": 3.58,
+        "vol_ratio": 3.62,
+        "turnover": 11.44,
+        "capital_net": 0.11,
+        "score": 45,
+        "rec": "短线做多",
+        "rec_color": "#00cc55",
+        "fund_flow_analysis": {
+          "label": "温和流入",
+          "rating": "bullish",
+          "score_delta": 7,
+          "summary": "主力资金温和流入，但需要价格和板块继续确认。",
+          "metrics": {
+            "rows": 1,
+            "today_net": 0.113,
+            "today_pct": 1.67,
+            "net3": 0.113,
+            "positive_days_3": 1,
+            "large_super_net": 0.113,
+            "large_net": 0.006,
+            "super_net": 0.107,
+            "small_net": -0.262,
+            "chg_pct": 3.58,
+            "vol_ratio": 3.62,
+            "turnover": 11.44
+          },
+          "drivers": [
+            "小单净流出，筹码向大资金集中",
+            "价格上涨+3.58%确认资金方向",
+            "量比3.6，活跃但未过热"
+          ],
+          "risks": []
+        },
+        "trade_plan": {
+          "decision": "尾盘确认",
+          "confidence": "中",
+          "position_pct": 15,
+          "buy_plan": "先观察，14:30-14:55 再确认；若仍在现价±1.0%内、未放量跳水、主力不转流出，再考虑买入。",
+          "sell_plan": "止损参考 8.75（约-2.6%）；止盈先看 9.41（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 2.6,
+          "stop_loss_price": 8.75,
+          "take_profit_pct": 4.8,
+          "take_profit_price": 9.41,
+          "max_holding_days": 3,
+          "drivers": [
+            "换手活跃但未失控",
+            "温和流入",
+            "小单净流出，筹码向大资金集中",
+            "价格上涨+3.58%确认资金方向"
+          ],
+          "risk_flags": [],
+          "invalidations": [
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 8,
+            "capital": 7,
+            "market": 0,
+            "news": 14,
+            "risk": 0
+          },
+          "composite_score": 55.1
+        },
+        "decision": "尾盘确认",
+        "confidence": "中",
+        "position_pct": 15,
+        "quick_score": 50,
+        "quick_rec": "尾盘确认",
+        "quick_decision": "尾盘确认",
+        "market_sentiment": {
+          "score": 43,
+          "label": "恐慌",
+          "color": "#4488ff",
+          "details": [
+            {
+              "label": "上证",
+              "value": "+0.07%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "-1.42%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "-3.23%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 17.5 乐观"
+            },
+            {
+              "label": "外资情绪",
+              "value": "外资ETF -0.1% 中性"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    }
+  ]
+}
