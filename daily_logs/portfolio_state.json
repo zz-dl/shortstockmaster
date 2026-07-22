@@ -13,10 +13,10 @@
       "buy_time": "14:44:59",
       "amount": 10000,
       "shares": 751.88,
-      "cur_price": 13.87,
-      "chg_today": 4.92,
-      "pnl": 428.57,
-      "pnl_pct": 4.29,
+      "cur_price": 13.31,
+      "chg_today": -4.04,
+      "pnl": 7.52,
+      "pnl_pct": 0.08,
       "rank_at_buy": 2,
       "score_at_buy": 36,
       "rec_at_buy": "偏多观望",
@@ -325,6 +325,12 @@
       "date": "2026-07-21",
       "total_pnl": 1138.19,
       "pct": 5.69095,
+      "anomalies": 0
+    },
+    {
+      "date": "2026-07-22",
+      "total_pnl": 7.52,
+      "pct": 0.07519999999999999,
       "anomalies": 0
     }
   ]
