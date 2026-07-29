@@ -13,10 +13,10 @@
       "buy_time": "14:44:59",
       "amount": 10000,
       "shares": 790.51,
-      "cur_price": 12.3,
-      "chg_today": -2.46,
-      "pnl": -276.68,
-      "pnl_pct": -2.77,
+      "cur_price": 12.52,
+      "chg_today": 1.79,
+      "pnl": -102.77,
+      "pnl_pct": -1.03,
       "rank_at_buy": 2,
       "score_at_buy": 56,
       "rec_at_buy": "短线做多",
@@ -69,10 +69,10 @@
       "buy_time": "14:44:59",
       "amount": 10000,
       "shares": 996.02,
-      "cur_price": 10.05,
-      "chg_today": -1.18,
-      "pnl": 9.96,
-      "pnl_pct": 0.1,
+      "cur_price": 10.49,
+      "chg_today": 4.38,
+      "pnl": 448.21,
+      "pnl_pct": 4.48,
       "rank_at_buy": 6,
       "score_at_buy": 40,
       "rec_at_buy": "短线做多",
@@ -107,59 +107,6 @@
           "risk": 0
         },
         "composite_score": 61.0
-      },
-      "bought_today": true
-    },
-    {
-      "code": "002303",
-      "name": "美盈森",
-      "market": "A股",
-      "tk": "sz002303",
-      "score": 30,
-      "rec": "偏多观望",
-      "entry_price": 4.62,
-      "entry_date": "2026-07-27",
-      "buy_time": "14:44:59",
-      "amount": 10000,
-      "shares": 2164.5,
-      "cur_price": 4.58,
-      "chg_today": -2.14,
-      "pnl": -86.58,
-      "pnl_pct": -0.87,
-      "rank_at_buy": 9,
-      "score_at_buy": 30,
-      "rec_at_buy": "偏多观望",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
-        "confidence": "中",
-        "position_pct": 15,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 4.5（约-2.6%）；止盈先看 4.84（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 2.6,
-        "stop_loss_price": 4.5,
-        "take_profit_pct": 4.8,
-        "take_profit_price": 4.84,
-        "max_holding_days": 3,
-        "drivers": [
-          "低位启动观察",
-          "吸筹观察",
-          "今日主力温和净流入0.55亿",
-          "主力净占比32.5%较强"
-        ],
-        "risk_flags": [],
-        "invalidations": [
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 12,
-          "capital": 18,
-          "market": 8,
-          "news": 12,
-          "risk": 0
-        },
-        "composite_score": 47.5
       },
       "bought_today": true
     }
@@ -464,6 +411,12 @@
       "total_pnl": -2359.96,
       "pct": -2.622177777777778,
       "anomalies": 1
+    },
+    {
+      "date": "2026-07-29",
+      "total_pnl": -44.17,
+      "pct": -0.14723333333333333,
+      "anomalies": 0
     }
   ]
 }
