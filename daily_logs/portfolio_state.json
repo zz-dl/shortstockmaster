@@ -13,10 +13,10 @@
       "buy_time": "14:44:59",
       "amount": 10000,
       "shares": 790.51,
-      "cur_price": 12.52,
-      "chg_today": 1.79,
-      "pnl": -102.77,
-      "pnl_pct": -1.03,
+      "cur_price": 12.27,
+      "chg_today": -2.0,
+      "pnl": -300.39,
+      "pnl_pct": -3.0,
       "rank_at_buy": 2,
       "score_at_buy": 56,
       "rec_at_buy": "短线做多",
@@ -69,10 +69,10 @@
       "buy_time": "14:44:59",
       "amount": 10000,
       "shares": 996.02,
-      "cur_price": 10.49,
-      "chg_today": 4.38,
-      "pnl": 448.21,
-      "pnl_pct": 4.48,
+      "cur_price": 9.96,
+      "chg_today": -5.05,
+      "pnl": -79.68,
+      "pnl_pct": -0.8,
       "rank_at_buy": 6,
       "score_at_buy": 40,
       "rec_at_buy": "短线做多",
@@ -417,6 +417,12 @@
       "total_pnl": -44.17,
       "pct": -0.14723333333333333,
       "anomalies": 0
+    },
+    {
+      "date": "2026-07-30",
+      "total_pnl": -380.07,
+      "pct": -1.90035,
+      "anomalies": 1
     }
   ]
 }
