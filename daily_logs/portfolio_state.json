@@ -1,116 +1,6 @@
 {
   "created": "2026-05-19",
-  "positions": [
-    {
-      "code": "300589",
-      "name": "江龙船艇",
-      "market": "A股",
-      "tk": "sz300589",
-      "score": 56,
-      "rec": "短线做多",
-      "entry_price": 12.65,
-      "entry_date": "2026-07-27",
-      "buy_time": "14:44:59",
-      "amount": 10000,
-      "shares": 790.51,
-      "cur_price": 12.27,
-      "chg_today": -2.0,
-      "pnl": -300.39,
-      "pnl_pct": -3.0,
-      "rank_at_buy": 2,
-      "score_at_buy": 56,
-      "rec_at_buy": "短线做多",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
-        "confidence": "高",
-        "position_pct": 20,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 12.25（约-3.2%）；止盈先看 13.47（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 3.2,
-        "stop_loss_price": 12.25,
-        "take_profit_pct": 6.5,
-        "take_profit_price": 13.47,
-        "max_holding_days": 3,
-        "drivers": [
-          "量价温和放大",
-          "温和流入",
-          "今日主力温和净流入0.63亿",
-          "主力净占比10.3%较强"
-        ],
-        "risk_flags": [
-          "换手17.9%偏高"
-        ],
-        "invalidations": [
-          "换手17.9%偏高",
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 25,
-          "capital": 16,
-          "market": 8,
-          "news": 12,
-          "risk": 0
-        },
-        "composite_score": 77.3
-      },
-      "bought_today": true
-    },
-    {
-      "code": "300141",
-      "name": "和顺电气",
-      "market": "A股",
-      "tk": "sz300141",
-      "score": 40,
-      "rec": "短线做多",
-      "entry_price": 10.04,
-      "entry_date": "2026-07-27",
-      "buy_time": "14:44:59",
-      "amount": 10000,
-      "shares": 996.02,
-      "cur_price": 9.96,
-      "chg_today": -5.05,
-      "pnl": -79.68,
-      "pnl_pct": -0.8,
-      "rank_at_buy": 6,
-      "score_at_buy": 40,
-      "rec_at_buy": "短线做多",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
-        "confidence": "高",
-        "position_pct": 20,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 9.72（约-3.2%）；止盈先看 10.69（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 3.2,
-        "stop_loss_price": 9.72,
-        "take_profit_pct": 6.5,
-        "take_profit_price": 10.69,
-        "max_holding_days": 3,
-        "drivers": [
-          "低位启动观察",
-          "换手活跃但未失控",
-          "温和流入",
-          "主力净占比5.1%"
-        ],
-        "risk_flags": [],
-        "invalidations": [
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 20,
-          "capital": 15,
-          "market": 8,
-          "news": 0,
-          "risk": 0
-        },
-        "composite_score": 61.0
-      },
-      "bought_today": true
-    }
-  ],
+  "positions": [],
   "history": [
     {
       "date": "2026-05-19",
@@ -423,6 +313,12 @@
       "total_pnl": -380.07,
       "pct": -1.90035,
       "anomalies": 1
+    },
+    {
+      "date": "2026-07-31",
+      "total_pnl": -89.33,
+      "pct": -0.44665,
+      "anomalies": 0
     }
   ]
 }
