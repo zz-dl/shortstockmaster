@@ -2,23 +2,23 @@
   "created": "2026-05-19",
   "positions": [
     {
-      "code": "300394",
-      "name": "天孚通信",
+      "code": "000716",
+      "name": "黑芝麻",
       "market": "A股",
-      "tk": "sz300394",
-      "score": 68,
+      "tk": "sz000716",
+      "score": 66,
       "rec": "短线做多",
-      "entry_price": 267.05,
-      "entry_date": "2026-08-14",
-      "buy_time": "14:52:10",
+      "entry_price": 5.25,
+      "entry_date": "2026-08-17",
+      "buy_time": "14:44:59",
       "amount": 10000,
-      "shares": 37.45,
-      "cur_price": 267.05,
-      "chg_today": 3.9,
+      "shares": 1904.76,
+      "cur_price": 5.25,
+      "chg_today": 3.14,
       "pnl": 0.0,
       "pnl_pct": 0.0,
       "rank_at_buy": 1,
-      "score_at_buy": 68,
+      "score_at_buy": 66,
       "rec_at_buy": "短线做多",
       "decision_at_buy": "买入",
       "trade_plan_at_buy": {
@@ -26,17 +26,126 @@
         "confidence": "高",
         "position_pct": 20,
         "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 258.5（约-3.2%）；止盈先看 284.41（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+        "sell_plan": "止损参考 5.08（约-3.2%）；止盈先看 5.59（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
         "stop_loss_pct": 3.2,
-        "stop_loss_price": 258.5,
+        "stop_loss_price": 5.08,
         "take_profit_pct": 6.5,
-        "take_profit_price": 284.41,
+        "take_profit_price": 5.59,
+        "max_holding_days": 3,
+        "drivers": [
+          "量价温和放大",
+          "换手活跃但未失控",
+          "温和流入",
+          "今日主力温和净流入0.76亿"
+        ],
+        "risk_flags": [],
+        "invalidations": [
+          "跌破买入日收盘价或盘中VWAP",
+          "板块热度退潮或出现突发利空"
+        ],
+        "factor_scores": {
+          "technical": 33,
+          "capital": 16,
+          "market": 8,
+          "news": 12,
+          "risk": 0
+        },
+        "composite_score": 90.2
+      },
+      "bought_today": true
+    },
+    {
+      "code": "301287",
+      "name": "康力源",
+      "market": "A股",
+      "tk": "sz301287",
+      "score": 60,
+      "rec": "短线做多",
+      "entry_price": 42.02,
+      "entry_date": "2026-08-17",
+      "buy_time": "14:44:59",
+      "amount": 10000,
+      "shares": 237.98,
+      "cur_price": 42.02,
+      "chg_today": 5.58,
+      "pnl": 0.0,
+      "pnl_pct": 0.0,
+      "rank_at_buy": 2,
+      "score_at_buy": 60,
+      "rec_at_buy": "短线做多",
+      "decision_at_buy": "买入",
+      "trade_plan_at_buy": {
+        "decision": "买入",
+        "confidence": "高",
+        "position_pct": 20,
+        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+        "sell_plan": "止损参考 40.68（约-3.2%）；止盈先看 44.75（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+        "stop_loss_pct": 3.2,
+        "stop_loss_price": 40.68,
+        "take_profit_pct": 6.5,
+        "take_profit_price": 44.75,
+        "max_holding_days": 3,
+        "drivers": [
+          "量价温和放大",
+          "温和流入",
+          "主力净占比13.1%较强",
+          "近3日有2日主力净流入"
+        ],
+        "risk_flags": [
+          "换手15.9%偏高"
+        ],
+        "invalidations": [
+          "换手15.9%偏高",
+          "跌破买入日收盘价或盘中VWAP",
+          "板块热度退潮或出现突发利空"
+        ],
+        "factor_scores": {
+          "technical": 25,
+          "capital": 13,
+          "market": 8,
+          "news": 12,
+          "risk": 0
+        },
+        "composite_score": 80.3
+      },
+      "bought_today": true
+    },
+    {
+      "code": "601609",
+      "name": "金田股份",
+      "market": "A股",
+      "tk": "sh601609",
+      "score": 53,
+      "rec": "短线做多",
+      "entry_price": 11.69,
+      "entry_date": "2026-08-17",
+      "buy_time": "14:44:59",
+      "amount": 10000,
+      "shares": 855.43,
+      "cur_price": 11.69,
+      "chg_today": 6.76,
+      "pnl": 0.0,
+      "pnl_pct": 0.0,
+      "rank_at_buy": 3,
+      "score_at_buy": 53,
+      "rec_at_buy": "短线做多",
+      "decision_at_buy": "买入",
+      "trade_plan_at_buy": {
+        "decision": "买入",
+        "confidence": "高",
+        "position_pct": 20,
+        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+        "sell_plan": "止损参考 11.32（约-3.2%）；止盈先看 12.45（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+        "stop_loss_pct": 3.2,
+        "stop_loss_price": 11.32,
+        "take_profit_pct": 6.5,
+        "take_profit_price": 12.45,
         "max_holding_days": 3,
         "drivers": [
           "换手活跃但未失控",
-          "强资金共振",
-          "今日主力大幅净流入10.52亿",
-          "主力净占比6.2%"
+          "温和流入",
+          "今日主力净流入1.99亿",
+          "主力净占比31.3%较强"
         ],
         "risk_flags": [],
         "invalidations": [
@@ -45,139 +154,33 @@
         ],
         "factor_scores": {
           "technical": 8,
-          "capital": 30,
-          "market": 8,
-          "news": 14,
-          "risk": 0
-        },
-        "composite_score": 89.0
-      },
-      "bought_today": true
-    },
-    {
-      "code": "300661",
-      "name": "圣邦股份",
-      "market": "A股",
-      "tk": "sz300661",
-      "score": 68,
-      "rec": "短线做多",
-      "entry_price": 122.97,
-      "entry_date": "2026-08-14",
-      "buy_time": "14:52:10",
-      "amount": 10000,
-      "shares": 81.32,
-      "cur_price": 122.97,
-      "chg_today": 3.56,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
-      "rank_at_buy": 2,
-      "score_at_buy": 68,
-      "rec_at_buy": "短线做多",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
-        "confidence": "高",
-        "position_pct": 20,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 119.03（约-3.2%）；止盈先看 130.96（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 3.2,
-        "stop_loss_price": 119.03,
-        "take_profit_pct": 6.5,
-        "take_profit_price": 130.96,
-        "max_holding_days": 3,
-        "drivers": [
-          "量价温和放大",
-          "换手活跃但未失控",
-          "强资金共振",
-          "今日主力大幅净流入2.12亿"
-        ],
-        "risk_flags": [],
-        "invalidations": [
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 33,
-          "capital": 30,
-          "market": 8,
-          "news": 14,
-          "risk": 0
-        },
-        "composite_score": 97.8
-      },
-      "bought_today": true
-    },
-    {
-      "code": "688167",
-      "name": "炬光科技",
-      "market": "A股",
-      "tk": "sh688167",
-      "score": 61,
-      "rec": "短线做多",
-      "entry_price": 271.0,
-      "entry_date": "2026-08-14",
-      "buy_time": "14:52:10",
-      "amount": 10000,
-      "shares": 36.9,
-      "cur_price": 271.0,
-      "chg_today": 5.84,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
-      "rank_at_buy": 3,
-      "score_at_buy": 61,
-      "rec_at_buy": "短线做多",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
-        "confidence": "高",
-        "position_pct": 20,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 262.33（约-3.2%）；止盈先看 288.62（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 3.2,
-        "stop_loss_price": 262.33,
-        "take_profit_pct": 6.5,
-        "take_profit_price": 288.62,
-        "max_holding_days": 3,
-        "drivers": [
-          "量价温和放大",
-          "换手活跃但未失控",
-          "温和流入",
-          "今日主力大幅净流入2.21亿"
-        ],
-        "risk_flags": [],
-        "invalidations": [
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 33,
           "capital": 16,
           "market": 8,
-          "news": 14,
+          "news": 12,
           "risk": 0
         },
-        "composite_score": 85.8
+        "composite_score": 68.4
       },
       "bought_today": true
     },
     {
-      "code": "002149",
-      "name": "西部材料",
+      "code": "300017",
+      "name": "网宿科技",
       "market": "A股",
-      "tk": "sz002149",
-      "score": 48,
+      "tk": "sz300017",
+      "score": 42,
       "rec": "短线做多",
-      "entry_price": 43.69,
-      "entry_date": "2026-08-14",
-      "buy_time": "14:52:10",
+      "entry_price": 17.52,
+      "entry_date": "2026-08-17",
+      "buy_time": "14:44:59",
       "amount": 10000,
-      "shares": 228.89,
-      "cur_price": 43.69,
-      "chg_today": 2.01,
+      "shares": 570.78,
+      "cur_price": 17.52,
+      "chg_today": 1.04,
       "pnl": 0.0,
       "pnl_pct": 0.0,
       "rank_at_buy": 4,
-      "score_at_buy": 48,
+      "score_at_buy": 42,
       "rec_at_buy": "短线做多",
       "decision_at_buy": "买入",
       "trade_plan_at_buy": {
@@ -185,198 +188,34 @@
         "confidence": "高",
         "position_pct": 20,
         "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 42.25（约-3.2%）；止盈先看 46.49（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+        "sell_plan": "止损参考 16.96（约-3.2%）；止盈先看 18.66（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
         "stop_loss_pct": 3.2,
-        "stop_loss_price": 42.25,
+        "stop_loss_price": 16.96,
         "take_profit_pct": 6.5,
-        "take_profit_price": 46.49,
+        "take_profit_price": 18.66,
         "max_holding_days": 3,
         "drivers": [
           "低位启动观察",
-          "温和流入",
-          "今日主力大幅净流入2.60亿",
-          "近3日主力合计净流入2.60亿"
+          "强资金共振",
+          "今日主力大幅净流入20.45亿",
+          "主力净占比26.7%较强"
         ],
         "risk_flags": [
-          "换手15.6%偏高"
+          "换手16.8%偏高"
         ],
         "invalidations": [
-          "换手15.6%偏高",
+          "换手16.8%偏高",
           "跌破买入日收盘价或盘中VWAP",
           "板块热度退潮或出现突发利空"
         ],
         "factor_scores": {
           "technical": 12,
-          "capital": 16,
-          "market": 0,
-          "news": 0,
-          "risk": 0
-        },
-        "composite_score": 64.8
-      },
-      "bought_today": true
-    },
-    {
-      "code": "688981",
-      "name": "中芯国际",
-      "market": "A股",
-      "tk": "sh688981",
-      "score": 44,
-      "rec": "短线做多",
-      "entry_price": 132.12,
-      "entry_date": "2026-08-14",
-      "buy_time": "14:52:10",
-      "amount": 10000,
-      "shares": 75.69,
-      "cur_price": 132.12,
-      "chg_today": 2.1,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
-      "rank_at_buy": 5,
-      "score_at_buy": 44,
-      "rec_at_buy": "短线做多",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
-        "confidence": "高",
-        "position_pct": 20,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 127.89（约-3.2%）；止盈先看 140.71（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 3.2,
-        "stop_loss_price": 127.89,
-        "take_profit_pct": 6.5,
-        "take_profit_price": 140.71,
-        "max_holding_days": 3,
-        "drivers": [
-          "量价温和放大",
-          "换手活跃但未失控",
-          "温和流入",
-          "今日主力大幅净流入3.78亿"
-        ],
-        "risk_flags": [],
-        "invalidations": [
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 33,
-          "capital": 16,
+          "capital": 30,
           "market": 8,
           "news": 6,
           "risk": 0
         },
-        "composite_score": 66.0
-      },
-      "bought_today": true
-    },
-    {
-      "code": "300857",
-      "name": "协创数据",
-      "market": "A股",
-      "tk": "sz300857",
-      "score": 34,
-      "rec": "偏多观望",
-      "entry_price": 265.25,
-      "entry_date": "2026-08-14",
-      "buy_time": "14:52:10",
-      "amount": 10000,
-      "shares": 37.7,
-      "cur_price": 265.25,
-      "chg_today": 3.62,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
-      "rank_at_buy": 6,
-      "score_at_buy": 34,
-      "rec_at_buy": "偏多观望",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
-        "confidence": "中",
-        "position_pct": 10,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 258.35（约-2.6%）；止盈先看 277.98（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 2.6,
-        "stop_loss_price": 258.35,
-        "take_profit_pct": 4.8,
-        "take_profit_price": 277.98,
-        "max_holding_days": 3,
-        "drivers": [
-          "量价温和放大",
-          "换手活跃但未失控",
-          "温和流入",
-          "今日主力温和净流入0.51亿"
-        ],
-        "risk_flags": [
-          "近3日主力合计净流出2.07亿",
-          "小单净流入，资金结构偏散"
-        ],
-        "invalidations": [
-          "近3日主力合计净流出2.07亿",
-          "小单净流入，资金结构偏散",
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 33,
-          "capital": 11,
-          "market": 8,
-          "news": 6,
-          "risk": 0
-        },
-        "composite_score": 54.3
-      },
-      "bought_today": true
-    },
-    {
-      "code": "002353",
-      "name": "杰瑞股份",
-      "market": "A股",
-      "tk": "sz002353",
-      "score": 33,
-      "rec": "偏多观望",
-      "entry_price": 150.28,
-      "entry_date": "2026-08-14",
-      "buy_time": "14:52:10",
-      "amount": 10000,
-      "shares": 66.54,
-      "cur_price": 150.28,
-      "chg_today": 4.04,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
-      "rank_at_buy": 7,
-      "score_at_buy": 33,
-      "rec_at_buy": "偏多观望",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
-        "confidence": "高",
-        "position_pct": 20,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 145.54（约-3.2%）；止盈先看 160.12（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 3.2,
-        "stop_loss_price": 145.54,
-        "take_profit_pct": 6.5,
-        "take_profit_price": 160.12,
-        "max_holding_days": 3,
-        "drivers": [
-          "量价温和放大",
-          "换手活跃但未失控",
-          "温和流入",
-          "今日主力大幅净流入2.32亿"
-        ],
-        "risk_flags": [],
-        "invalidations": [
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 33,
-          "capital": 16,
-          "market": 0,
-          "news": 0,
-          "risk": 0
-        },
-        "composite_score": 84.2
+        "composite_score": 61.6
       },
       "bought_today": true
     }
@@ -758,6 +597,12 @@
       "date": "2026-08-14",
       "total_pnl": 476.37,
       "pct": 0.5954625,
+      "anomalies": 0
+    },
+    {
+      "date": "2026-08-17",
+      "total_pnl": 2715.95,
+      "pct": 2.469045454545454,
       "anomalies": 0
     }
   ]
