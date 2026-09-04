@@ -1,0 +1,302 @@
+{
+  "date": "2026-09-04",
+  "source_app": "short_stockmaster",
+  "strategy": "daily_report_top10",
+  "rank_available": true,
+  "rank_status": "done",
+  "rank_total": 60,
+  "rank_error": "",
+  "scheduled_report_time": "14:45:00",
+  "generated_at_beijing": "2026-09-04 14:46:24",
+  "market_date": "2026-09-04",
+  "market_time": "2026-09-04 14:48:06",
+  "trade_execution_enabled": true,
+  "buy_execution_enabled": true,
+  "sell_execution_enabled": true,
+  "late_exit_enabled": false,
+  "records": [
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-09-04",
+      "snapshot_time": "14:46:24",
+      "sequence": 1,
+      "code": "002940",
+      "name": "昂利康",
+      "market": "A股",
+      "industry": "",
+      "rank": 1,
+      "score": 66,
+      "recommendation": "短线做多",
+      "signal_action": "daily_rank",
+      "price": 26.89,
+      "open": null,
+      "close": null,
+      "chg_pct": 6.16,
+      "vol_ratio": 3.33,
+      "turnover": 16.43,
+      "capital_net": 0.11,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "002940",
+        "name": "昂利康",
+        "market": "A股",
+        "price": 26.89,
+        "chg_pct": 6.16,
+        "vol_ratio": 3.33,
+        "turnover": 16.43,
+        "capital_net": 0.11,
+        "score": 66,
+        "rec": "短线做多",
+        "rec_color": "#00cc55",
+        "fund_flow_analysis": {
+          "label": "温和流入",
+          "rating": "bullish",
+          "score_delta": 8,
+          "summary": "主力资金温和流入，但需要价格和板块继续确认。",
+          "metrics": {
+            "rows": 5,
+            "today_net": 0.109,
+            "today_pct": 2.52,
+            "net3": 0.744,
+            "positive_days_3": 2,
+            "large_super_net": 0.109,
+            "large_net": 0.141,
+            "super_net": -0.032,
+            "small_net": -0.398,
+            "chg_pct": 6.16,
+            "vol_ratio": 3.33,
+            "turnover": 16.43
+          },
+          "drivers": [
+            "近3日有2日主力净流入",
+            "小单净流出，筹码向大资金集中",
+            "价格上涨+6.16%确认资金方向",
+            "量比3.3，活跃但未过热"
+          ],
+          "risks": [
+            "换手16.4%偏高"
+          ]
+        },
+        "trade_plan": {
+          "decision": "买入",
+          "confidence": "高",
+          "position_pct": 20,
+          "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+          "sell_plan": "止损参考 26.03（约-3.2%）；止盈先看 28.64（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 3.2,
+          "stop_loss_price": 26.03,
+          "take_profit_pct": 6.5,
+          "take_profit_price": 28.64,
+          "max_holding_days": 3,
+          "drivers": [
+            "量价温和放大",
+            "温和流入",
+            "近3日有2日主力净流入",
+            "小单净流出，筹码向大资金集中"
+          ],
+          "risk_flags": [
+            "换手16.4%偏高"
+          ],
+          "invalidations": [
+            "换手16.4%偏高",
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 25,
+            "capital": 8,
+            "market": 0,
+            "news": 14,
+            "risk": 0
+          },
+          "composite_score": 82.5
+        },
+        "decision": "买入",
+        "confidence": "高",
+        "position_pct": 20,
+        "quick_score": 37,
+        "quick_rec": "观察",
+        "quick_decision": "观察",
+        "market_sentiment": {
+          "score": 43,
+          "label": "恐慌",
+          "color": "#4488ff",
+          "details": [
+            {
+              "label": "上证",
+              "value": "-0.56%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "-1.13%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "-1.17%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 14.3 乐观"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    },
+    {
+      "source_app": "short_stockmaster",
+      "strategy": "daily_report_top10",
+      "snapshot_date": "2026-09-04",
+      "snapshot_time": "14:46:24",
+      "sequence": 2,
+      "code": "603400",
+      "name": "华之杰",
+      "market": "A股",
+      "industry": "",
+      "rank": 2,
+      "score": 55,
+      "recommendation": "短线做多",
+      "signal_action": "daily_rank",
+      "price": 54.11,
+      "open": null,
+      "close": null,
+      "chg_pct": 5.68,
+      "vol_ratio": 1.74,
+      "turnover": 19.64,
+      "capital_net": 0.15,
+      "market_state": "",
+      "weights": {},
+      "factors": {},
+      "news": [],
+      "raw": {
+        "code": "603400",
+        "name": "华之杰",
+        "market": "A股",
+        "price": 54.11,
+        "chg_pct": 5.68,
+        "vol_ratio": 1.74,
+        "turnover": 19.64,
+        "capital_net": 0.15,
+        "score": 55,
+        "rec": "短线做多",
+        "rec_color": "#00cc55",
+        "fund_flow_analysis": {
+          "label": "温和流入",
+          "rating": "bullish",
+          "score_delta": 8,
+          "summary": "主力资金温和流入，但需要价格和板块继续确认。",
+          "metrics": {
+            "rows": 5,
+            "today_net": 0.146,
+            "today_pct": 4.45,
+            "net3": 0.28,
+            "positive_days_3": 3,
+            "large_super_net": 0.146,
+            "large_net": 0.053,
+            "super_net": 0.093,
+            "small_net": -0.056,
+            "chg_pct": 5.68,
+            "vol_ratio": 1.74,
+            "turnover": 19.64
+          },
+          "drivers": [
+            "近3日主力连续净流入",
+            "价格上涨+5.68%确认资金方向",
+            "量比1.7，活跃但未过热"
+          ],
+          "risks": [
+            "换手19.6%偏高"
+          ]
+        },
+        "trade_plan": {
+          "decision": "买入",
+          "confidence": "中",
+          "position_pct": 10,
+          "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+          "sell_plan": "止损参考 52.7（约-2.6%）；止盈先看 56.71（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+          "stop_loss_pct": 2.6,
+          "stop_loss_price": 52.7,
+          "take_profit_pct": 4.8,
+          "take_profit_price": 56.71,
+          "max_holding_days": 3,
+          "drivers": [
+            "量价温和放大",
+            "温和流入",
+            "近3日主力连续净流入",
+            "价格上涨+5.68%确认资金方向"
+          ],
+          "risk_flags": [
+            "换手过高，追高风险大",
+            "换手19.6%偏高"
+          ],
+          "invalidations": [
+            "换手过高，追高风险大",
+            "换手19.6%偏高",
+            "跌破买入日收盘价或盘中VWAP",
+            "板块热度退潮或出现突发利空"
+          ],
+          "factor_scores": {
+            "technical": 25,
+            "capital": 8,
+            "market": 0,
+            "news": 6,
+            "risk": -16
+          },
+          "composite_score": 63.0
+        },
+        "decision": "买入",
+        "confidence": "中",
+        "position_pct": 10,
+        "quick_score": 35,
+        "quick_rec": "观察",
+        "quick_decision": "观察",
+        "market_sentiment": {
+          "score": 43,
+          "label": "恐慌",
+          "color": "#4488ff",
+          "details": [
+            {
+              "label": "上证",
+              "value": "-0.55%",
+              "code": "sh000001"
+            },
+            {
+              "label": "深证成指",
+              "value": "-1.13%",
+              "code": "sz399001"
+            },
+            {
+              "label": "创业板",
+              "value": "-1.16%",
+              "code": "sz399006"
+            },
+            {
+              "label": "VIX恐慌指数",
+              "value": "VIX 14.3 乐观"
+            }
+          ]
+        },
+        "detail_synced": true
+      },
+      "forward_returns": {
+        "next_open_pct": null,
+        "next_close_pct": null,
+        "return_5d_pct": null,
+        "return_20d_pct": null
+      }
+    }
+  ]
+}
