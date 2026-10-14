@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-14",
+  "source_app": "short_stockmaster",
+  "strategy": "daily_report_top10",
+  "rank_available": false,
+  "rank_status": "done",
+  "rank_total": 60,
+  "rank_error": "rank returned no effective results during daily report run",
+  "scheduled_report_time": "14:45:00",
+  "generated_at_beijing": "2026-10-14 14:55:05",
+  "market_date": "2026-10-14",
+  "market_time": "2026-10-14 14:56:39",
+  "trade_execution_enabled": true,
+  "buy_execution_enabled": true,
+  "sell_execution_enabled": true,
+  "late_exit_enabled": false,
+  "records": []
+}
