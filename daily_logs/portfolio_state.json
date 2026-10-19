@@ -13,10 +13,10 @@
       "buy_time": "14:44:59",
       "amount": 10000,
       "shares": 235.74,
-      "cur_price": 42.42,
-      "chg_today": 5.0,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
+      "cur_price": 43.18,
+      "chg_today": 1.31,
+      "pnl": 179.16,
+      "pnl_pct": 1.79,
       "rank_at_buy": 1,
       "score_at_buy": 71,
       "rec_at_buy": "短线做多",
@@ -55,59 +55,6 @@
       "bought_today": true
     },
     {
-      "code": "688072",
-      "name": "拓荆科技",
-      "market": "A股",
-      "tk": "sh688072",
-      "score": 53,
-      "rec": "短线做多",
-      "entry_price": 657.48,
-      "entry_date": "2026-10-16",
-      "buy_time": "14:44:59",
-      "amount": 10000,
-      "shares": 15.21,
-      "cur_price": 657.48,
-      "chg_today": 1.94,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
-      "rank_at_buy": 3,
-      "score_at_buy": 53,
-      "rec_at_buy": "短线做多",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
-        "confidence": "高",
-        "position_pct": 20,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 636.44（约-3.2%）；止盈先看 700.22（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 3.2,
-        "stop_loss_price": 636.44,
-        "take_profit_pct": 6.5,
-        "take_profit_price": 700.22,
-        "max_holding_days": 3,
-        "drivers": [
-          "低位启动观察",
-          "强资金共振",
-          "今日主力大幅净流入4.57亿",
-          "主力净占比11.8%较强"
-        ],
-        "risk_flags": [],
-        "invalidations": [
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 12,
-          "capital": 30,
-          "market": 0,
-          "news": 14,
-          "risk": 0
-        },
-        "composite_score": 72.6
-      },
-      "bought_today": true
-    },
-    {
       "code": "600988",
       "name": "赤峰黄金",
       "market": "A股",
@@ -119,10 +66,10 @@
       "buy_time": "14:44:59",
       "amount": 10000,
       "shares": 250.88,
-      "cur_price": 39.86,
-      "chg_today": 2.65,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
+      "cur_price": 41.38,
+      "chg_today": 3.74,
+      "pnl": 381.34,
+      "pnl_pct": 3.81,
       "rank_at_buy": 5,
       "score_at_buy": 51,
       "rec_at_buy": "短线做多",
@@ -161,59 +108,6 @@
       "bought_today": true
     },
     {
-      "code": "300260",
-      "name": "新莱应材",
-      "market": "A股",
-      "tk": "sz300260",
-      "score": 43,
-      "rec": "短线做多",
-      "entry_price": 49.27,
-      "entry_date": "2026-10-16",
-      "buy_time": "14:44:59",
-      "amount": 10000,
-      "shares": 202.96,
-      "cur_price": 49.27,
-      "chg_today": 3.75,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
-      "rank_at_buy": 6,
-      "score_at_buy": 43,
-      "rec_at_buy": "短线做多",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
-        "confidence": "高",
-        "position_pct": 20,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 47.69（约-3.2%）；止盈先看 52.47（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 3.2,
-        "stop_loss_price": 47.69,
-        "take_profit_pct": 6.5,
-        "take_profit_price": 52.47,
-        "max_holding_days": 3,
-        "drivers": [
-          "量价温和放大",
-          "换手活跃但未失控",
-          "温和流入",
-          "近3日有2日主力净流入"
-        ],
-        "risk_flags": [],
-        "invalidations": [
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 33,
-          "capital": 15,
-          "market": 0,
-          "news": 12,
-          "risk": 0
-        },
-        "composite_score": 64.0
-      },
-      "bought_today": true
-    },
-    {
       "code": "003006",
       "name": "百亚股份",
       "market": "A股",
@@ -225,10 +119,10 @@
       "buy_time": "14:44:59",
       "amount": 10000,
       "shares": 418.94,
-      "cur_price": 23.87,
-      "chg_today": 4.56,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
+      "cur_price": 24.4,
+      "chg_today": 1.29,
+      "pnl": 222.04,
+      "pnl_pct": 2.22,
       "rank_at_buy": 7,
       "score_at_buy": 33,
       "rec_at_buy": "偏多观望",
@@ -264,7 +158,8 @@
         },
         "composite_score": 46.3
       },
-      "bought_today": true
+      "bought_today": true,
+      "current_rank": 9
     },
     {
       "code": "600519",
@@ -278,10 +173,10 @@
       "buy_time": "14:44:59",
       "amount": 10000,
       "shares": 7.57,
-      "cur_price": 1320.94,
-      "chg_today": 0.61,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
+      "cur_price": 1324.97,
+      "chg_today": -0.3,
+      "pnl": 30.51,
+      "pnl_pct": 0.31,
       "rank_at_buy": 8,
       "score_at_buy": 33,
       "rec_at_buy": "偏多观望",
@@ -967,6 +862,12 @@
       "date": "2026-10-16",
       "total_pnl": -1414.48,
       "pct": -1.2858909090909092,
+      "anomalies": 0
+    },
+    {
+      "date": "2026-10-19",
+      "total_pnl": -1135.55,
+      "pct": -1.8925833333333333,
       "anomalies": 0
     }
   ]
