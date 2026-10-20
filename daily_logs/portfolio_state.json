@@ -2,23 +2,23 @@
   "created": "2026-05-19",
   "positions": [
     {
-      "code": "600391",
-      "name": "航发科技",
+      "code": "002376",
+      "name": "新北洋",
       "market": "A股",
-      "tk": "sh600391",
-      "score": 71,
+      "tk": "sz002376",
+      "score": 73,
       "rec": "短线做多",
-      "entry_price": 42.42,
-      "entry_date": "2026-10-16",
-      "buy_time": "14:44:59",
+      "entry_price": 7.33,
+      "entry_date": "2026-10-20",
+      "buy_time": "14:53:42",
       "amount": 10000,
-      "shares": 235.74,
-      "cur_price": 43.18,
-      "chg_today": 1.31,
-      "pnl": 179.16,
-      "pnl_pct": 1.79,
+      "shares": 1364.26,
+      "cur_price": 7.33,
+      "chg_today": 5.77,
+      "pnl": 0.0,
+      "pnl_pct": 0.0,
       "rank_at_buy": 1,
-      "score_at_buy": 71,
+      "score_at_buy": 73,
       "rec_at_buy": "短线做多",
       "decision_at_buy": "买入",
       "trade_plan_at_buy": {
@@ -26,17 +26,73 @@
         "confidence": "高",
         "position_pct": 20,
         "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 41.06（约-3.2%）；止盈先看 45.18（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+        "sell_plan": "止损参考 7.1（约-3.2%）；止盈先看 7.81（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
         "stop_loss_pct": 3.2,
-        "stop_loss_price": 41.06,
+        "stop_loss_price": 7.1,
         "take_profit_pct": 6.5,
-        "take_profit_price": 45.18,
+        "take_profit_price": 7.81,
+        "max_holding_days": 3,
+        "drivers": [
+          "温和流入",
+          "主力净占比9.7%较强",
+          "近3日主力连续净流入",
+          "消息面偏多"
+        ],
+        "risk_flags": [
+          "换手15.2%偏高"
+        ],
+        "invalidations": [
+          "换手15.2%偏高",
+          "跌破买入日收盘价或盘中VWAP",
+          "板块热度退潮或出现突发利空"
+        ],
+        "factor_scores": {
+          "technical": 0,
+          "capital": 16,
+          "market": 0,
+          "news": 6,
+          "risk": 0
+        },
+        "composite_score": 80.7
+      },
+      "bought_today": true
+    },
+    {
+      "code": "300314",
+      "name": "戴维医疗",
+      "market": "A股",
+      "tk": "sz300314",
+      "score": 63,
+      "rec": "短线做多",
+      "entry_price": 13.25,
+      "entry_date": "2026-10-20",
+      "buy_time": "14:53:42",
+      "amount": 10000,
+      "shares": 754.72,
+      "cur_price": 13.25,
+      "chg_today": 6.26,
+      "pnl": 0.0,
+      "pnl_pct": 0.0,
+      "rank_at_buy": 2,
+      "score_at_buy": 63,
+      "rec_at_buy": "短线做多",
+      "decision_at_buy": "买入",
+      "trade_plan_at_buy": {
+        "decision": "买入",
+        "confidence": "高",
+        "position_pct": 20,
+        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+        "sell_plan": "止损参考 12.83（约-3.2%）；止盈先看 14.11（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+        "stop_loss_pct": 3.2,
+        "stop_loss_price": 12.83,
+        "take_profit_pct": 6.5,
+        "take_profit_price": 14.11,
         "max_holding_days": 3,
         "drivers": [
           "量价温和放大",
           "温和流入",
-          "今日主力温和净流入0.62亿",
-          "主力净占比5.2%"
+          "主力净占比8.2%较强",
+          "近3日主力连续净流入"
         ],
         "risk_flags": [],
         "invalidations": [
@@ -47,102 +103,49 @@
           "technical": 25,
           "capital": 16,
           "market": 0,
-          "news": 14,
+          "news": 12,
           "risk": 0
         },
-        "composite_score": 90.2
+        "composite_score": 81.5
       },
       "bought_today": true
     },
     {
-      "code": "600988",
-      "name": "赤峰黄金",
+      "code": "301302",
+      "name": "华如科技",
       "market": "A股",
-      "tk": "sh600988",
-      "score": 51,
+      "tk": "sz301302",
+      "score": 42,
       "rec": "短线做多",
-      "entry_price": 39.86,
-      "entry_date": "2026-10-16",
-      "buy_time": "14:44:59",
+      "entry_price": 23.73,
+      "entry_date": "2026-10-20",
+      "buy_time": "14:53:42",
       "amount": 10000,
-      "shares": 250.88,
-      "cur_price": 41.38,
-      "chg_today": 3.74,
-      "pnl": 381.34,
-      "pnl_pct": 3.81,
-      "rank_at_buy": 5,
-      "score_at_buy": 51,
+      "shares": 421.41,
+      "cur_price": 23.73,
+      "chg_today": 3.26,
+      "pnl": 0.0,
+      "pnl_pct": 0.0,
+      "rank_at_buy": 3,
+      "score_at_buy": 42,
       "rec_at_buy": "短线做多",
       "decision_at_buy": "买入",
       "trade_plan_at_buy": {
         "decision": "买入",
-        "confidence": "高",
-        "position_pct": 20,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 38.58（约-3.2%）；止盈先看 42.45（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 3.2,
-        "stop_loss_price": 38.58,
-        "take_profit_pct": 6.5,
-        "take_profit_price": 42.45,
-        "max_holding_days": 3,
-        "drivers": [
-          "换手活跃但未失控",
-          "强资金共振",
-          "今日主力净流入1.34亿",
-          "主力净占比6.7%"
-        ],
-        "risk_flags": [],
-        "invalidations": [
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 8,
-          "capital": 30,
-          "market": 0,
-          "news": 14,
-          "risk": 0
-        },
-        "composite_score": 69.2
-      },
-      "bought_today": true
-    },
-    {
-      "code": "003006",
-      "name": "百亚股份",
-      "market": "A股",
-      "tk": "sz003006",
-      "score": 33,
-      "rec": "偏多观望",
-      "entry_price": 23.87,
-      "entry_date": "2026-10-16",
-      "buy_time": "14:44:59",
-      "amount": 10000,
-      "shares": 418.94,
-      "cur_price": 24.4,
-      "chg_today": 1.29,
-      "pnl": 222.04,
-      "pnl_pct": 2.22,
-      "rank_at_buy": 7,
-      "score_at_buy": 33,
-      "rec_at_buy": "偏多观望",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
         "confidence": "中",
         "position_pct": 15,
         "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 23.25（约-2.6%）；止盈先看 25.02（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+        "sell_plan": "止损参考 23.11（约-2.6%）；止盈先看 24.87（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
         "stop_loss_pct": 2.6,
-        "stop_loss_price": 23.25,
+        "stop_loss_price": 23.11,
         "take_profit_pct": 4.8,
-        "take_profit_price": 25.02,
+        "take_profit_price": 24.87,
         "max_holding_days": 3,
         "drivers": [
-          "换手活跃但未失控",
-          "强资金共振",
-          "今日主力大幅净流入2.53亿",
-          "主力净占比30.4%较强"
+          "量价温和放大",
+          "温和流入",
+          "近3日有2日主力净流入",
+          "小单净流出，筹码向大资金集中"
         ],
         "risk_flags": [],
         "invalidations": [
@@ -150,67 +153,13 @@
           "板块热度退潮或出现突发利空"
         ],
         "factor_scores": {
-          "technical": 8,
-          "capital": 30,
+          "technical": 25,
+          "capital": 12,
           "market": 0,
           "news": 0,
           "risk": 0
         },
-        "composite_score": 46.3
-      },
-      "bought_today": true,
-      "current_rank": 9
-    },
-    {
-      "code": "600519",
-      "name": "贵州茅台",
-      "market": "A股",
-      "tk": "sh600519",
-      "score": 33,
-      "rec": "偏多观望",
-      "entry_price": 1320.94,
-      "entry_date": "2026-10-16",
-      "buy_time": "14:44:59",
-      "amount": 10000,
-      "shares": 7.57,
-      "cur_price": 1324.97,
-      "chg_today": -0.3,
-      "pnl": 30.51,
-      "pnl_pct": 0.31,
-      "rank_at_buy": 8,
-      "score_at_buy": 33,
-      "rec_at_buy": "偏多观望",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
-        "confidence": "中",
-        "position_pct": 15,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 1286.6（约-2.6%）；止盈先看 1384.35（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 2.6,
-        "stop_loss_price": 1286.6,
-        "take_profit_pct": 4.8,
-        "take_profit_price": 1384.35,
-        "max_holding_days": 3,
-        "drivers": [
-          "低位启动观察",
-          "吸筹观察",
-          "今日主力大幅净流入5.52亿",
-          "主力净占比7.3%"
-        ],
-        "risk_flags": [],
-        "invalidations": [
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 12,
-          "capital": 18,
-          "market": 0,
-          "news": 6,
-          "risk": 0
-        },
-        "composite_score": 45.6
+        "composite_score": 55.0
       },
       "bought_today": true
     }
@@ -868,6 +817,12 @@
       "date": "2026-10-19",
       "total_pnl": -1135.55,
       "pct": -1.8925833333333333,
+      "anomalies": 0
+    },
+    {
+      "date": "2026-10-20",
+      "total_pnl": 156.62,
+      "pct": 0.22374285714285716,
       "anomalies": 0
     }
   ]
