@@ -6,17 +6,17 @@
       "name": "新北洋",
       "market": "A股",
       "tk": "sz002376",
-      "score": 73,
+      "score": 62,
       "rec": "短线做多",
       "entry_price": 7.33,
       "entry_date": "2026-10-20",
       "buy_time": "14:53:42",
       "amount": 10000,
       "shares": 1364.26,
-      "cur_price": 7.33,
-      "chg_today": 5.77,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
+      "cur_price": 7.45,
+      "chg_today": 1.78,
+      "pnl": 163.71,
+      "pnl_pct": 1.64,
       "rank_at_buy": 1,
       "score_at_buy": 73,
       "rec_at_buy": "短线做多",
@@ -55,26 +55,27 @@
         },
         "composite_score": 80.7
       },
-      "bought_today": true
+      "bought_today": true,
+      "current_rank": 2
     },
     {
-      "code": "300314",
-      "name": "戴维医疗",
+      "code": "603341",
+      "name": "龙旗科技",
       "market": "A股",
-      "tk": "sz300314",
-      "score": 63,
+      "tk": "sh603341",
+      "score": 67,
       "rec": "短线做多",
-      "entry_price": 13.25,
-      "entry_date": "2026-10-20",
-      "buy_time": "14:53:42",
+      "entry_price": 40.21,
+      "entry_date": "2026-10-21",
+      "buy_time": "14:49:18",
       "amount": 10000,
-      "shares": 754.72,
-      "cur_price": 13.25,
-      "chg_today": 6.26,
+      "shares": 248.69,
+      "cur_price": 40.21,
+      "chg_today": 5.23,
       "pnl": 0.0,
       "pnl_pct": 0.0,
-      "rank_at_buy": 2,
-      "score_at_buy": 63,
+      "rank_at_buy": 1,
+      "score_at_buy": 67,
       "rec_at_buy": "短线做多",
       "decision_at_buy": "买入",
       "trade_plan_at_buy": {
@@ -82,20 +83,240 @@
         "confidence": "高",
         "position_pct": 20,
         "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 12.83（约-3.2%）；止盈先看 14.11（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+        "sell_plan": "止损参考 38.92（约-3.2%）；止盈先看 42.82（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
         "stop_loss_pct": 3.2,
-        "stop_loss_price": 12.83,
+        "stop_loss_price": 38.92,
         "take_profit_pct": 6.5,
-        "take_profit_price": 14.11,
+        "take_profit_price": 42.82,
+        "max_holding_days": 3,
+        "drivers": [
+          "强资金共振",
+          "今日主力大幅净流入2.75亿",
+          "主力净占比28.1%较强",
+          "消息面偏多"
+        ],
+        "risk_flags": [
+          "换手15.9%偏高"
+        ],
+        "invalidations": [
+          "换手15.9%偏高",
+          "跌破买入日收盘价或盘中VWAP",
+          "板块热度退潮或出现突发利空"
+        ],
+        "factor_scores": {
+          "technical": 0,
+          "capital": 30,
+          "market": 0,
+          "news": 6,
+          "risk": 0
+        },
+        "composite_score": 79.6
+      },
+      "bought_today": true
+    },
+    {
+      "code": "603683",
+      "name": "晶华新材",
+      "market": "A股",
+      "tk": "sh603683",
+      "score": 58,
+      "rec": "短线做多",
+      "entry_price": 15.04,
+      "entry_date": "2026-10-21",
+      "buy_time": "14:49:18",
+      "amount": 10000,
+      "shares": 664.89,
+      "cur_price": 15.04,
+      "chg_today": 2.66,
+      "pnl": 0.0,
+      "pnl_pct": 0.0,
+      "rank_at_buy": 3,
+      "score_at_buy": 58,
+      "rec_at_buy": "短线做多",
+      "decision_at_buy": "买入",
+      "trade_plan_at_buy": {
+        "decision": "买入",
+        "confidence": "高",
+        "position_pct": 20,
+        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+        "sell_plan": "止损参考 14.56（约-3.2%）；止盈先看 16.02（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+        "stop_loss_pct": 3.2,
+        "stop_loss_price": 14.56,
+        "take_profit_pct": 6.5,
+        "take_profit_price": 16.02,
+        "max_holding_days": 3,
+        "drivers": [
+          "量价温和放大",
+          "强资金共振",
+          "今日主力净流入0.97亿",
+          "主力净占比27.1%较强"
+        ],
+        "risk_flags": [],
+        "invalidations": [
+          "跌破买入日收盘价或盘中VWAP",
+          "板块热度退潮或出现突发利空"
+        ],
+        "factor_scores": {
+          "technical": 25,
+          "capital": 30,
+          "market": 0,
+          "news": 14,
+          "risk": 0
+        },
+        "composite_score": 82.2
+      },
+      "bought_today": true
+    },
+    {
+      "code": "002009",
+      "name": "天奇股份",
+      "market": "A股",
+      "tk": "sz002009",
+      "score": 46,
+      "rec": "短线做多",
+      "entry_price": 15.92,
+      "entry_date": "2026-10-21",
+      "buy_time": "14:49:18",
+      "amount": 10000,
+      "shares": 628.14,
+      "cur_price": 15.92,
+      "chg_today": 3.24,
+      "pnl": 0.0,
+      "pnl_pct": 0.0,
+      "rank_at_buy": 4,
+      "score_at_buy": 46,
+      "rec_at_buy": "短线做多",
+      "decision_at_buy": "买入",
+      "trade_plan_at_buy": {
+        "decision": "买入",
+        "confidence": "高",
+        "position_pct": 20,
+        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+        "sell_plan": "止损参考 15.41（约-3.2%）；止盈先看 16.95（约+6.5%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+        "stop_loss_pct": 3.2,
+        "stop_loss_price": 15.41,
+        "take_profit_pct": 6.5,
+        "take_profit_price": 16.95,
+        "max_holding_days": 3,
+        "drivers": [
+          "量价温和放大",
+          "换手活跃但未失控",
+          "温和流入",
+          "主力净占比5.5%"
+        ],
+        "risk_flags": [],
+        "invalidations": [
+          "跌破买入日收盘价或盘中VWAP",
+          "板块热度退潮或出现突发利空"
+        ],
+        "factor_scores": {
+          "technical": 33,
+          "capital": 13,
+          "market": 0,
+          "news": 0,
+          "risk": 0
+        },
+        "composite_score": 62.1
+      },
+      "bought_today": true
+    },
+    {
+      "code": "300354",
+      "name": "东华测试",
+      "market": "A股",
+      "tk": "sz300354",
+      "score": 36,
+      "rec": "偏多观望",
+      "entry_price": 29.99,
+      "entry_date": "2026-10-21",
+      "buy_time": "14:49:18",
+      "amount": 10000,
+      "shares": 333.44,
+      "cur_price": 29.99,
+      "chg_today": 2.35,
+      "pnl": 0.0,
+      "pnl_pct": 0.0,
+      "rank_at_buy": 5,
+      "score_at_buy": 36,
+      "rec_at_buy": "偏多观望",
+      "decision_at_buy": "买入",
+      "trade_plan_at_buy": {
+        "decision": "买入",
+        "confidence": "中",
+        "position_pct": 15,
+        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+        "sell_plan": "止损参考 29.21（约-2.6%）；止盈先看 31.43（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+        "stop_loss_pct": 2.6,
+        "stop_loss_price": 29.21,
+        "take_profit_pct": 4.8,
+        "take_profit_price": 31.43,
+        "max_holding_days": 3,
+        "drivers": [
+          "量价温和放大",
+          "换手活跃但未失控",
+          "温和流入",
+          "主力净占比12.1%较强"
+        ],
+        "risk_flags": [],
+        "invalidations": [
+          "跌破买入日收盘价或盘中VWAP",
+          "板块热度退潮或出现突发利空"
+        ],
+        "factor_scores": {
+          "technical": 33,
+          "capital": 16,
+          "market": 0,
+          "news": 0,
+          "risk": 0
+        },
+        "composite_score": 53.1
+      },
+      "bought_today": true
+    },
+    {
+      "code": "300244",
+      "name": "迪安诊断",
+      "market": "A股",
+      "tk": "sz300244",
+      "score": 36,
+      "rec": "偏多观望",
+      "entry_price": 22.49,
+      "entry_date": "2026-10-21",
+      "buy_time": "14:49:18",
+      "amount": 10000,
+      "shares": 444.64,
+      "cur_price": 22.49,
+      "chg_today": 3.26,
+      "pnl": 0.0,
+      "pnl_pct": 0.0,
+      "rank_at_buy": 6,
+      "score_at_buy": 36,
+      "rec_at_buy": "偏多观望",
+      "decision_at_buy": "买入",
+      "trade_plan_at_buy": {
+        "decision": "买入",
+        "confidence": "中",
+        "position_pct": 10,
+        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
+        "sell_plan": "止损参考 21.91（约-2.6%）；止盈先看 23.57（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
+        "stop_loss_pct": 2.6,
+        "stop_loss_price": 21.91,
+        "take_profit_pct": 4.8,
+        "take_profit_price": 23.57,
         "max_holding_days": 3,
         "drivers": [
           "量价温和放大",
           "温和流入",
-          "主力净占比8.2%较强",
-          "近3日主力连续净流入"
+          "今日主力大幅净流入2.18亿",
+          "主力净占比11.9%较强"
         ],
-        "risk_flags": [],
+        "risk_flags": [
+          "换手过高，追高风险大",
+          "换手18.7%偏高"
+        ],
         "invalidations": [
+          "换手过高，追高风险大",
+          "换手18.7%偏高",
           "跌破买入日收盘价或盘中VWAP",
           "板块热度退潮或出现突发利空"
         ],
@@ -104,62 +325,9 @@
           "capital": 16,
           "market": 0,
           "news": 12,
-          "risk": 0
+          "risk": -16
         },
-        "composite_score": 81.5
-      },
-      "bought_today": true
-    },
-    {
-      "code": "301302",
-      "name": "华如科技",
-      "market": "A股",
-      "tk": "sz301302",
-      "score": 42,
-      "rec": "短线做多",
-      "entry_price": 23.73,
-      "entry_date": "2026-10-20",
-      "buy_time": "14:53:42",
-      "amount": 10000,
-      "shares": 421.41,
-      "cur_price": 23.73,
-      "chg_today": 3.26,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
-      "rank_at_buy": 3,
-      "score_at_buy": 42,
-      "rec_at_buy": "短线做多",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
-        "confidence": "中",
-        "position_pct": 15,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 23.11（约-2.6%）；止盈先看 24.87（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 2.6,
-        "stop_loss_price": 23.11,
-        "take_profit_pct": 4.8,
-        "take_profit_price": 24.87,
-        "max_holding_days": 3,
-        "drivers": [
-          "量价温和放大",
-          "温和流入",
-          "近3日有2日主力净流入",
-          "小单净流出，筹码向大资金集中"
-        ],
-        "risk_flags": [],
-        "invalidations": [
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 25,
-          "capital": 12,
-          "market": 0,
-          "news": 0,
-          "risk": 0
-        },
-        "composite_score": 55.0
+        "composite_score": 49.0
       },
       "bought_today": true
     }
@@ -823,6 +991,12 @@
       "date": "2026-10-20",
       "total_pnl": 156.62,
       "pct": 0.22374285714285716,
+      "anomalies": 0
+    },
+    {
+      "date": "2026-10-21",
+      "total_pnl": 696.16,
+      "pct": 0.8702,
       "anomalies": 0
     }
   ]
