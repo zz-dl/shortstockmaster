@@ -13,10 +13,10 @@
       "buy_time": "14:51:59",
       "amount": 10000,
       "shares": 41.13,
-      "cur_price": 251.58,
-      "chg_today": 3.46,
-      "pnl": 346.73,
-      "pnl_pct": 3.47,
+      "cur_price": 242.52,
+      "chg_today": -3.38,
+      "pnl": -25.91,
+      "pnl_pct": -0.26,
       "rank_at_buy": 1,
       "score_at_buy": 78,
       "rec_at_buy": "短线做多",
@@ -67,10 +67,10 @@
       "buy_time": "14:46:16",
       "amount": 10000,
       "shares": 49.35,
-      "cur_price": 202.65,
-      "chg_today": 5.99,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
+      "cur_price": 198.0,
+      "chg_today": -1.54,
+      "pnl": -229.48,
+      "pnl_pct": -2.29,
       "rank_at_buy": 2,
       "score_at_buy": 54,
       "rec_at_buy": "短线做多",
@@ -105,59 +105,6 @@
           "risk": 0
         },
         "composite_score": 76.0
-      },
-      "bought_today": true
-    },
-    {
-      "code": "003006",
-      "name": "百亚股份",
-      "market": "A股",
-      "tk": "sz003006",
-      "score": 41,
-      "rec": "短线做多",
-      "entry_price": 23.68,
-      "entry_date": "2026-10-23",
-      "buy_time": "14:46:16",
-      "amount": 10000,
-      "shares": 422.3,
-      "cur_price": 23.68,
-      "chg_today": 6.33,
-      "pnl": 0.0,
-      "pnl_pct": 0.0,
-      "rank_at_buy": 3,
-      "score_at_buy": 41,
-      "rec_at_buy": "短线做多",
-      "decision_at_buy": "买入",
-      "trade_plan_at_buy": {
-        "decision": "买入",
-        "confidence": "中",
-        "position_pct": 15,
-        "buy_plan": "14:30-14:55 已进入确认窗口；价格不跌破日内均价/VWAP且主力仍净流入时，小仓买入。",
-        "sell_plan": "止损参考 23.06（约-2.6%）；止盈先看 24.82（约+4.8%）。若次日高开后量能跟不上或跌破买入日收盘/VWAP，优先减仓。最长持有3个交易日。",
-        "stop_loss_pct": 2.6,
-        "stop_loss_price": 23.06,
-        "take_profit_pct": 4.8,
-        "take_profit_price": 24.82,
-        "max_holding_days": 3,
-        "drivers": [
-          "换手活跃但未失控",
-          "温和流入",
-          "今日主力大幅净流入4.16亿",
-          "主力净占比34.2%较强"
-        ],
-        "risk_flags": [],
-        "invalidations": [
-          "跌破买入日收盘价或盘中VWAP",
-          "板块热度退潮或出现突发利空"
-        ],
-        "factor_scores": {
-          "technical": 8,
-          "capital": 16,
-          "market": 8,
-          "news": 6,
-          "risk": 0
-        },
-        "composite_score": 54.3
       },
       "bought_today": true
     }
@@ -840,6 +787,12 @@
       "total_pnl": 1894.58,
       "pct": 1.89458,
       "anomalies": 0
+    },
+    {
+      "date": "2026-10-26",
+      "total_pnl": -665.02,
+      "pct": -2.2167333333333334,
+      "anomalies": 1
     }
   ]
 }
