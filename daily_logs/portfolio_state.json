@@ -691,6 +691,12 @@
       "total_pnl": -1558.49,
       "pct": -7.79245,
       "anomalies": 0
+    },
+    {
+      "date": "2026-10-28",
+      "total_pnl": 0,
+      "pct": 0,
+      "anomalies": 0
     }
   ]
 }
