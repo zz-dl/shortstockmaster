@@ -733,6 +733,12 @@
       "total_pnl": 0,
       "pct": 0,
       "anomalies": 0
+    },
+    {
+      "date": "2026-11-06",
+      "total_pnl": 0,
+      "pct": 0,
+      "anomalies": 0
     }
   ]
 }
